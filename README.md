@@ -1,2 +1,54 @@
-# gazoken
-Image Forensics Workbench
+# ガゾケン · GAZOKEN
+
+**Image Forensics Workbench · 画像フォレンジック・ワークベンチ**
+
+**グルー研究室 · Grou-lab**
+
+## English
+
+Gazoken is an image forensics project combining software development and research.
+We aim to build a workbench for investigating image artefacts, processing traces,
+and signs of editing or manipulation, with tools that make the evidence inspectable.
+
+### Development
+
+We will begin by studying, implementing, and testing methods from existing research
+for detecting image artefacts and doctoring. Through controlled comparisons, we
+will assess which methods produce useful results and understand their limitations.
+The goal is a usable website supported by reusable Python, C, and C++ packages.
+
+### Research
+
+Building on those evaluations, we will explore improvements to existing methods
+and develop ideas of our own. We aim to conduct reproducible experiments and
+publish our findings in journals or conferences, with research material in English
+and Japanese. Gazoken will present evidence and its limitations to support informed
+judgments about an image.
+
+## 日本語
+
+Gazoken（ガゾケン）は、ソフトウェア開発と研究を両輪とする画像フォレンジックの
+プロジェクトです。画像のアーティファクト、処理の痕跡、編集・改ざんの兆候を調べ、
+その根拠を確認できるワークベンチの構築を目指します。
+
+### 開発
+
+まずは既存研究を学び、画像のアーティファクトや改ざんを検出する手法を実装・検証
+することから始めます。条件を管理した比較実験を通じて、どの手法が有用な結果を
+もたらすのか、またどのような限界があるのかを評価します。再利用可能な Python・C・C++
+のパッケージと、それらを活用できるウェブサイトの開発を目指します。
+
+### 研究
+
+検証で得られた知見をもとに、既存手法の改良や独自のアイデアに取り組みます。
+再現可能な実験を行い、学術誌や学会での成果発表を目指すとともに、英語と日本語で
+研究内容を伝えていきます。画像について適切に判断できるよう、根拠となる情報と
+その限界を示すことを重視します。
+
+---
+
+**Status / 現状:** Early development and research planning / 開発初期・研究計画段階
+
+- [Documentation / ドキュメント](docs/README.md)
+- [Planned website / 公開予定サイト](https://chronomicron.com/gazoken/)
+- [License / ライセンス: Apache-2.0](LICENSE)
