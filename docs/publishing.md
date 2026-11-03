@@ -12,12 +12,49 @@ Updated: 2026-11-03
   [CNAME file specifying chronomicron.com](https://github.com/chronomicron/chronomicron.github.io/blob/main/CNAME)
   (checked 2026-11-03).
 
-The domain's live DNS, certificate, Pages settings, and `/gazoken/` response have
-not been verified. Attempts to inspect the website with the web tool did not
-return accessible pages; this does not establish that the website is offline.
-No deployment, DNS, or repository settings were changed in this documentation step.
+The user confirmed on 2026-11-03 that the placeholder is visible at the target
+address. Live DNS, certificate details, and HTTPS enforcement were not independently
+checked in this session. No DNS or GitHub settings were changed from this checkout.
 
-## Proposed route: GitHub Pages project site
+## Current application and local preview
+
+The initial workbench is buildless HTML, CSS, and JavaScript, with browser-local
+image processing and module workers. Publish `index.html`, `.nojekyll`, and the
+entire `assets/` directory together. It has no package installation or build step.
+Relative asset and worker URLs support the `/gazoken/` path. Do not open it as a
+`file://` document: JavaScript modules and workers need an HTTP/HTTPS server.
+
+From the repository root:
+
+```bash
+python3 -m http.server 8000 --bind 127.0.0.1
+```
+
+Open `http://127.0.0.1:8000/`; stop with Ctrl+C. Browser integration checks are at
+`http://127.0.0.1:8000/tests/browser.html`. See
+[first workbench](first-workbench.md) for capabilities and verification limits.
+
+## Publish after pushing the files
+
+1. Commit and push the page and complete `assets/` directory with `.nojekyll`
+   to `main` using the normal local VS Code/Git workflow.
+2. Open [Gazoken Pages settings](https://github.com/chronomicron/gazoken/settings/pages).
+3. Under **Build and deployment**, choose **Deploy from a branch**, branch
+   **main**, folder **/(root)**, and save.
+4. Leave the Gazoken project's custom-domain override unset to inherit the user
+   site's domain. Do not enter `chronomicron.com/gazoken` as a custom domain.
+5. Wait for the Pages deployment to complete, then verify
+   `https://chronomicron.com/gazoken/` and the redirect from `/gazoken`.
+
+See [GitHub's publishing-source instructions](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
+The user has confirmed the placeholder deployment. The interactive workbench is
+currently local and must be pushed before it replaces that page. No custom
+Actions workflow is needed for this setup.
+
+For a content rollback, revert the relevant page change and push the revert to
+`main`; with branch publishing enabled, Pages will redeploy the previous content.
+
+## GitHub Pages project-site routing
 
 GitHub documents that project sites inherit the custom domain configured on the
 same account's user site when the project has no custom domain override.
@@ -41,7 +78,8 @@ See [GitHub: what is GitHub Pages?](https://docs.github.com/en/pages/getting-sta
 
 1. Verify the main user site's Pages custom-domain setting, DNS, and HTTPS.
 2. Choose the Gazoken website implementation and publishing source: branch output
-   or an Actions workflow. No framework or publishing source is selected yet.
+   or an Actions workflow. The initial placeholder uses buildless HTML with
+   `main` / `/(root)` branch publishing; a future application may change this.
 3. Configure generated assets, navigation, and any client routes for `/gazoken/`.
 4. Publish Gazoken as a project site with no project custom-domain override under
    the inherited-domain plan.

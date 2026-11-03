@@ -17,6 +17,11 @@ unknown? Is the output global or localized?
 
 ## Method
 
+Record the original paper and authors, source repository and pinned version,
+required models or data, and applicable licenses. Identify whether this is author
+code, an adaptation, a reimplementation, or an original method. List deviations
+from the published procedure and unavailable reference material.
+
 Describe the algorithm, equations, preprocessing, parameters, threshold units,
 and image representation. Cite primary sources. Distinguish the original research
 idea from proposed extensions and implementation choices.
@@ -26,6 +31,11 @@ idea from proposed extensions and implementation choices.
 Specify supported formats and limits, required metadata, source-image handling,
 derived artifacts, region coordinates, units, visualization scales, and error
 behavior. Identify shared interface dependencies or decisions still needed.
+
+Define whether each numeric output is a measurement, detector score, p-value,
+likelihood ratio, or estimated probability. For probability claims, specify the
+predicted event, population, calibration procedure, and held-out validation.
+Describe how workbench and batch evaluations use the same implementation.
 
 ## Assumptions and confounders
 
@@ -40,6 +50,10 @@ that may cause similar results, and relationships with other detectors.
 - Generation procedures, random seeds, parameters, code revision, dependencies,
   and environment sufficient to reproduce the experiment.
 - Metrics suited to the claim, controls, failures, and uncertainty.
+- Author-reference checks, published-experiment reproduction, and independent
+  generalization tests, clearly distinguished.
+- False alarms and missed detections at recorded thresholds; localization metrics
+  for localization claims. Keep tuning and calibration separate from final tests.
 
 ## Findings
 

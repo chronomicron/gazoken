@@ -9,6 +9,12 @@ No experiments, papers, or publication results exist in this repository yet.
 
 These are initial project practices to refine with the first investigation.
 
+The initial emphasis is evaluating existing research through our own testing
+suite, using author code or a documented implementation. See
+[workbench and evaluation](../workbench-and-evaluation.md) for the proposed
+evaluation lifecycle and statistical reporting requirements. Improvements and
+original research will build on these findings.
+
 ## From idea to study
 
 1. Create a [method brief](tool-template.md) with attribution, a bounded research

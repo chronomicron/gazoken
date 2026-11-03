@@ -64,8 +64,10 @@ explain the measured trace. Code tests alone do not validate forensic claims.
 Website work should verify the user workflow and deployed `/gazoken/` navigation
 and assets. Documentation changes need link, consistency, and whitespace checks.
 
-No build system, automated test suite, or CI workflow is configured yet. Record
-commands and environments as they are introduced.
+The prototype is buildless HTML/CSS/JavaScript. Run its numerical checks with
+`node tests/analysis.test.mjs` and its browser checks at `tests/browser.html`
+through a local HTTP server. See [first workbench](first-workbench.md) for the
+contract and validation scope. No CI workflow or cross-language build is configured.
 
 ## Roles and handoffs
 

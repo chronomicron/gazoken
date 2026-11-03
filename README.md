@@ -17,6 +17,10 @@ for detecting image artefacts and doctoring. Through controlled comparisons, we
 will assess which methods produce useful results and understand their limitations.
 The goal is a usable website supported by reusable Python, C, and C++ packages.
 
+The first browser-based prototype offers JPEG error-level analysis, a noise
+residual, edge strength, and bit-plane inspection. Images stay on your device.
+These exploratory views do not assign a tampering probability.
+
 ### Research
 
 Building on those evaluations, we will explore improvements to existing methods
@@ -38,6 +42,10 @@ Gazoken（ガゾケン）は、ソフトウェア開発と研究を両輪とす�
 もたらすのか、またどのような限界があるのかを評価します。再利用可能な Python・C・C++
 のパッケージと、それらを活用できるウェブサイトの開発を目指します。
 
+初期のブラウザ版では、JPEG のエラーレベル解析、ノイズ残差、エッジ強度、
+ビットプレーンの観察ができます。画像は外部に送信されません。これらは探索用の
+可視化であり、改ざんの確率を判定するものではありません。
+
 ### 研究
 
 検証で得られた知見をもとに、既存手法の改良や独自のアイデアに取り組みます。
@@ -47,8 +55,9 @@ Gazoken（ガゾケン）は、ソフトウェア開発と研究を両輪とす�
 
 ---
 
-**Status / 現状:** Early development and research planning / 開発初期・研究計画段階
+**Status / 現状:** Initial workbench implemented locally / 初期ワークベンチ実装済み（ローカル）
 
 - [Documentation / ドキュメント](docs/README.md)
-- [Planned website / 公開予定サイト](https://chronomicron.com/gazoken/)
+- [Prototype methods / 試作版の手法](docs/first-workbench.md)
+- [Website / ウェブサイト](https://chronomicron.com/gazoken/)
 - [License / ライセンス: Apache-2.0](LICENSE)

@@ -5,8 +5,10 @@ Image Forensics Workbench, under グルー研究室 · Grou-lab.
 
 | Document | Purpose |
 | --- | --- |
+| [First workbench](first-workbench.md) | Usage, implemented methods, preprocessing, and verification limits. |
 | [Project overview](project-overview.md) | Confirmed scope, philosophy, and open decisions. |
 | [Roadmap](roadmap.md) | Proposed milestones and completion criteria. |
+| [Workbench and evaluation](workbench-and-evaluation.md) | Checkbox workflow, external-method testing, and statistical reporting. |
 | [Decision log](decisions.md) | Accepted decisions, rationale, and pending proposals. |
 | [Development workflow](development.md) | Local work, packages, review, and agent coordination. |
 | [Research workflow](research/README.md) | Experiments, reproducibility, and publication preparation. |

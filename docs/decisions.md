@@ -41,12 +41,55 @@ Proposals remain separate until agreed. The initial handoff predates this log;
   experiment provenance with code. Language roles, package layout, venues, and the
   first study remain open; publication acceptance is not presumed.
 
+## D004 — Selectable analyses and independent method evaluation
+
+- Status: accepted; 2026-11-03.
+- Basis: user description of a checkbox-based analysis page and an independent
+  suite for testing methods from other projects and research laboratories.
+- Decision: begin with existing methods, integrating available code where permitted
+  or reimplementing published procedures. Build a workbench for selecting analyses
+  and a complementary suite to test methods and their research claims. Pursue
+  statistical interpretation of results where supported by validation.
+- Rationale: establish practical utility and experimental evidence before extending
+  methods or developing original work.
+- Consequences: record provenance, distinguish code correctness from scientific
+  evaluation, and document the scope of each reproduced result. The first method,
+  result contract, metrics, and probability calibration remain open. Detailed
+  behavior is proposed in [workbench and evaluation requirements](workbench-and-evaluation.md).
+
+## D005 — Initial static placeholder webpage
+
+- Status: accepted; 2026-11-03.
+- Basis: user request for a simple placeholder at `chronomicron.com/gazoken`.
+- Decision: prepare a self-contained bilingual `index.html` and `.nojekyll`,
+  suitable for GitHub Pages branch publishing from `main` / `/(root)`.
+- Rationale: establish the project page without build tooling or dependencies.
+- Consequences: retain the user's local commit-and-push workflow. Public deployment
+  requires pushing the files and enabling Pages; neither is implied by local
+  preview. This choice does not select the future workbench architecture.
+
+## D006 — First browser-local investigation workbench
+
+- Status: implemented, 2026-11-03; initial tool selection pending user review.
+- Basis: user request to replace the landing page with image input and separately
+  selectable, versatile analysis tools.
+- Decision: implement a static browser-local prototype with a shared source,
+  independent checkbox selections, parameterized views, descriptive measurements,
+  and PNG exports. The architect selected ELA, local-mean residual, Sobel edges,
+  and bit-plane inspection as elementary starting tools.
+- Rationale: deliver an inspectable workflow compatible with existing Pages
+  hosting, without server uploads or package dependencies.
+- Consequences: these views are exploratory and have no established detection
+  rates or probability calibration. Source decoding and computation are documented
+  in [first workbench](first-workbench.md). This does not select the future
+  Python/C/C++ integration or replace paper-specific replication studies.
+
 ## Pending proposals
 
 | Proposal | Status | Next evidence or decision needed |
 | --- | --- | --- |
-| First milestone around threshold-sweep edge analysis | Proposed by architect | Agree research scope and controlled comparisons with user |
-| GitHub Pages project site inheriting the main site's custom domain | Proposed publishing route | Verify Pages configuration and domain routing; choose website source |
+| Threshold-sweep edge analysis as an original research expert | Candidate for later investigation; not the selected starting milestone | Scope after initial evaluation of existing methods |
+| Future evaluated detector and shared package API | Open | Select a published claim, controlled inputs, and language requirements |
 
 ## Entry format for future decisions
 

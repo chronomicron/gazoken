@@ -17,6 +17,10 @@ hypothesis to examine, not a conclusion from loading the file.
 ## Confirmed direction
 
 - Load an image and choose from a suite of investigative tools.
+- Select filters and analysis algorithms using checkboxes on the workbench page.
+- Start development by implementing or integrating existing published methods
+  and testing their results with our own evaluation suite.
+- Support statistical interpretation where justified by method-specific validation.
 - Investigate acquisition, processing history, modifications, synthetic content,
   and concealed information as distinct but related questions.
 - Show measurements and visual evidence with assumptions, plausible explanations,
@@ -38,9 +42,13 @@ decryption. Failure to extract readable content does not establish its absence.
 
 ## Current state
 
-The repository began with a minimal README and Apache-2.0 license. Project
-documentation is now being established. No detector, dataset, experiment,
-application stack, or deployment has been selected or implemented here.
+The placeholder is live at the intended URL according to the user. A first
+interactive workbench is now implemented locally with browser-only image loading,
+independent checkboxes, four exploratory visualizations, and result exports.
+See [first workbench](first-workbench.md) for precise methods and verification.
+The updated workbench has not been pushed or its public deployment verified.
+No calibrated detector, scientific benchmark, Python/C/C++ package, or paper is
+implemented yet.
 
 The architect supports brainstorming, research planning, shared architecture,
 tool-agent task definition, and integration review. The user retains direction
@@ -48,23 +56,28 @@ and final project decisions.
 
 ## Candidate first investigation
 
+Development will begin with existing methods and independent evaluation. The
+first external method is still to be chosen. See the
+[workbench and evaluation requirements](workbench-and-evaluation.md).
+
 The user's threshold-sweep edge analysis is a candidate regional blur-consistency
 expert. It compares regional edge responses across thresholds. Its attribution
 and proposed mathematical formalization are preserved in the
 [initial handoff](archive/initial-handoff.md#7-prior-research-idea-relevant-to-gazoken-threshold-sweep-edge-analysis-for-blur).
 
-The architect proposed a first workflow around image loading, region selection,
-response curves, and controlled comparisons. **This milestone is not yet accepted.**
+The architect previously proposed a first workflow around image loading, region
+selection, response curves, and controlled comparisons. **This milestone was not
+accepted; the user's clarified starting direction is evaluating existing methods.**
 Low texture, contrast, noise, and scene content must be controlled before treating
 curve differences as blur evidence. Edge operators and threshold units remain open.
 
 ## Open decisions
 
-- First research question, milestone, and initial tool suite.
-- Stack, shared tool interfaces, execution location, and result representation.
-- Image formats, limits, upload handling, retention, and privacy behavior.
+- First paper-specific research question, benchmark, and evaluated detector suite.
+- Future cross-language interfaces, package stack, and execution needs beyond the static browser prototype.
+- Future image formats and limits beyond the prototype; any server upload, retention, or privacy requirements.
 - Datasets, model selection, evaluation protocol, and evidence combination.
-- Website implementation and publishing source; launch interface languages.
+- Future website architecture and full interface languages; the prototype uses static Pages hosting.
 - Visual design and consistent bilingual research terminology.
 
 The repository already contains an Apache-2.0 license. Licensing for future

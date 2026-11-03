@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Gazoken: a local image investigation workbench from Grou-lab. Inspect compression differences, residuals, edges, and bit planes.">
+  <meta name="color-scheme" content="light dark">
+  <title>ガゾケン · GAZOKEN — Image Forensics Workbench</title>
+  <link rel="stylesheet" href="./assets/workbench.css">
+  <script type="module" src="./assets/js/app.mjs"></script>
+</head>
+<body>
+  <a class="skip-link" href="#workbench">Skip to workbench</a>
+  <div class="page">
+    <header>
+      <a class="brand" href="./"><span lang="ja">ガゾケン</span> <strong>GAZOKEN</strong></a>
+      <div class="header-links"><span class="lab"><span lang="ja">グルー研究室</span> · Grou-lab</span><a href="https://github.com/chronomicron/gazoken">GitHub ↗</a></div>
+    </header>
+    <main id="workbench">
+      <section class="intro">
+        <p class="eyebrow">IMAGE INVESTIGATION / WORKBENCH 0.1</p>
+        <h1>Look closer.</h1>
+        <p class="subtitle">Image Forensics Workbench <span lang="ja">画像フォレンジック・ワークベンチ</span></p>
+        <p class="lead">Load an image. Choose your tools. Explore the traces.</p>
+        <p class="local-note"><span class="dot" aria-hidden="true"></span>Image processing stays in your browser. No image uploads or account required.</p>
+      </section>
+      <noscript><p class="error">Enable JavaScript to load images and use analysis tools.</p></noscript>
+      <div class="workspace">
+        <section class="panel source-panel" aria-labelledby="source-title">
+          <div class="panel-heading"><h2 id="source-title"><span class="step">01</span> Source image</h2><button id="clear" class="text-button" type="button" disabled>Clear</button></div>
+          <div id="drop-zone" class="drop-zone">
+            <div class="empty-source" id="empty-source">
+              <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true"><rect x="5" y="7" width="38" height="34" rx="3" stroke="currentColor" stroke-width="1.5"/><circle cx="16" cy="18" r="3" stroke="currentColor" stroke-width="1.5"/><path d="m7 36 12-11 8 7 6-6 9 9" stroke="currentColor" stroke-width="1.5"/></svg>
+              <h3>Your investigation starts here</h3><p>Drop an image here, or choose a file below.</p>
+            </div>
+            <canvas id="original" hidden aria-label="Original decoded image"></canvas>
+          </div>
+          <div class="source-actions"><label class="button secondary" id="file-label" for="file">Choose image<input id="file" class="file-input" type="file" accept="image/jpeg,image/png,image/webp"></label><button id="demo" class="text-button" type="button">Try a demo</button></div>
+          <p class="file-limits">JPEG, PNG, WebP · up to 25 MiB and 12 megapixels</p>
+          <p id="file-info" class="file-info">No image loaded.</p>
+          <p id="source-note" class="fine-print">The source file is kept unchanged. Analyses use its browser-decoded pixels.</p>
+        </section>
+        <section class="panel tools-panel" aria-labelledby="tools-title">
+          <div class="panel-heading"><h2 id="tools-title"><span class="step">02</span> Analysis tools</h2><span class="tag">Independent views</span></div>
+          <form id="tools-form">
+            <fieldset id="tool-options">
+              <legend class="sr-only">Choose analysis tools and parameters</legend>
+              <div class="tool"><label class="tool-label"><input type="checkbox" name="tool" value="ela" checked><span><strong>Error-level analysis</strong><span>Inspect differences after JPEG recompression.</span></span></label><div class="parameters"><label for="quality">JPEG quality</label><input id="quality" type="range" min="50" max="99" value="90"><output for="quality" id="quality-value">90</output><label for="ela-gain">Gain</label><select id="ela-gain"><option value="5">5×</option><option value="15" selected>15×</option><option value="30">30×</option></select></div><p class="tool-note">JPEG sources only. Bright areas can also come from ordinary texture and compression.</p></div>
+              <div class="tool"><label class="tool-label"><input type="checkbox" name="tool" value="residual" checked><span><strong>Noise residual</strong><span>Reveal fine detail with a local high-pass view.</span></span></label><div class="parameters"><label for="residual-gain">Gain</label><select id="residual-gain"><option value="3">3×</option><option value="8" selected>8×</option><option value="16">16×</option></select></div><p class="tool-note">Texture and edges remain in this residual. It is not a sensor-noise fingerprint.</p></div>
+              <div class="tool"><label class="tool-label"><input type="checkbox" name="tool" value="edges"><span><strong>Edge strength</strong><span>Inspect a Sobel gradient map of image structure.</span></span></label><p class="tool-note">Smooth surfaces and blur can both produce weaker edges.</p></div>
+              <div class="tool"><label class="tool-label"><input type="checkbox" name="tool" value="bitplane"><span><strong>Bit-plane inspection</strong><span>Isolate one bit in a decoded colour channel.</span></span></label><div class="parameters"><label for="channel">Channel</label><select id="channel"><option value="0">Red</option><option value="1">Green</option><option value="2">Blue</option></select><label for="bit">Bit</label><select id="bit"><option value="0">0 · lowest</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7 · highest</option></select></div><p class="tool-note">Patterns alone do not establish hidden data. This tool does not extract messages.</p></div>
+            </fieldset>
+            <button class="button primary" id="run" type="submit" disabled>Run selected tools <span aria-hidden="true">→</span></button>
+          </form>
+          <p id="status" class="status" role="status" aria-live="polite">Load an image to begin.</p>
+        </section>
+      </div>
+      <section class="results-section" aria-labelledby="results-title">
+        <div class="section-heading"><h2 id="results-title"><span class="step">03</span> Results</h2><span id="result-count" class="muted">No analyses yet</span></div>
+        <div class="evidence-note"><strong>Evidence, with context.</strong> These are exploratory visualizations, not validated tampering detectors. No authenticity score or probability is assigned.</div>
+        <div id="results" class="results-grid"><p class="results-empty">Your selected analyses will appear here, each with its own settings and interpretation.</p></div>
+      </section>
+      <details class="about"><summary>About Gazoken / <span lang="ja">ガゾケンについて</span></summary><div class="about-columns"><p>We start by implementing existing methods and testing their usefulness and limitations. Independent evaluation will guide improvements, reusable packages, and original research. This first workbench is a foundation for that work.</p><p lang="ja">既存の手法を実装し、有用性と限界を検証することから始めます。独立した評価をもとに、手法の改良、再利用可能なパッケージ、独自の研究へと進めていきます。このワークベンチは、その第一歩です。</p></div></details>
+    </main>
+    <footer><span><span lang="ja">グルー研究室</span> · Grou-lab</span><nav aria-label="Project links"><a href="https://github.com/chronomicron/gazoken/blob/main/docs/first-workbench.md">Methods &amp; limitations</a><a href="https://chronomicron.com/">chronomicron.com ↗</a></nav></footer>
+  </div>
+</body>
+</html>
