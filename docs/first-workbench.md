@@ -124,6 +124,17 @@ The worker wraps this exact function; browser orchestration owns decoding and
 recompression. A future evaluation runner must reproduce preprocessing and record
 the JPEG encoder/browser as well as parameters when comparing ELA.
 
+## Sample inputs
+
+Eight small synthetic images are available in
+[`tests/fixtures/images/`](../tests/fixtures/README.md): a reference chart, benign
+JPEG processing, controlled smoothing and copy-move edits, and a known red-bit
+pattern with a control. Three construction masks and a checksum manifest document
+what changed. They are exploratory software fixtures, not camera images or a
+representative detection benchmark. The fixture README explains how to use and
+regenerate them. Other file types can later live alongside `images/` under
+`tests/fixtures/`.
+
 ## Verification and next research step
 
 Numerical checks (Node.js with built-in test support; checked with Node 24):

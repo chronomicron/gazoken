@@ -5,6 +5,7 @@ Image Forensics Workbench, under グルー研究室 · Grou-lab.
 
 | Document | Purpose |
 | --- | --- |
+| [Test fixtures](../tests/fixtures/README.md) | Synthetic inputs, known edits, masks, and regeneration instructions. |
 | [First workbench](first-workbench.md) | Usage, implemented methods, preprocessing, and verification limits. |
 | [Project overview](project-overview.md) | Confirmed scope, philosophy, and open decisions. |
 | [Roadmap](roadmap.md) | Proposed milestones and completion criteria. |

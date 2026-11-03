@@ -1,0 +1,184 @@
+{
+  "schema_version": 1,
+  "generator": "tests/generate_fixtures.py",
+  "seed": 4281,
+  "python": "3.12.3",
+  "pillow": "10.2.0",
+  "jpeg_codec": "8.0",
+  "provenance": "Generated synthetic signal chart. No camera photograph or third-party image was used.",
+  "purpose": "Software exploration and controlled examples, not a scientific accuracy benchmark.",
+  "coordinates": "Origin at upper left; x right, y down. Boxes use half-open x0,y0,x1,y1.",
+  "mask_semantics": "White = selected edit region or bit-plane pattern. Masks describe construction, not a detector output. JPEG changes can extend beyond edit regions.",
+  "cases": [
+    {
+      "path": "images/01-reference.png",
+      "kind": "synthetic_reference",
+      "parent": null,
+      "operations": [],
+      "mask": null
+    },
+    {
+      "path": "images/02-reference-q90.jpg",
+      "kind": "benign_processing",
+      "parent": "images/01-reference.png",
+      "operations": [
+        "JPEG encode: quality=90, subsampling=0"
+      ],
+      "mask": null
+    },
+    {
+      "path": "images/03-recompressed-q55.jpg",
+      "kind": "benign_processing",
+      "parent": "images/02-reference-q90.jpg",
+      "operations": [
+        "Decode JPEG q90; JPEG encode: quality=55, subsampling=2"
+      ],
+      "mask": null
+    },
+    {
+      "path": "images/04-local-smoothing.png",
+      "kind": "known_local_edit",
+      "parent": "images/01-reference.png",
+      "operations": [
+        {
+          "operation": "local_gaussian_blur",
+          "radius": 4,
+          "box_xyxy_half_open": [
+            60,
+            195,
+            335,
+            405
+          ]
+        }
+      ],
+      "mask": "images/masks/smooth-patch.png"
+    },
+    {
+      "path": "images/05-local-smoothing-q90.jpg",
+      "kind": "known_local_edit_with_compression",
+      "parent": "images/04-local-smoothing.png",
+      "operations": [
+        "JPEG encode: quality=90, subsampling=0"
+      ],
+      "mask": "images/masks/smooth-patch.png"
+    },
+    {
+      "path": "images/06-copy-move.png",
+      "kind": "known_local_edit",
+      "parent": "images/01-reference.png",
+      "operations": [
+        {
+          "operation": "copy_move",
+          "source_box_xyxy_half_open": [
+            138,
+            218,
+            250,
+            330
+          ],
+          "target_xy": [
+            550,
+            245
+          ]
+        }
+      ],
+      "mask": "images/masks/copy-move-target.png"
+    },
+    {
+      "path": "images/07-red-lsb-control.png",
+      "kind": "bitplane_control",
+      "parent": "images/01-reference.png",
+      "operations": [
+        "Clear red bit 0 throughout the image"
+      ],
+      "mask": null
+    },
+    {
+      "path": "images/08-red-lsb-pattern.png",
+      "kind": "known_bitplane_pattern",
+      "parent": "images/07-red-lsb-control.png",
+      "operations": [
+        "Set red bit 0 where the binary pattern is white; preserve all other bits"
+      ],
+      "mask": "images/masks/red-lsb-pattern.png"
+    }
+  ],
+  "files": {
+    "images/01-reference.png": {
+      "sha256": "70d41fecfafd46e709841274c2c171e090b05bbf0b573b9853daab71437705a3",
+      "width": 768,
+      "height": 512,
+      "mode": "RGB",
+      "bytes": 162594
+    },
+    "images/02-reference-q90.jpg": {
+      "sha256": "a7230d1ca143f8cc8b78e5251ff835ba919f70516e3c86a6328b40aaf8dbafc0",
+      "width": 768,
+      "height": 512,
+      "mode": "RGB",
+      "bytes": 75305
+    },
+    "images/03-recompressed-q55.jpg": {
+      "sha256": "92136ed8644d0e80f8f7006eacf7f850e48f0cea44203558b7ceb5dbce47e26c",
+      "width": 768,
+      "height": 512,
+      "mode": "RGB",
+      "bytes": 32292
+    },
+    "images/04-local-smoothing.png": {
+      "sha256": "9bacfa5a28cd3bf1ebc7df92e3bd8164bfdd1b1e8711e7df038f4873b4a17e77",
+      "width": 768,
+      "height": 512,
+      "mode": "RGB",
+      "bytes": 91995
+    },
+    "images/05-local-smoothing-q90.jpg": {
+      "sha256": "6e7e5d230509d519b1e53dc82bdb5a6f82488c4798e1ca492974e5fee8fc012f",
+      "width": 768,
+      "height": 512,
+      "mode": "RGB",
+      "bytes": 52716
+    },
+    "images/06-copy-move.png": {
+      "sha256": "098e3b73b4634c660dc77c5417b512b46eab52876bb87f27c85fa13f7b0180a6",
+      "width": 768,
+      "height": 512,
+      "mode": "RGB",
+      "bytes": 175081
+    },
+    "images/07-red-lsb-control.png": {
+      "sha256": "d204218fba053d5f55c44b73a24cc8dfb84cd85aeea1a0a6bd72b0b5b9fcd5dc",
+      "width": 768,
+      "height": 512,
+      "mode": "RGB",
+      "bytes": 179325
+    },
+    "images/08-red-lsb-pattern.png": {
+      "sha256": "60d15c365ee2c3059d2a722edb113c810a1defd2fee774a3bcf5f24752db75ec",
+      "width": 768,
+      "height": 512,
+      "mode": "RGB",
+      "bytes": 180284
+    },
+    "images/masks/copy-move-target.png": {
+      "sha256": "00433e686f1d44ea04558ff6f8da785511c3ee95c1e99224e4bafe798b526251",
+      "width": 768,
+      "height": 512,
+      "mode": "L",
+      "bytes": 690
+    },
+    "images/masks/red-lsb-pattern.png": {
+      "sha256": "47db97e4dcb532a743575655f675716a81ba760f116b2d50a115f7443ba6804f",
+      "width": 768,
+      "height": 512,
+      "mode": "L",
+      "bytes": 1436
+    },
+    "images/masks/smooth-patch.png": {
+      "sha256": "cd85fd7c2ce1fbf5258ac7862dcd940623adf9471c729947bae9e3e46b0af010",
+      "width": 768,
+      "height": 512,
+      "mode": "L",
+      "bytes": 876
+    }
+  }
+}
