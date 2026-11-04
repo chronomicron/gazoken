@@ -17,6 +17,6 @@ Planned paths below are reserved names, not generated stubs or implemented metho
 | 1.7 Byte distribution | `byte_distribution.py` | Registered | jpeg_bytes |
 | 1.8 Encoder profiles | `encoder_profiles.py` | Planned | jpeg_bytes |
 | 1.9 Stored DCT arrays | `stored_coefficients.py` | Registered (optional coefficients extra) | jpeg_bytes |
-| 1.10 Coefficient statistics | `coefficient_statistics.py` | Planned | jpeg_bytes, coefficients |
+| 1.10 Coefficient statistics | `coefficient_statistics.py` | Registered | jpeg_bytes, coefficients |
 | 1.11 Compression history | `compression_history.py` | Planned | jpeg_bytes, coefficients |
 | 1.12 Evidence report | `evidence_report.py` | Registered | jpeg_bytes, run_evidence |

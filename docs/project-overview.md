@@ -58,6 +58,8 @@ exports. A [modular tool interface](tool-development.md) now isolates adapters,
 preserves source identity, declares prerequisites, and shows selected call order.
 An optional [stored-coefficient reader](stored-coefficients.md) now supplies
 source-bound quantized DCT packages without reconstructing pixels.
+[Coefficient statistics](coefficient-statistics.md) now describes their per-frequency
+histograms, moments and zero fractions without inferring compression history.
 A [current-run evidence report](evidence-report.md) assembles Phase 1 outputs
 without adding a forensic verdict. All Phase 2 and Phase 3 analyses remain configuration-only.
 No calibrated detector, scientific benchmark, C/C++ package, or paper is

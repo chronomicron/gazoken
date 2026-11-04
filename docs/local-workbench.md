@@ -1,7 +1,7 @@
 # Local Python research workbench
 
 Updated: 2026-11-04  
-Version: 0.5.0 — modular tool foundation; nine registered Python tools (1.9 requires an optional extra)
+Version: 0.5.0 — modular tool foundation; ten registered Python tools (1.9 requires an optional extra)
 
 ## Launch
 
@@ -106,6 +106,7 @@ Python decoded reference and prerequisites are not automatically executed.
 | 1.6 Embedded images | Implemented | Bounded Exif IFD1/JFXX JPEG range extraction, hashes and optional nested structure. See [coverage](embedded-images.md). |
 | 1.7 Byte distribution | Implemented | Exact 256-bin whole-file histogram and Shannon entropy in bits/byte. Descriptive only. |
 | 1.9 Stored coefficients | Implemented; optional extra | Original quantized DCT arrays, fixed source-bound package, component/table provenance and first-block samples. See [setup and limits](stored-coefficients.md). |
+| 1.10 Coefficient statistics | Implemented; requires coefficients | DC plus selected zigzag AC histograms, mean, population variance and optional zero fractions per component. See [usage](coefficient-statistics.md). |
 | 1.12 Evidence report | Implemented | Assemble earlier Phase 1 results within the same run, with coverage, provenance and optional raw measurements/warnings. See [usage](evidence-report.md). |
 | Other Phase 1 steps | Not implemented | Validated configuration and explicit status; no analytical output. |
 | All eleven Phase 2 steps | Not implemented | Parameter records linked to the same original JPEG; no Python decode or spatial analysis. |
@@ -385,3 +386,9 @@ Step 1.9 added (2026-11-04): install `.[coefficients]` to enable the optional
 Full arrays are passed only to later selected Python consumers; exports include
 descriptors and first-block samples. Current executable IDs: 1.1–1.7, 1.9, 1.12
 (with 1.9 failing clearly without its extra). Next: 1.10 statistics.
+
+
+Step 1.10 added (2026-11-04): select 1.9 and 1.10 in the same run for exact
+[coefficient statistics](coefficient-statistics.md). Running 1.10 alone is blocked
+without a supplied Python coefficient package; no implicit decoder call. Current
+executable IDs: 1.1–1.7, 1.9–1.10 and 1.12. Phase 1 remaining: 1.8 and 1.11.

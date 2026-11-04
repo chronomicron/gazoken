@@ -29,7 +29,7 @@ class WorkbenchTests(unittest.TestCase):
         records = result.json()["results"]
         expected = ["1.1", "1.2", "1.3", "1.4", "1.5", "1.6", "1.7"]
         try:
-            if importlib.metadata.version('jpeglib') == '0.14.0': expected.append('1.9')
+            if importlib.metadata.version('jpeglib') == '0.14.0': expected.extend(['1.9','1.10'])
         except importlib.metadata.PackageNotFoundError:
             pass
         expected.append('1.12')

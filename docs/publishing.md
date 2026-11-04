@@ -132,3 +132,6 @@ been verified or changed by this increment.
 The optional [1.9 native coefficient reader](stored-coefficients.md) runs only in
 the local Python app; install `.[coefficients]` separately. Its buffers are not
 available to the static JavaScript demo. No public backend was added.
+
+Step 1.10 [coefficient statistics](coefficient-statistics.md) consumes that native
+package in the same local run. It is not added to the static browser demo.

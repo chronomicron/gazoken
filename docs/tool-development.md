@@ -26,6 +26,7 @@ src/gazoken/
 │   │   ├── quantization_tables.py Step 1.4, registered
 │   │   ├── byte_distribution.py  Step 1.7, registered
 │   │   ├── stored_coefficients.py Step 1.9, registered (optional extra)
+│   │   ├── coefficient_statistics.py Step 1.10, registered
 │   │   └── evidence_report.py    Step 1.12, registered
 │   ├── decoded/                  Phase 2: reference provider and spatial tools
 │   └── history/                  Phase 3: processing-history specialists
@@ -187,7 +188,8 @@ Updated 2026-11-04. Completed Python adapters, in implementation order:
 [1.5 Entropy coding](entropy-coding.md), then
 [1.6 Embedded images](embedded-images.md), then
 [1.12 Evidence report](evidence-report.md), then
-[1.9 Stored coefficients](stored-coefficients.md). All use the same version 1 input
+[1.9 Stored coefficients](stored-coefficients.md), then
+[1.10 Coefficient statistics](coefficient-statistics.md). All use the same version 1 input
 contract and explicit registry. Existing browser-only tools have separate coverage.
 
 The bounded header adapters on Gopher's initial shortlist are now implemented.
@@ -204,8 +206,9 @@ earlier records of the current run only to tools declaring `run_evidence`;
 no history payload is accepted from HTTP callers. Report 1.12 filters Phase 1,
 excludes itself, and never invokes missing steps. It is separate from the future
 Phase 3 `evaluated_evidence` input. See [report scope](evidence-report.md).
-Next implementation priority is 1.10 coefficient statistics;
-1.8 profile data and 1.11 method evaluation remain research-led work.
+1.10 coefficient statistics is implemented on the immutable package.
+Only 1.8 profile data/matching and 1.11 compression-history evaluation remain
+unimplemented in Phase 1; both need bounded research/reference scopes.
 
 `tools/coefficients.py` defines immutable signed-int16-LE component buffers with
 block-row/block-column/v/u layout and source/reader/quantization provenance.

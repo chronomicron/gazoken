@@ -334,8 +334,8 @@
     "title": "Coefficient statistics",
     "subtitle": "Frequency-wise distributions",
     "group": "Coefficients",
-    "description": "Reserve coefficient histograms and dependencies. Requires an implemented stored-coefficient reader.",
-    "implementation": "planned",
+    "description": "Measure exact per-frequency histograms, means, population variances and optional zero fractions from stored coefficients. Select 1.9 and 1.10 together; DC is included plus the first N zigzag AC positions.",
+    "implementation": "ready",
     "view": "quantization",
     "selected": false,
     "requires": [

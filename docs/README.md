@@ -7,6 +7,7 @@ Image Forensics Workbench, under グルー研究室 · Grou-lab.
 | --- | --- |
 | [Local Python workbench](local-workbench.md) | Launch instructions, all three phases, shared-source previews, reports, session migration, and extension points. |
 | [Tool development](tool-development.md) | Common inputs, isolated phase modules, execution lifecycle, templates, and future-tool checklist. |
+| [Coefficient statistics](coefficient-statistics.md) | Python step 1.10: exact frequency histograms, population moments, zero fractions and known-answer tests. |
 | [Stored coefficients](stored-coefficients.md) | Python step 1.9: optional jpeglib reader, immutable coefficient package, process bounds and tests. |
 | [Evidence report](evidence-report.md) | Python step 1.12: same-run evidence assembly, source linkage, coverage and report download. |
 | [Embedded images](embedded-images.md) | Python step 1.6: bounded Exif/JFXX JPEG preview ranges, hashes and nested structure. |
