@@ -7,6 +7,7 @@ Image Forensics Workbench, under グルー研究室 · Grou-lab.
 | --- | --- |
 | [Local Python workbench](local-workbench.md) | Launch instructions, all three phases, shared-source previews, reports, session migration, and extension points. |
 | [Tool development](tool-development.md) | Common inputs, isolated phase modules, execution lifecycle, templates, and future-tool checklist. |
+| [Embedded images](embedded-images.md) | Python step 1.6: bounded Exif/JFXX JPEG preview ranges, hashes and nested structure. |
 | [Entropy coding](entropy-coding.md) | Python step 1.5: stored Huffman codebooks, canonical codes and scan-time assignments. |
 | [Metadata inventory](metadata-inventory.md) | Python step 1.3: bounded Exif, reader options, GPS/vendor controls and limitations. |
 | [JPEG file structure](file-structure.md) | Python step 1.2: marker map, frames, scans, restart intervals and byte-boundary checks. |

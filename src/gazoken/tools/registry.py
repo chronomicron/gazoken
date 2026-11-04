@@ -1,7 +1,7 @@
 """Explicit allowlist of executable adapters; never import a module from a request."""
 from dataclasses import dataclass
 from .contracts import ToolHandler
-from .encoded import source_identity, byte_distribution, quantization_tables, file_structure, metadata_inventory, entropy_coding
+from .encoded import source_identity, byte_distribution, quantization_tables, file_structure, metadata_inventory, entropy_coding, embedded_images
 
 
 @dataclass(frozen=True)
@@ -11,6 +11,7 @@ class Registration:
 
 
 REGISTRY = {
+    "encoded.embedded_images": Registration(embedded_images.run, embedded_images.VERSION),
     "encoded.entropy_coding": Registration(entropy_coding.run, entropy_coding.VERSION),
     "encoded.metadata_inventory": Registration(metadata_inventory.run, metadata_inventory.VERSION),
     "encoded.file_structure": Registration(file_structure.run, file_structure.VERSION),

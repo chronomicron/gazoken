@@ -1,7 +1,7 @@
 # Local Python research workbench
 
 Updated: 2026-11-04  
-Version: 0.5.0 — modular tool foundation; six registered Python measurements
+Version: 0.5.0 — modular tool foundation; seven registered Python measurements
 
 ## Launch
 
@@ -103,6 +103,7 @@ Python decoded reference and prerequisites are not automatically executed.
 | 1.3 Metadata inventory | Implemented | Bounded classic TIFF/Exif, metadata block inventory, standard GPS and opaque MakerNote controls. See [coverage](metadata-inventory.md). |
 | 1.4 Quantization atlas | Implemented | Exact DQT values, precision, layouts, component assignments, scan-time definition references and partial-data warnings. See [coverage](quantization-tables.md). |
 | 1.5 Entropy coding | Implemented | Stored Huffman definitions, canonical codes, chronological scan assignments and partial-data warnings. See [coverage](entropy-coding.md). |
+| 1.6 Embedded images | Implemented | Bounded Exif IFD1/JFXX JPEG range extraction, hashes and optional nested structure. See [coverage](embedded-images.md). |
 | 1.7 Byte distribution | Implemented | Exact 256-bin whole-file histogram and Shannon entropy in bits/byte. Descriptive only. |
 | Other Phase 1 steps | Not implemented | Validated configuration and explicit status; no analytical output. |
 | All eleven Phase 2 steps | Not implemented | Parameter records linked to the same original JPEG; no Python decode or spatial analysis. |
@@ -362,3 +363,9 @@ settings remain accepted; ExifTool remains unavailable. Restart for catalog chan
 Step 1.5 added (2026-11-04): [entropy coding](entropy-coding.md) executes through
 the common registry. Implemented IDs: 1.1–1.5 and 1.7. This inventory does not
 measure symbol usage or compression optimality. Restart for catalog changes.
+
+
+Step 1.6 added (2026-11-04): [embedded images](embedded-images.md) executes through
+the common registry. Steps 1.1–1.7 are now implemented within their documented
+bounded scopes. Preview records do not decode pixels or compare image content.
+Restart for catalog changes.

@@ -13,7 +13,7 @@ Planned paths below are reserved names, not generated stubs or implemented metho
 | 1.3 Metadata inventory | `metadata_inventory.py` | Registered | jpeg_bytes |
 | 1.4 Quantization atlas | `quantization_tables.py` | Registered | jpeg_bytes |
 | 1.5 Entropy coding | `entropy_coding.py` | Registered | jpeg_bytes |
-| 1.6 Embedded images | `embedded_images.py` | Planned | jpeg_bytes |
+| 1.6 Embedded images | `embedded_images.py` | Registered | jpeg_bytes |
 | 1.7 Byte distribution | `byte_distribution.py` | Registered | jpeg_bytes |
 | 1.8 Encoder profiles | `encoder_profiles.py` | Planned | jpeg_bytes |
 | 1.9 Stored DCT arrays | `stored_coefficients.py` | Planned | jpeg_bytes |

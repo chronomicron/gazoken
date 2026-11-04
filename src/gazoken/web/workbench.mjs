@@ -99,7 +99,10 @@ function showEvidence(id = state.active) {
     body=`<div class="config-note">${state.source?'Uses the same preserved source as Phase 1.':'Load a source once in any phase.'} Python decoded reference: not created. This step records configuration only. Provisional settings are not validated experimental parameters.</div><h3 class="artifact-heading">Expected outputs · not generated</h3><ul class="artifact-slots">${(step.outputs||[]).map(label=>`<li>${esc(label)}</li>`).join('')}</ul>${step.requires?.length?`<p class="muted">Planned inputs from steps ${esc(step.requires.join(', '))}. Dependencies are declared, not automatically executed.</p>`:''}`;
   }
   else if (id === '1.1' && state.source) body = definitionList(Object.entries(measured?.output || state.source));
-  else if (id === '1.7' && (measured || preview?.statistics)) {
+  else if (id === '1.6' && measured) {
+    const o=measured.output;
+    body=`<p>${esc(o.extraction_status)} extraction · ${o.preview_count} embedded JPEG previews</p>`+table(['Kind','Offset','Bytes','SHA-256'],o.previews.map(p=>[p.kind,p.offset,p.byte_count,p.sha256]))+`<details><summary>Embedded preview records</summary><pre>${esc(JSON.stringify(o.previews,null,2))}</pre></details><p class="muted">${esc(o.interpretation)}</p>`+(measured.warnings||[]).map(w=>`<p class="warning-note">${esc(w)}</p>`).join('');
+  } else if (id === '1.7' && (measured || preview?.statistics)) {
     const statistics = measured?.output || {histogram: preview.statistics.histogram, entropy_bits_per_byte: preview.statistics.entropy, count: preview.size};
     body = `<canvas id="distribution-chart" class="chart" aria-label="Whole-file byte frequency histogram"></canvas><div class="chart-label"><span>BYTE VALUE 0 → 255</span><span>${statistics.entropy_bits_per_byte.toFixed(4)} BITS / BYTE</span></div><p class="warning-note">Whole-file bytes, including headers and scan data. This descriptive measurement is not a tampering score.${measured ? '' : ' Browser preview; run 1.7 for a Python record.'}</p>`;
     if (!measured) $('evidence-origin').textContent = 'BROWSER PREVIEW';

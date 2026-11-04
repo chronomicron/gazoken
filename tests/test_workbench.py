@@ -26,7 +26,7 @@ class WorkbenchTests(unittest.TestCase):
         result = self.upload([{"id": s["id"]} for s in catalog])
         self.assertEqual(result.status_code, 200, result.text)
         records = result.json()["results"]
-        self.assertEqual([r["id"] for r in records if r["status"] == "completed"], ["1.1", "1.2", "1.3", "1.4", "1.5", "1.7"])
+        self.assertEqual([r["id"] for r in records if r["status"] == "completed"], ["1.1", "1.2", "1.3", "1.4", "1.5", "1.6", "1.7"])
         self.assertTrue(all(r["output"] is None for r in records if r["status"] == "not_implemented"))
 
     def test_bytes_hash_and_parameter_record(self):

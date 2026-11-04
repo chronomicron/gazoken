@@ -184,8 +184,8 @@
     "title": "Embedded images",
     "subtitle": "Thumbnails as separate evidence",
     "group": "Structure",
-    "description": "Configure embedded-preview discovery. Extraction, nested parsing and image comparison are not implemented in this framework.",
-    "implementation": "planned",
+    "description": "Extract bounded Exif IFD1 and JFXX JPEG preview ranges, identities and optional nested structure records. No pixels are compared or decoded.",
+    "implementation": "ready",
     "view": "source",
     "selected": false,
     "parameters": [
