@@ -10,7 +10,7 @@ Planned paths below are reserved names, not generated stubs or implemented metho
 | --- | --- | --- | --- |
 | 1.1 Source identity | `source_identity.py` | Registered | jpeg_bytes |
 | 1.2 File structure | `file_structure.py` | Registered | jpeg_bytes |
-| 1.3 Metadata inventory | `metadata_inventory.py` | Planned | jpeg_bytes |
+| 1.3 Metadata inventory | `metadata_inventory.py` | Registered | jpeg_bytes |
 | 1.4 Quantization atlas | `quantization_tables.py` | Registered | jpeg_bytes |
 | 1.5 Entropy coding | `entropy_coding.py` | Planned | jpeg_bytes |
 | 1.6 Embedded images | `embedded_images.py` | Planned | jpeg_bytes |

@@ -111,6 +111,9 @@ function showEvidence(id = state.active) {
     body = table(['Marker','Byte offset','Length'], preview.segments.slice(0,256).map(s => [s.marker, s.offset, `${s.length} B`]));
     if (preview.segments.length > 256) body += '<p class="muted">First 256 segments shown.</p>';
     body += `<p class="warning-note">${esc(preview.complete ? 'EOI reached; not a complete validity check.' : 'Partial structural report.')} ${esc(preview.warnings.join(' '))}</p>`;
+  } else if (id === '1.3' && measured) {
+    const o=measured.output;
+    body=`<p>${esc(o.extraction_status)} metadata inventory · ${esc(o.reader)}</p>`+table(['Block','Kind','Bytes'],o.blocks.map(b=>[b.marker,b.kind,b.payload_bytes]))+`<details><summary>Exif declarations</summary><pre>${esc(JSON.stringify(o.exif,null,2))}</pre></details><p class="muted">${esc(o.interpretation||'No reader executed.')}</p>`+(measured.warnings||[]).map(w=>`<p class="warning-note">${esc(w)}</p>`).join('');
   } else if (id === '1.3' && preview) {
     const entries = preview.exif.flatMap(e => e.entries).filter(e => state.settings[id].include_gps || !e.ifd.startsWith('GPS')).slice(0,100);
     body = entries.length ? table(['Directory','Tag','Stored value'], entries.map(e => [e.ifd,e.name, typeof e.value === 'object' ? JSON.stringify(e.value) : e.value])) : '<p class="muted">No readable EXIF entries in this preview. Other metadata formats and vendor data are not decoded here.</p>';

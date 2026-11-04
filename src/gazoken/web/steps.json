@@ -68,8 +68,8 @@
     "title": "Metadata inventory",
     "subtitle": "Declarations & directories",
     "group": "Structure",
-    "description": "Configure a future metadata reader. EXIF declarations are evidence to inspect, not authenticated provenance.",
-    "implementation": "planned",
+    "description": "Inventory metadata blocks and bounded classic TIFF/Exif declarations. GPS IFD values are excluded by default; metadata is not authenticated provenance.",
+    "implementation": "ready",
     "view": "metadata",
     "selected": true,
     "parameters": [
@@ -78,21 +78,23 @@
         "label": "Reader preference",
         "type": "select",
         "options": [
-          "Auto (not connected)",
+          "Auto",
+          "Bounded TIFF reader",
           "ExifTool (not connected)",
+          "Auto (not connected)",
           "Bounded TIFF reader (not connected)"
         ],
-        "default": "Auto (not connected)"
+        "default": "Auto"
       },
       {
         "key": "include_gps",
-        "label": "Include GPS in future results",
+        "label": "Include standard GPS IFD",
         "type": "checkbox",
         "default": false
       },
       {
         "key": "include_vendor",
-        "label": "Request vendor metadata",
+        "label": "Include bounded opaque MakerNote bytes",
         "type": "checkbox",
         "default": false
       }
