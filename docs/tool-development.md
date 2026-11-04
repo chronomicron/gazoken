@@ -24,7 +24,8 @@ src/gazoken/
 │   │   ├── entropy_coding.py     Step 1.5, registered
 │   │   ├── embedded_images.py    Step 1.6, registered
 │   │   ├── quantization_tables.py Step 1.4, registered
-│   │   └── byte_distribution.py  Step 1.7, registered
+│   │   ├── byte_distribution.py  Step 1.7, registered
+│   │   └── evidence_report.py    Step 1.12, registered
 │   ├── decoded/                  Phase 2: reference provider and spatial tools
 │   └── history/                  Phase 3: processing-history specialists
 └── web/
@@ -183,7 +184,8 @@ Updated 2026-11-04. Completed Python adapters, in implementation order:
 [1.2 File structure](file-structure.md), then
 [1.3 Metadata inventory](metadata-inventory.md), then
 [1.5 Entropy coding](entropy-coding.md), then
-[1.6 Embedded images](embedded-images.md). All use the same version 1 input
+[1.6 Embedded images](embedded-images.md), then
+[1.12 Evidence report](evidence-report.md). All use the same version 1 input
 contract and explicit registry. Existing browser-only tools have separate coverage.
 
 The bounded header adapters on Gopher's initial shortlist are now implemented.
@@ -193,3 +195,12 @@ need explicit reference data and matching scope before implementation.
 Coefficient statistics 1.10 needs reader 1.9 first; decoded methods need 2.1.
 This is implementation priority, not execution order: selected tools still run
 in numeric phase/step order. Research-heavy detection methods remain later work.
+
+The additive `ToolInputs.evidence` field accepts `RunEvidence`, an immutable
+source-bound JSON snapshot with digest/count provenance. The runner supplies
+earlier records of the current run only to tools declaring `run_evidence`;
+no history payload is accepted from HTTP callers. Report 1.12 filters Phase 1,
+excludes itself, and never invokes missing steps. It is separate from the future
+Phase 3 `evaluated_evidence` input. See [report scope](evidence-report.md).
+Next implementation priority is 1.9 Stored DCT arrays, then 1.10 statistics;
+1.8 profile data and 1.11 method evaluation remain research-led work.

@@ -413,8 +413,8 @@
     "title": "Evidence report",
     "subtitle": "Observations with provenance",
     "group": "Report",
-    "description": "Configure the future Python report assembler. The workbench's Export session action already saves configuration, source identity and actual run records.",
-    "implementation": "planned",
+    "description": "Assemble earlier Phase 1 results from this run with source identity, provenance, coverage and warnings. Select tools and this report together; separate runs are not merged.",
+    "implementation": "ready",
     "view": "source",
     "selected": false,
     "parameters": [
@@ -436,7 +436,8 @@
       "module": "gazoken.tools.encoded.evidence_report",
       "contract_version": 1,
       "inputs": [
-        "jpeg_bytes"
+        "jpeg_bytes",
+        "run_evidence"
       ],
       "provides": []
     }

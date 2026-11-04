@@ -3,6 +3,7 @@
 No pixel reconstruction is performed here. This module does not depend on the UI.
 """
 from copy import deepcopy
+from dataclasses import replace
 from datetime import datetime, timezone
 import json
 import math
@@ -12,7 +13,7 @@ from types import MappingProxyType
 
 from . import __version__
 from .catalog import CATALOG, BY_ID
-from .tools.contracts import MAX_BYTES, ImageSource, PixelPackage, ToolInputs, ToolOutput
+from .tools.contracts import MAX_BYTES, ImageSource, PixelPackage, ToolInputs, ToolOutput, RunEvidence
 from .tools.registry import lookup
 from .tools.encoded.byte_distribution import measure as byte_distribution
 
@@ -71,11 +72,14 @@ def run_plan(data: bytes, filename: str, plan: list, *, pixels: PixelPackage | N
     results = []
     for item in plan:
         started = time.perf_counter()
+        spec = BY_ID[item['id']]
+        inputs = replace(inputs, evidence=RunEvidence(inputs.source.sha256, json.dumps(results, allow_nan=False))
+                         if 'run_evidence' in spec['tool']['inputs'] else None)
         input_record = inputs.record()
         produced_inputs = {}
         spec = BY_ID[item['id']]
         registration = lookup(spec['tool']['key'])
-        available = {'jpeg_bytes'} | ({'pixels'} if inputs.pixels else set())
+        available = {'jpeg_bytes'} | ({'pixels'} if inputs.pixels else set()) | ({'run_evidence'} if inputs.evidence is not None else set())
         missing = [kind for kind in spec['tool']['inputs'] if kind not in available]
         status, output, warnings, error_type = 'not_implemented', None, [], None
         message = 'Configuration recorded; Python method not connected. No analysis result produced.'

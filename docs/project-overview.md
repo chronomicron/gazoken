@@ -56,7 +56,8 @@ inspection. A local [Python framework](local-workbench.md) now provides all thre
 controls, shared-source visual previews, seven Python measurements (source identity, file structure, bounded metadata inventory, byte distribution, exact quantization tables, Huffman codebook/scan inventory, and bounded embedded JPEG extraction), and session
 exports. A [modular tool interface](tool-development.md) now isolates adapters,
 preserves source identity, declares prerequisites, and shows selected call order.
-All Phase 2 and Phase 3 analyses remain configuration-only.
+A [current-run evidence report](evidence-report.md) assembles Phase 1 outputs
+without adding a forensic verdict. All Phase 2 and Phase 3 analyses remain configuration-only.
 No calibrated detector, scientific benchmark, C/C++ package, or paper is
 implemented yet.
 

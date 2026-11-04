@@ -19,4 +19,4 @@ Planned paths below are reserved names, not generated stubs or implemented metho
 | 1.9 Stored DCT arrays | `stored_coefficients.py` | Planned | jpeg_bytes |
 | 1.10 Coefficient statistics | `coefficient_statistics.py` | Planned | jpeg_bytes, coefficients |
 | 1.11 Compression history | `compression_history.py` | Planned | jpeg_bytes, coefficients |
-| 1.12 Evidence report | `evidence_report.py` | Planned | jpeg_bytes |
+| 1.12 Evidence report | `evidence_report.py` | Registered | jpeg_bytes, run_evidence |

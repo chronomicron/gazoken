@@ -26,7 +26,7 @@ class WorkbenchTests(unittest.TestCase):
         result = self.upload([{"id": s["id"]} for s in catalog])
         self.assertEqual(result.status_code, 200, result.text)
         records = result.json()["results"]
-        self.assertEqual([r["id"] for r in records if r["status"] == "completed"], ["1.1", "1.2", "1.3", "1.4", "1.5", "1.6", "1.7"])
+        self.assertEqual([r["id"] for r in records if r["status"] == "completed"], ["1.1", "1.2", "1.3", "1.4", "1.5", "1.6", "1.7", "1.12"])
         self.assertTrue(all(r["output"] is None for r in records if r["status"] == "not_implemented"))
 
     def test_bytes_hash_and_parameter_record(self):
@@ -52,6 +52,17 @@ class WorkbenchTests(unittest.TestCase):
         self.assertEqual(self.client.get('/api/sample?id=../../README.md').status_code, 404)
         self.assertEqual(self.client.get('/api/sample').content,
                          (Path(__file__).parent / 'fixtures/images/02-reference-q90.jpg').read_bytes())
+
+    def test_report_assembles_api_run_without_cross_request_history(self):
+        run = self.upload([{'id':'1.12'}, {'id':'1.7'}, {'id':'1.1'}]).json()
+        report = run['results'][-1]['output']
+        self.assertEqual([r['id'] for r in report['records']], ['1.1','1.7'])
+        self.assertEqual(report['source'], run['source'])
+        self.assertEqual(report['evidence_provenance']['record_count'], 2)
+        empty = self.upload([{'id':'1.12'}], data=self.data+b'other source').json()['results'][0]
+        self.assertEqual(empty['output']['records'], [])
+        self.assertNotEqual(empty['output']['source']['sha256'], report['source']['sha256'])
+        self.assertTrue(empty['warnings'])
 
     def test_known_entropy(self):
         self.assertEqual(byte_distribution(bytes(range(256)))["entropy_bits_per_byte"], 8)

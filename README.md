@@ -69,6 +69,7 @@ Python adapters currently measure source identity,
 [exact quantization tables](docs/quantization-tables.md), plus
 [Huffman codebooks and scan assignments](docs/entropy-coding.md), and
 [embedded JPEG preview ranges](docs/embedded-images.md).
+The [evidence report](docs/evidence-report.md) assembles current-run Phase 1 results.
 See [setup and coverage](docs/local-workbench.md). From an installed checkout,
 run `.venv/bin/gazoken` and open `http://127.0.0.1:8765/`.
 

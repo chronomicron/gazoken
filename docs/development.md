@@ -38,8 +38,8 @@ these are separate states.
 
 The first Python package uses an editable `src/gazoken` layout and FastAPI with a
 custom browser interface. See [local workbench](local-workbench.md) for setup,
-framework boundaries, API checks, and adding a method. This increment has two
-basic byte-measurement handlers; C/C++ roles remain open.
+framework boundaries, API checks, and adding a method. The executable adapter coverage is maintained in that guide and the Phase 1
+README; C/C++ roles remain open.
 
 All three languages are intended project outputs. Broader build systems,
 bindings, and distribution channels remain undecided.
@@ -91,3 +91,7 @@ Completion reports should explain changes, checks, limitations, and open questio
 Keep private images, credentials, and unlicensed data out of public commits.
 Version dataset manifests and acquisition instructions without committing large
 or restricted datasets. Artifact storage remains an open decision.
+
+The [evidence assembler](evidence-report.md) adds optional source-bound current-run
+records to the shared input packet. Follow its documented scope when adding report
+consumers; do not import unverified browser history into measurement provenance.

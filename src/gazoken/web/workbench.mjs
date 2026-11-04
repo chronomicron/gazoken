@@ -50,11 +50,11 @@ function control(p, id) {
   else widget = `<input data-step="${id}" data-param="${p.key}" id="${key}" type="${p.type}" value="${esc(value)}" ${p.type === 'number' ? `min="${p.min}" max="${p.max}" step="${p.step}"` : 'maxlength="2000"'} placeholder="${esc(p.placeholder || '')}">`;
   return `<label class="param" for="${key}"><span>${esc(p.label)}</span>${widget}</label>`;
 }
-const inputLabel = kind => ({jpeg_bytes:'Original JPEG bytes',pixels:'Python pixel package',coefficients:'Stored coefficient package',sensor_reference:'Enrolled sensor reference',model_weights:'Versioned model weights',evaluated_evidence:'Evaluated specialist evidence'}[kind] || kind);
+const inputLabel = kind => ({jpeg_bytes:'Original JPEG bytes',pixels:'Python pixel package',coefficients:'Stored coefficient package',sensor_reference:'Enrolled sensor reference',model_weights:'Versioned model weights',evaluated_evidence:'Evaluated specialist evidence',run_evidence:'Earlier results in this run'}[kind] || kind);
 function toolBoundary(step) {
   const tool=step.tool;
   if(!tool)return '';
-  return `<div class="tool-boundary"><strong>Common tool interface · v${esc(tool.contract_version)}</strong><code>${esc(tool.module)}</code><span>${step.implementation==='ready'?'Registered adapter':'Reserved module · not implemented'}</span><ul>${tool.inputs.map(kind=>`<li>${esc(inputLabel(kind))}: ${kind==='jpeg_bytes'?(state.source?'source ready for submission':'load a source'):'not provided by this framework'}</li>`).join('')}</ul></div>`;
+  return `<div class="tool-boundary"><strong>Common tool interface · v${esc(tool.contract_version)}</strong><code>${esc(tool.module)}</code><span>${step.implementation==='ready'?'Registered adapter':'Reserved module · not implemented'}</span><ul>${tool.inputs.map(kind=>`<li>${esc(inputLabel(kind))}: ${kind==='jpeg_bytes'?(state.source?'source ready for submission':'load a source'):kind==='run_evidence'?'assembled by runner; may be empty':'not provided by this framework'}</li>`).join('')}</ul></div>`;
 }
 function renderSteps() {
   const open = state.openByPhase[state.phase];
@@ -99,7 +99,10 @@ function showEvidence(id = state.active) {
     body=`<div class="config-note">${state.source?'Uses the same preserved source as Phase 1.':'Load a source once in any phase.'} Python decoded reference: not created. This step records configuration only. Provisional settings are not validated experimental parameters.</div><h3 class="artifact-heading">Expected outputs · not generated</h3><ul class="artifact-slots">${(step.outputs||[]).map(label=>`<li>${esc(label)}</li>`).join('')}</ul>${step.requires?.length?`<p class="muted">Planned inputs from steps ${esc(step.requires.join(', '))}. Dependencies are declared, not automatically executed.</p>`:''}`;
   }
   else if (id === '1.1' && state.source) body = definitionList(Object.entries(measured?.output || state.source));
-  else if (id === '1.6' && measured) {
+  else if (id === '1.12' && measured) {
+    const o=measured.output;
+    body=`<p>${o.record_count} earlier records · ${o.completed_count} completed steps · ${o.warning_count} warnings</p><button id="download-evidence-report" class="button subtle">Download assembled report ↗</button><p class="muted">${esc(o.scope)}</p>`+table(['Step','Execution','Partial extraction','Warnings'],o.coverage.map(r=>[r.id,r.status,r.partial_extraction?'Yes':'No',r.has_warnings?'Yes':'No']))+`<details><summary>Assembled evidence report</summary><pre>${esc(JSON.stringify(o,null,2))}</pre></details><p class="warning-note">${esc(o.interpretation)}</p>`+(measured.warnings||[]).map(w=>`<p class="warning-note">${esc(w)}</p>`).join('');
+  } else if (id === '1.6' && measured) {
     const o=measured.output;
     body=`<p>${esc(o.extraction_status)} extraction · ${o.preview_count} embedded JPEG previews</p>`+table(['Kind','Offset','Bytes','SHA-256'],o.previews.map(p=>[p.kind,p.offset,p.byte_count,p.sha256]))+`<details><summary>Embedded preview records</summary><pre>${esc(JSON.stringify(o.previews,null,2))}</pre></details><p class="muted">${esc(o.interpretation)}</p>`+(measured.warnings||[]).map(w=>`<p class="warning-note">${esc(w)}</p>`).join('');
   } else if (id === '1.7' && (measured || preview?.statistics)) {
@@ -134,6 +137,7 @@ function showEvidence(id = state.active) {
     body += '<p class="muted">Definitions only; actual symbol usage is not measured.</p>';
   } else body = `<div class="config-note">${state.file ? 'Parameters ready for a future method adapter. No analytical output has been produced for this step.' : 'Load a JPEG to begin. You can configure this step in advance.'}</div>`;
   $('evidence-content').innerHTML = body;
+  if(id==='1.12' && measured) $('download-evidence-report').onclick=()=>downloadJson(measured.output,'gazoken-evidence-report.json');
 }
 function drawHistogram(histogram, canvas = $('distribution-chart')) {
   if (!canvas) return;
@@ -283,7 +287,7 @@ function renderReports() {
   $('export-phase').disabled=!state.source;
   if(!state.source){$('phase-summary').innerHTML='<p class="muted">Load a source to begin a report. Unrun and unimplemented steps remain visible.</p>';return;}
   const c=report.coverage;
-  $('phase-summary').innerHTML=`<div class="coverage"><strong>${c.completed}<small>of ${c.total} steps measured</small></strong><div><b>${report.status==='complete'?'Execution complete':'Partial phase report'}</b><p>${c.not_implemented} not implemented · ${c.not_run} not run${c.other?` · ${c.other} other status`:''}</p></div></div><p class="report-source">${esc(state.source.filename)}<br><code>SHA-256 ${esc(state.source.sha256)}</code></p>${table(['Step','Latest execution','Attempts'],report.steps.map(s=>[`${s.id} ${s.title}`,statusLabel(s.status),s.attempt_count]))}<p class="warning-note">This is a framework summary of recorded outputs. Planned methods and browser previews do not count as completed Python steps. It is not an authenticity verdict or the future ${state.phase===1?'1.12 analysis adapter':state.phase===2?'2.11 analysis adapter':'processing-history interpretation'}.</p>`;
+  $('phase-summary').innerHTML=`<div class="coverage"><strong>${c.completed}<small>of ${c.total} steps measured</small></strong><div><b>${report.status==='complete'?'Execution complete':'Partial phase report'}</b><p>${c.not_implemented} not implemented · ${c.not_run} not run${c.other?` · ${c.other} other status`:''}</p></div></div><p class="report-source">${esc(state.source.filename)}<br><code>SHA-256 ${esc(state.source.sha256)}</code></p>${table(['Step','Latest execution','Attempts'],report.steps.map(s=>[`${s.id} ${s.title}`,statusLabel(s.status),s.attempt_count]))}<p class="warning-note">This is a framework summary of recorded outputs. Planned methods and browser previews do not count as completed Python steps. It is not an authenticity verdict and is separate from ${state.phase===1?'the 1.12 current-run evidence assembler':state.phase===2?'the future 2.11 analysis adapter':'processing-history interpretation'}.</p>`;
 }
 function downloadJson(report,filename) {
   const url=URL.createObjectURL(new Blob([JSON.stringify(report,null,2)],{type:'application/json'}));

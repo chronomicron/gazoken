@@ -224,6 +224,22 @@ Proposals remain separate until agreed. The initial handoff predates this log;
   isolation, not a security sandbox. Broader scientific schemas remain open.
 - Guide: [tool development](tool-development.md).
 
+## D016 — Current-run evidence input and report — 2026-11-04
+
+- Status: accepted local increment, following the user's approval to implement 1.12
+  before coefficient reader 1.9 and statistics 1.10.
+- Decision: add optional `RunEvidence` to the common input packet. The runner supplies
+  a detached, immutable, source-bound JSON snapshot of earlier records in the current
+  plan to declared consumers. Report 1.12 assembles Phase 1 records only.
+- Rationale: reuse real validated execution records without allowing user-supplied
+  history to masquerade as measurements or merging unrelated browser runs.
+- Consequences: current-run reports require selecting analysis tools and 1.12 together.
+  Standalone reports are explicitly empty. Existing session/phase exports still handle
+  multi-run browser history. No automatic dependencies, detector fusion or probability
+  calculation is introduced. The addition is compatible with existing source/pixel
+  callers; broader scientific schemas and evaluated specialist evidence remain open.
+- Guide: [evidence report](evidence-report.md).
+
 ## Pending proposals
 
 

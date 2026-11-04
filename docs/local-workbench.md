@@ -1,7 +1,7 @@
 # Local Python research workbench
 
 Updated: 2026-11-04  
-Version: 0.5.0 — modular tool foundation; seven registered Python measurements
+Version: 0.5.0 — modular tool foundation; eight registered Python tools
 
 ## Launch
 
@@ -67,7 +67,7 @@ resets cards and summaries across all phases; changing parameters alone preserve
 **Download phase report** saves a separate JSON summary containing latest per-step
 results and executed parameters. The full session export includes that summary
 and every run from all three phases. The framework summaries are separate from the
-future 1.12 and 2.11 Python analysis adapters, which remain unimplemented. Neither is an authenticity verdict.
+1.12 current-run evidence assembler and the future 2.11 Python adapter. None is an authenticity verdict.
 
 The stage offers fit/100%/200% display, an optional 64-pixel coordinate guide,
 an encoded-byte color map, and numeric quantization heatmaps. The guide is an
@@ -105,6 +105,7 @@ Python decoded reference and prerequisites are not automatically executed.
 | 1.5 Entropy coding | Implemented | Stored Huffman definitions, canonical codes, chronological scan assignments and partial-data warnings. See [coverage](entropy-coding.md). |
 | 1.6 Embedded images | Implemented | Bounded Exif IFD1/JFXX JPEG range extraction, hashes and optional nested structure. See [coverage](embedded-images.md). |
 | 1.7 Byte distribution | Implemented | Exact 256-bin whole-file histogram and Shannon entropy in bits/byte. Descriptive only. |
+| 1.12 Evidence report | Implemented | Assemble earlier Phase 1 results within the same run, with coverage, provenance and optional raw measurements/warnings. See [usage](evidence-report.md). |
 | Other Phase 1 steps | Not implemented | Validated configuration and explicit status; no analytical output. |
 | All eleven Phase 2 steps | Not implemented | Parameter records linked to the same original JPEG; no Python decode or spatial analysis. |
 | All fourteen Phase 3 steps | Not implemented | Typed settings and explicit unmet requirements; no processing-history algorithms, reference matching or model inference. |
@@ -369,3 +370,9 @@ Step 1.6 added (2026-11-04): [embedded images](embedded-images.md) executes thro
 the common registry. Steps 1.1–1.7 are now implemented within their documented
 bounded scopes. Preview records do not decode pixels or compare image content.
 Restart for catalog changes.
+
+
+Step 1.12 added (2026-11-04): select tools and 1.12 together, then Run selected.
+The [evidence report](evidence-report.md) is assembled from earlier records of
+that run, with its own JSON download. Separate GUI runs are not merged. Current
+executable IDs: 1.1–1.7 and 1.12. Next: 1.9 coefficient reader, then 1.10 statistics.

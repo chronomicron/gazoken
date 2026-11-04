@@ -83,9 +83,38 @@ class PixelPackage:
 
 
 @dataclass(frozen=True)
+class RunEvidence:
+    """Detached JSON snapshot of records produced earlier in this run."""
+    source_sha256: str
+    records_json: str
+
+    def __post_init__(self):
+        if not isinstance(self.records_json, str):
+            raise ValueError('Evidence must be a serialized JSON record list.')
+        records = json.loads(self.records_json)
+        if not isinstance(records, list) or len(records) > 37:
+            raise ValueError('Invalid evidence record list.')
+        for record in records:
+            if (not isinstance(record, dict) or not isinstance(record.get('inputs'), dict)
+                    or record['inputs'].get('source_sha256') != self.source_sha256):
+                raise ValueError('Evidence belongs to another source.')
+        # Reject nonfinite values and keep only an immutable serialized snapshot.
+        object.__setattr__(self, 'records_json', json.dumps(records, sort_keys=True, allow_nan=False))
+
+    def records(self):
+        return json.loads(self.records_json)
+
+    def record(self):
+        return {'source_sha256': self.source_sha256, 'record_count': len(self.records()),
+                'sha256': hashlib.sha256(self.records_json.encode()).hexdigest(),
+                'scope': 'Earlier results in this run only'}
+
+
+@dataclass(frozen=True)
 class ToolInputs:
     source: ImageSource
     pixels: PixelPackage | None = None
+    evidence: RunEvidence | None = None
 
     def __post_init__(self):
         if not isinstance(self.source, ImageSource):
@@ -93,9 +122,13 @@ class ToolInputs:
         if self.pixels is not None and (not isinstance(self.pixels, PixelPackage) or self.pixels.source_sha256 != self.source.sha256):
             raise ValueError("Pixel package does not belong to this source.")
 
+        if self.evidence is not None and (not isinstance(self.evidence, RunEvidence) or self.evidence.source_sha256 != self.source.sha256):
+            raise ValueError('Evidence package does not belong to this source.')
+
     def record(self):
         return {"contract_version": CONTRACT_VERSION, "source_sha256": self.source.sha256,
-                "pixels": self.pixels.record() if self.pixels else None}
+                "pixels": self.pixels.record() if self.pixels else None,
+                "evidence": self.evidence.record() if self.evidence else None}
 
 
 @dataclass(frozen=True)
