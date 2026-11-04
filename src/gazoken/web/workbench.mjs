@@ -104,6 +104,9 @@ function showEvidence(id = state.active) {
     body = `<canvas id="distribution-chart" class="chart" aria-label="Whole-file byte frequency histogram"></canvas><div class="chart-label"><span>BYTE VALUE 0 → 255</span><span>${statistics.entropy_bits_per_byte.toFixed(4)} BITS / BYTE</span></div><p class="warning-note">Whole-file bytes, including headers and scan data. This descriptive measurement is not a tampering score.${measured ? '' : ' Browser preview; run 1.7 for a Python record.'}</p>`;
     if (!measured) $('evidence-origin').textContent = 'BROWSER PREVIEW';
     $('evidence-content').innerHTML = body; drawHistogram(statistics.histogram); return;
+  } else if (id === '1.2' && measured) {
+    const o=measured.output;
+    body = `<p>${esc(o.extraction_status)} inventory · ${o.segment_count} segments · ${o.scan_count} scans · trailing bytes: ${o.trailing_bytes===null?'unknown':o.trailing_bytes}</p>` + table(['Marker','Offset','Bytes'],o.segments.map(s=>[s.marker,s.offset,s.byte_length])) + `<p class="muted">${esc(o.interpretation)}</p><details><summary>Frames, sampling and scan layout</summary><pre>${esc(JSON.stringify({frames:o.frames,scans:o.scans,restart_intervals:o.restart_intervals},null,2))}</pre></details>` + (measured.warnings||[]).map(w=>`<p class="warning-note">${esc(w)}</p>`).join('');
   } else if (id === '1.2' && preview) {
     body = table(['Marker','Byte offset','Length'], preview.segments.slice(0,256).map(s => [s.marker, s.offset, `${s.length} B`]));
     if (preview.segments.length > 256) body += '<p class="muted">First 256 segments shown.</p>';

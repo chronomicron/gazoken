@@ -53,7 +53,7 @@ The updated workbench has not been pushed or its public deployment verified.
 A separate read-only [JPEG inspector](jpeg-inspector.md) now extracts original
 encoding structures and EXIF, with graphical tables, byte statistics, and hex
 inspection. A local [Python framework](local-workbench.md) now provides all three phases of
-controls, shared-source visual previews, three Python measurements (source identity, byte distribution, and exact quantization-table extraction), and session
+controls, shared-source visual previews, four Python measurements (source identity, file structure, byte distribution, and exact quantization-table extraction), and session
 exports. A [modular tool interface](tool-development.md) now isolates adapters,
 preserves source identity, declares prerequisites, and shows selected call order.
 All Phase 2 and Phase 3 analyses remain configuration-only.

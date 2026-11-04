@@ -32,8 +32,8 @@
     "title": "File structure",
     "subtitle": "Map the encoded file",
     "group": "Structure",
-    "description": "Plan the marker walk, frame and scan inventory. The viewer can already show a browser-parsed structural preview; the Python step is not connected.",
-    "implementation": "planned",
+    "description": "Inventory original JPEG markers, frames, sampling, scan layout and restart intervals without decoding pixels. Damaged inputs retain partial records with warnings.",
+    "implementation": "ready",
     "view": "structure",
     "selected": true,
     "parameters": [
