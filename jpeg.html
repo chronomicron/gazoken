@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Read-only JPEG file inspection: encoding tables, Exif, byte statistics, and structural evidence. Images stay on your device.">
+  <meta name="color-scheme" content="light dark">
+  <title>JPEG file inspector · GAZOKEN</title>
+  <link rel="stylesheet" href="./assets/workbench.css">
+  <link rel="stylesheet" href="./assets/jpeg.css">
+  <script type="module" src="./assets/js/jpeg-ui.mjs"></script>
+</head>
+<body>
+  <a class="skip-link" href="#inspector">Skip to inspector</a>
+  <div class="page">
+    <header>
+      <a class="brand" href="./"><span lang="ja">ガゾケン</span> <strong>GAZOKEN</strong></a>
+      <div class="header-links"><a href="./">Pixel workbench</a><a href="https://github.com/chronomicron/gazoken">GitHub ↗</a></div>
+    </header>
+    <main id="inspector">
+      <section class="intro">
+        <p class="eyebrow">FILE STRUCTURE / JPEG INSPECTOR 0.1</p>
+        <h1>Read the file.</h1>
+        <p class="subtitle">JPEG as data <span lang="ja">JPEG ファイルの構造と統計を調べる</span></p>
+        <p class="lead">Inspect the encoded bytes, tables, and metadata. No pixel rendering required.</p>
+        <p class="local-note"><span class="dot" aria-hidden="true"></span>Read-only, on your device. No image uploads or external lookups.</p>
+      </section>
+      <noscript><p class="error">Enable JavaScript to inspect JPEG files.</p></noscript>
+      <section class="panel" aria-labelledby="file-heading">
+        <div class="panel-heading"><h2 id="file-heading"><span class="step">01</span> Original JPEG file</h2><button id="jpeg-clear" class="text-button" disabled>Clear</button></div>
+        <div id="jpeg-drop" class="inspector-input">
+          <div><p>Choose a JPEG or drop it here.</p><p class="muted">Up to 25 MiB · original bytes retained unchanged · no pixel-size limit</p></div>
+          <div class="source-actions"><label class="button secondary" for="jpeg-file">Choose JPEG<input id="jpeg-file" class="file-input" type="file" accept="image/jpeg,.jpg,.jpeg"></label><button id="jpeg-demo" class="text-button">Try reference JPEG</button></div>
+        </div>
+        <p id="jpeg-status" class="status" role="status" aria-live="polite">No JPEG loaded.</p>
+      </section>
+      <div id="jpeg-report" hidden>
+        <section class="results-section" aria-labelledby="overview-heading">
+          <div class="section-heading"><h2 id="overview-heading"><span class="step">02</span> File overview</h2><button id="jpeg-export" class="text-button">Save JSON report</button></div>
+          <div id="jpeg-summary" class="summary-grid"></div>
+          <p id="jpeg-hash" class="hash"></p>
+          <div id="jpeg-warnings" class="inspection-warnings"></div>
+        </section>
+        <section class="results-section" aria-labelledby="interpretation-heading">
+          <h2 id="interpretation-heading"><span class="step">03</span> Evidence &amp; possible history</h2>
+          <p class="muted">A transparent, rule-based reading of the extracted fields. No encoder database, learned detector, or calibrated probability is applied.</p>
+          <div id="jpeg-opinion" class="interpretation-grid"></div>
+        </section>
+        <section class="results-section" aria-labelledby="quantization-heading">
+          <h2 id="quantization-heading"><span class="step">04</span> Quantization tables</h2>
+          <p class="muted">8 × 8 frequency layout: DC at top-left, higher frequencies toward the bottom-right. Each heatmap uses its own scale; read the numeric values when comparing tables.</p>
+          <div id="jpeg-quantization" class="results-grid"></div>
+        </section>
+        <section class="results-section" aria-labelledby="statistics-heading">
+          <h2 id="statistics-heading"><span class="step">05</span> Encoded-byte statistics</h2>
+          <p class="muted">These are file-byte frequencies, not pixel intensities, DCT coefficient histograms, or decoded Huffman symbol frequencies.</p>
+          <div id="jpeg-bytes" class="results-grid"></div>
+        </section>
+        <section class="results-section" aria-labelledby="coding-heading">
+          <h2 id="coding-heading"><span class="step">06</span> Components, scans &amp; Huffman tables</h2>
+          <div id="jpeg-coding"></div>
+        </section>
+        <section class="results-section" aria-labelledby="metadata-heading">
+          <h2 id="metadata-heading"><span class="step">07</span> Metadata as recorded</h2>
+          <p class="muted">EXIF fields are editable claims. Unknown tags are retained by ID. MakerNotes, XMP contents, ICC contents, and embedded thumbnails are not decoded in this version.</p>
+          <div id="jpeg-metadata"></div>
+        </section>
+        <section class="results-section" aria-labelledby="structure-heading">
+          <h2 id="structure-heading"><span class="step">08</span> Structure &amp; hex inspection</h2>
+          <p class="muted">Select a segment to inspect its original bytes. All offsets are zero-based file offsets.</p>
+          <div class="hex-layout"><div id="jpeg-segments" class="table-scroll"></div>
+            <div class="hex-panel panel">
+              <form id="hex-form"><label for="hex-offset">Go to byte offset</label><div class="hex-controls"><input id="hex-offset" value="0" inputmode="text" aria-describedby="hex-help"><button class="button secondary" type="submit">Go</button></div><p id="hex-help" class="muted">Decimal or 0x-prefixed hexadecimal</p></form>
+              <p id="hex-caption" class="muted" role="status"></p><pre id="jpeg-hex" tabindex="0" aria-label="Original JPEG hex bytes"></pre>
+              <div class="hex-paging"><button id="hex-prev" class="text-button">← Previous 256 bytes</button><button id="hex-next" class="text-button">Next 256 bytes →</button></div>
+            </div>
+          </div>
+        </section>
+      </div>
+      <p class="inspector-limit">This first inspector examines file structure and coding tables. It does not entropy-decode DCT coefficients or establish previous saves, local edits, or AI generation. <a href="https://github.com/chronomicron/gazoken/blob/main/docs/jpeg-inspector.md">Method &amp; coverage</a></p>
+    </main>
+    <footer><span><span lang="ja">グルー研究室</span> · Grou-lab</span><nav aria-label="Project links"><a href="./">Pixel workbench</a><a href="https://chronomicron.com/">chronomicron.com ↗</a></nav></footer>
+  </div>
+</body>
+</html>

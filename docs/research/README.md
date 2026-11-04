@@ -15,9 +15,22 @@ suite, using author code or a documented implementation. See
 evaluation lifecycle and statistical reporting requirements. Improvements and
 original research will build on these findings.
 
+## Literature notes
+
+Literature reviews, papers, study proposals, research data, and unpublished
+findings live in the sibling `gazoken-research` checkout. Start with that
+repository's README and architect summary. Previously uncommitted JPEG literature
+and investigation drafts have been relocated there, along with the research
+conversation synopsis. This public document retains the workflow; tool
+implementations and their coverage remain in `gazoken`.
+
+Reuse existing summaries for routine work. Reserve Mentat for bounded questions
+that warrant a deeper research pass.
+
 ## From idea to study
 
-1. Create a [method brief](tool-template.md) with attribution, a bounded research
+1. Create a method brief in the private research checkout using the
+   [template](tool-template.md), with attribution, a bounded research
    question, assumptions, and a claim to test.
 2. Review primary literature. Record bibliographic details and persistent
    identifiers where available. Distinguish reproduced methods from original

@@ -19,8 +19,8 @@ checked in this session. No DNS or GitHub settings were changed from this checko
 ## Current application and local preview
 
 The initial workbench is buildless HTML, CSS, and JavaScript, with browser-local
-image processing and module workers. Publish `index.html`, `.nojekyll`, and the
-entire `assets/` directory together. It has no package installation or build step.
+image processing and module workers. Publish `index.html`, `jpeg.html`, `.nojekyll`, the entire `assets/` directory,
+and the bundled `tests/fixtures/` reference files together. It has no package installation or build step.
 Relative asset and worker URLs support the `/gazoken/` path. Do not open it as a
 `file://` document: JavaScript modules and workers need an HTTP/HTTPS server.
 
@@ -36,7 +36,8 @@ Open `http://127.0.0.1:8000/`; stop with Ctrl+C. Browser integration checks are 
 
 ## Publish after pushing the files
 
-1. Commit and push the page and complete `assets/` directory with `.nojekyll`
+1. Commit and push both pages, the complete `assets/` directory, bundled fixtures,
+   and `.nojekyll`
    to `main` using the normal local VS Code/Git workflow.
 2. Open [Gazoken Pages settings](https://github.com/chronomicron/gazoken/settings/pages).
 3. Under **Build and deployment**, choose **Deploy from a branch**, branch

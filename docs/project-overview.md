@@ -10,9 +10,10 @@ Gazoken is a coined name associated with 画像 (gazō, image) and 研究
 (kenkyū, research), with a secondary phonetic association with 検証
 (kenshō, verification). Name availability has not been checked.
 
-The working question is: assuming an image originated from a camera, what traces
-suggest alteration, generation, or concealed information? Camera origin is a
-hypothesis to examine, not a conclusion from loading the file.
+The working question is: given a file of unknown provenance, what can we learn
+from its contents, structure, and processing traces? Camera origin, editing,
+generation, and concealed information are hypotheses to examine. This framing
+supersedes the initial camera-origin working assumption.
 
 ## Confirmed direction
 
@@ -31,6 +32,8 @@ hypothesis to examine, not a conclusion from loading the file.
 - Develop reusable Python, C, and C++ code packages alongside the website.
 - Pursue research papers for journals or conferences.
 - Manage local files in VS Code and push changes to GitHub.
+- Prioritize Python tools for research measurements, operated through a local
+  browser interface; the public static page may expose a smaller tool subset.
 
 Ordinary camera processing produces structured traces. Differences in texture,
 lighting, motion, and depth of field can resemble editing evidence. Recompression
@@ -47,7 +50,12 @@ interactive workbench is now implemented locally with browser-only image loading
 independent checkboxes, four exploratory visualizations, and result exports.
 See [first workbench](first-workbench.md) for precise methods and verification.
 The updated workbench has not been pushed or its public deployment verified.
-No calibrated detector, scientific benchmark, Python/C/C++ package, or paper is
+A separate read-only [JPEG inspector](jpeg-inspector.md) now extracts original
+encoding structures and EXIF, with graphical tables, byte statistics, and hex
+inspection. A local [Python framework](local-workbench.md) now adds Phase 1 and Phase 2
+controls, shared-source visual previews, two basic byte measurements, and session
+exports. All Phase 2 analyses remain configuration-only.
+No calibrated detector, scientific benchmark, C/C++ package, or paper is
 implemented yet.
 
 The architect supports brainstorming, research planning, shared architecture,
@@ -74,7 +82,7 @@ curve differences as blur evidence. Edge operators and threshold units remain op
 ## Open decisions
 
 - First paper-specific research question, benchmark, and evaluated detector suite.
-- Future cross-language interfaces, package stack, and execution needs beyond the static browser prototype.
+- Future cross-language interfaces and execution needs beyond the local Python framework and static browser prototype.
 - Future image formats and limits beyond the prototype; any server upload, retention, or privacy requirements.
 - Datasets, model selection, evaluation protocol, and evidence combination.
 - Future website architecture and full interface languages; the prototype uses static Pages hosting.

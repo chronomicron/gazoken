@@ -5,7 +5,10 @@ Image Forensics Workbench, under グルー研究室 · Grou-lab.
 
 | Document | Purpose |
 | --- | --- |
+| [Local Python workbench](local-workbench.md) | Launch instructions, Phase 1/2 controls, shared-source previews, reports, and extension points. |
 | [Test fixtures](../tests/fixtures/README.md) | Synthetic inputs, known edits, masks, and regeneration instructions. |
+| [Private research workspace](https://github.com/chronomicron/gazoken-research) | Literature, papers, research data, study proposals, and unpublished results. |
+| [JPEG inspector](jpeg-inspector.md) | Raw JPEG/Exif inspection, graphical tables, byte statistics, and coverage. |
 | [First workbench](first-workbench.md) | Usage, implemented methods, preprocessing, and verification limits. |
 | [Project overview](project-overview.md) | Confirmed scope, philosophy, and open decisions. |
 | [Roadmap](roadmap.md) | Proposed milestones and completion criteria. |
@@ -29,9 +32,11 @@ Preserve superseded decisions with replacement links; do not silently rewrite
 historical results. The handoff is an archive: maintained documents record later
 decisions that supersede its open questions.
 
-Add method briefs under `research/` when investigations are assigned. Create
-experiment, package, and manuscript directories when they contain actual work;
-plans do not imply those artifacts already exist.
+Use the sibling `gazoken-research` checkout for literature and research briefs,
+study records, data, and manuscripts. This repository retains implementation
+documentation, method coverage, reproducible software checks, and synthetic
+fixtures. The `docs/research/` workflow and template describe the process; completed
+research records belong in the private repository until selected for release.
 
 Documentation is sufficient when another contributor can understand the purpose,
 reproduce the relevant work, and identify its limitations.

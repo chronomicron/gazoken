@@ -36,8 +36,13 @@ these are separate states.
 
 ## Python, C, and C++ packages
 
-All three languages are intended project outputs. Package layout, language
-versions, build systems, bindings, and distribution channels remain undecided.
+The first Python package uses an editable `src/gazoken` layout and FastAPI with a
+custom browser interface. See [local workbench](local-workbench.md) for setup,
+framework boundaries, API checks, and adding a method. This increment has two
+basic byte-measurement handlers; C/C++ roles remain open.
+
+All three languages are intended project outputs. Broader build systems,
+bindings, and distribution channels remain undecided.
 A method need not be independently reimplemented in every language; decide roles
 and interoperability from actual research and performance needs.
 
@@ -65,7 +70,8 @@ Website work should verify the user workflow and deployed `/gazoken/` navigation
 and assets. Documentation changes need link, consistency, and whitespace checks.
 
 The prototype is buildless HTML/CSS/JavaScript. Run its numerical checks with
-`node tests/analysis.test.mjs` and its browser checks at `tests/browser.html`
+`node tests/analysis.test.mjs` and `node tests/jpeg.test.mjs`. Browser checks are
+at `tests/browser.html` and `tests/jpeg-browser.html`
 through a local HTTP server. See [first workbench](first-workbench.md) for the
 contract and validation scope. No CI workflow or cross-language build is configured.
 

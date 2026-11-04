@@ -13,6 +13,17 @@ Preserve the identity ガゾケン · GAZOKEN, Image Forensics Workbench,
 
 ## Documentation discipline
 
+Repository split: keep tool code, implementations, software tests/fixtures, and
+implementation documentation in this checkout. Keep literature notes, papers,
+research data/manifests, experimental proposals/results, unpublished ideas, and
+manuscripts in the sibling `/home/omoikane/workspace/gazoken-research` checkout.
+Consult its guidance before writing research material. Public release of private
+research remains a deliberate user decision.
+
+Use existing research summaries for routine work. Reserve Mentat for focused,
+difficult research questions; do not automatically repeat its broad literature
+survey. The day-to-day architect handles ordinary synthesis and coordination.
+
 - Update relevant documentation with each substantive implementation or research change.
 - Separate accepted decisions, proposals, hypotheses, and measured results.
 - Record the date, rationale, and consequences of accepted architectural decisions
@@ -35,6 +46,8 @@ representations when implementing analysis.
 Python, C, and C++ packages are intended outputs alongside the website and
 publication research; their responsibilities and integration remain undecided.
 
-The stack, execution location, shared result format, datasets, and first tool
-remain open. Do not treat an architectural proposal as an accepted constraint.
+The local Python framework uses FastAPI and a custom browser UI; consult
+`docs/local-workbench.md` for its actual coverage. Future method adapters,
+scientific result contracts, datasets, and paper-specific baselines remain open.
+Do not treat an architectural proposal as an accepted constraint.
 Do not claim the planned website is live without checking its deployed behavior.

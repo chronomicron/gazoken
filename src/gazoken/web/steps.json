@@ -1,0 +1,850 @@
+[
+  {
+    "id": "1.1",
+    "title": "Source identity",
+    "subtitle": "Preserve & identify",
+    "group": "Intake",
+    "description": "Record the original file's size, JPEG signature and SHA-256. The source remains unchanged.",
+    "implementation": "ready",
+    "view": "source",
+    "selected": true,
+    "parameters": [
+      {
+        "key": "note",
+        "label": "Acquisition note",
+        "type": "text",
+        "default": "",
+        "placeholder": "Where did this file come from?"
+      }
+    ]
+  },
+  {
+    "id": "1.2",
+    "title": "File structure",
+    "subtitle": "Map the encoded file",
+    "group": "Structure",
+    "description": "Plan the marker walk, frame and scan inventory. The viewer can already show a browser-parsed structural preview; the Python step is not connected.",
+    "implementation": "planned",
+    "view": "structure",
+    "selected": true,
+    "parameters": [
+      {
+        "key": "segment_limit",
+        "label": "Maximum segments",
+        "type": "number",
+        "min": 32,
+        "max": 4096,
+        "step": 1,
+        "default": 4096
+      },
+      {
+        "key": "include_scan_layout",
+        "label": "Include scan layout",
+        "type": "checkbox",
+        "default": true
+      }
+    ]
+  },
+  {
+    "id": "1.3",
+    "title": "Metadata inventory",
+    "subtitle": "Declarations & directories",
+    "group": "Structure",
+    "description": "Configure a future metadata reader. EXIF declarations are evidence to inspect, not authenticated provenance.",
+    "implementation": "planned",
+    "view": "metadata",
+    "selected": true,
+    "parameters": [
+      {
+        "key": "reader",
+        "label": "Reader preference",
+        "type": "select",
+        "options": [
+          "Auto (not connected)",
+          "ExifTool (not connected)",
+          "Bounded TIFF reader (not connected)"
+        ],
+        "default": "Auto (not connected)"
+      },
+      {
+        "key": "include_gps",
+        "label": "Include GPS in future results",
+        "type": "checkbox",
+        "default": false
+      },
+      {
+        "key": "include_vendor",
+        "label": "Request vendor metadata",
+        "type": "checkbox",
+        "default": false
+      }
+    ]
+  },
+  {
+    "id": "1.4",
+    "title": "Quantization atlas",
+    "subtitle": "The encoder's frequency choices",
+    "group": "Structure",
+    "description": "Configure exact table extraction and component assignments. Browse actual table values in the browser preview while the Python adapter is pending.",
+    "implementation": "planned",
+    "view": "quantization",
+    "selected": true,
+    "parameters": [
+      {
+        "key": "order",
+        "label": "Value layout",
+        "type": "select",
+        "options": [
+          "Natural 8 × 8",
+          "Stored zigzag"
+        ],
+        "default": "Natural 8 × 8"
+      },
+      {
+        "key": "retain_history",
+        "label": "Retain table redefinitions",
+        "type": "checkbox",
+        "default": true
+      }
+    ]
+  },
+  {
+    "id": "1.5",
+    "title": "Entropy coding",
+    "subtitle": "Codebooks & scan choices",
+    "group": "Structure",
+    "description": "Plan Huffman definitions and scan-script extraction. Actual encoded-symbol usage needs a separate entropy-event reader.",
+    "implementation": "planned",
+    "view": "structure",
+    "selected": false,
+    "parameters": [
+      {
+        "key": "codebooks",
+        "label": "Include codebook definitions",
+        "type": "checkbox",
+        "default": true
+      },
+      {
+        "key": "scan_script",
+        "label": "Include progressive scan script",
+        "type": "checkbox",
+        "default": true
+      }
+    ]
+  },
+  {
+    "id": "1.6",
+    "title": "Embedded images",
+    "subtitle": "Thumbnails as separate evidence",
+    "group": "Structure",
+    "description": "Configure embedded-preview discovery. Extraction, nested parsing and image comparison are not implemented in this framework.",
+    "implementation": "planned",
+    "view": "source",
+    "selected": false,
+    "parameters": [
+      {
+        "key": "preview_limit",
+        "label": "Maximum embedded previews",
+        "type": "number",
+        "min": 1,
+        "max": 16,
+        "step": 1,
+        "default": 4
+      },
+      {
+        "key": "nested_structure",
+        "label": "Request nested structure records",
+        "type": "checkbox",
+        "default": true
+      }
+    ]
+  },
+  {
+    "id": "1.7",
+    "title": "Byte distribution",
+    "subtitle": "Measure the original byte stream",
+    "group": "Measurements",
+    "description": "Compute exact counts for byte values 0–255 and descriptive Shannon entropy over the whole file. This is not a tampering score.",
+    "implementation": "ready",
+    "view": "bytes",
+    "selected": true,
+    "parameters": [
+      {
+        "key": "scope",
+        "label": "Measurement scope",
+        "type": "select",
+        "options": [
+          "Whole file"
+        ],
+        "default": "Whole file"
+      }
+    ]
+  },
+  {
+    "id": "1.8",
+    "title": "Encoder profiles",
+    "subtitle": "Compatible sources, not certainty",
+    "group": "Measurements",
+    "description": "Reserve a reference-profile comparison adapter. No source database is enrolled; no manufacturer or editor attribution is performed.",
+    "implementation": "planned",
+    "view": "source",
+    "selected": false,
+    "parameters": [
+      {
+        "key": "features",
+        "label": "Feature family",
+        "type": "select",
+        "options": [
+          "Quantization only",
+          "Coding structure",
+          "Coding + metadata structure"
+        ],
+        "default": "Coding structure"
+      },
+      {
+        "key": "unknown_allowed",
+        "label": "Allow an unknown source",
+        "type": "checkbox",
+        "default": true
+      }
+    ]
+  },
+  {
+    "id": "1.9",
+    "title": "Stored DCT arrays",
+    "subtitle": "Entropy decode, without IDCT",
+    "group": "Coefficients",
+    "description": "Configure a future coefficient reader. No DCT coefficients are extracted yet; reconstructed pixel DCTs are a different representation.",
+    "implementation": "planned",
+    "view": "quantization",
+    "selected": false,
+    "parameters": [
+      {
+        "key": "reader",
+        "label": "Reader preference",
+        "type": "select",
+        "options": [
+          "Not selected",
+          "jpegio candidate",
+          "jpeglib candidate"
+        ],
+        "default": "Not selected"
+      },
+      {
+        "key": "components",
+        "label": "Component selection",
+        "type": "select",
+        "options": [
+          "All stored components",
+          "First stored component"
+        ],
+        "default": "All stored components"
+      }
+    ]
+  },
+  {
+    "id": "1.10",
+    "title": "Coefficient statistics",
+    "subtitle": "Frequency-wise distributions",
+    "group": "Coefficients",
+    "description": "Reserve coefficient histograms and dependencies. Requires an implemented stored-coefficient reader.",
+    "implementation": "planned",
+    "view": "quantization",
+    "selected": false,
+    "requires": [
+      "1.9"
+    ],
+    "parameters": [
+      {
+        "key": "frequency_count",
+        "label": "First AC frequencies to inspect",
+        "type": "number",
+        "min": 1,
+        "max": 63,
+        "step": 1,
+        "default": 9
+      },
+      {
+        "key": "zero_fractions",
+        "label": "Include zero fractions",
+        "type": "checkbox",
+        "default": true
+      }
+    ]
+  },
+  {
+    "id": "1.11",
+    "title": "Compression history",
+    "subtitle": "Test earlier-quantization hypotheses",
+    "group": "Coefficients",
+    "description": "Reserve a published-method adapter for aligned recompression. The method and its validated operating conditions remain to be selected.",
+    "implementation": "planned",
+    "view": "quantization",
+    "selected": false,
+    "requires": [
+      "1.9"
+    ],
+    "parameters": [
+      {
+        "key": "method",
+        "label": "Method",
+        "type": "select",
+        "options": [
+          "Awaiting method review"
+        ],
+        "default": "Awaiting method review"
+      },
+      {
+        "key": "alignment",
+        "label": "Pilot assumption",
+        "type": "select",
+        "options": [
+          "Aligned; no geometry changes"
+        ],
+        "default": "Aligned; no geometry changes"
+      }
+    ]
+  },
+  {
+    "id": "1.12",
+    "title": "Evidence report",
+    "subtitle": "Observations with provenance",
+    "group": "Report",
+    "description": "Configure the future Python report assembler. The workbench's Export session action already saves configuration, source identity and actual run records.",
+    "implementation": "planned",
+    "view": "source",
+    "selected": false,
+    "parameters": [
+      {
+        "key": "include_measurements",
+        "label": "Include raw measurements",
+        "type": "checkbox",
+        "default": true
+      },
+      {
+        "key": "include_warnings",
+        "label": "Include limitations & warnings",
+        "type": "checkbox",
+        "default": true
+      }
+    ]
+  },
+  {
+    "id": "2.1",
+    "title": "Decoded reference",
+    "subtitle": "One source, a fixed pixel reference",
+    "group": "Reference",
+    "description": "Configure a reproducible Python decode of the same JPEG loaded in Phase 1. Decoder, color, orientation and sampling choices must be recorded. The current image is a browser display preview; no Python reference pixels have been created.",
+    "parameters": [
+      {
+        "key": "decoder",
+        "label": "Decoder preference",
+        "type": "select",
+        "options": [
+          "Awaiting decoder selection",
+          "libjpeg-turbo candidate",
+          "Pillow candidate"
+        ],
+        "default": "Awaiting decoder selection"
+      },
+      {
+        "key": "representation",
+        "label": "Reference representation",
+        "type": "select",
+        "options": [
+          "RGB 8-bit (proposed)",
+          "Native component planes (proposed)"
+        ],
+        "default": "RGB 8-bit (proposed)"
+      },
+      {
+        "key": "orientation",
+        "label": "Analysis coordinates",
+        "type": "select",
+        "options": [
+          "Keep stored orientation",
+          "Apply EXIF with coordinate mapping"
+        ],
+        "default": "Keep stored orientation"
+      },
+      {
+        "key": "record_color_policy",
+        "label": "Record color-profile and upsampling policy",
+        "type": "checkbox",
+        "default": true
+      }
+    ],
+    "outputs": [
+      "Decoder manifest",
+      "Reference pixels",
+      "Coordinate mapping"
+    ],
+    "requires": [],
+    "selected": true,
+    "implementation": "planned",
+    "view": "source"
+  },
+  {
+    "id": "2.2",
+    "title": "Spatial measurements",
+    "subtitle": "Histograms, texture & eligible regions",
+    "group": "Measurements",
+    "description": "Plan intensity/channel histograms, local variation, gradients and valid-region masks from the fixed decoded reference. These measurements describe usable evidence; low texture or clipping is not proof of editing.",
+    "parameters": [
+      {
+        "key": "channel",
+        "label": "Analysis channel",
+        "type": "select",
+        "options": [
+          "First stored component (when available)",
+          "Derived RGB luminance",
+          "Separate RGB channels"
+        ],
+        "default": "First stored component (when available)"
+      },
+      {
+        "key": "window_size",
+        "label": "Local window size (pixels)",
+        "type": "number",
+        "min": 8,
+        "max": 512,
+        "step": 1,
+        "default": 64
+      },
+      {
+        "key": "mark_clipping",
+        "label": "Mark clipped and low-texture regions",
+        "type": "checkbox",
+        "default": true
+      }
+    ],
+    "outputs": [
+      "Channel histograms",
+      "Local measurement maps",
+      "Eligibility masks"
+    ],
+    "requires": [
+      "2.1"
+    ],
+    "selected": true,
+    "implementation": "planned",
+    "view": "source"
+  },
+  {
+    "id": "2.3",
+    "title": "Current JPEG grid",
+    "subtitle": "Locate the present block lattice",
+    "group": "Grid analysis",
+    "description": "Reserve a local JPEG-grid method adapter for boundary responses, grid phase and spatial support. The visible coordinate guide is not a detected JPEG grid. A published method must be reviewed before any detector result is reported.",
+    "parameters": [
+      {
+        "key": "method",
+        "label": "Method preference",
+        "type": "select",
+        "options": [
+          "Awaiting method review",
+          "Local JPEG Grid Detector candidate"
+        ],
+        "default": "Awaiting method review"
+      },
+      {
+        "key": "window_size",
+        "label": "Proposed window size (pixels)",
+        "type": "number",
+        "min": 16,
+        "max": 1024,
+        "step": 1,
+        "default": 128
+      },
+      {
+        "key": "stride",
+        "label": "Proposed window stride (pixels)",
+        "type": "number",
+        "min": 1,
+        "max": 256,
+        "step": 1,
+        "default": 16
+      }
+    ],
+    "outputs": [
+      "Boundary response",
+      "Grid-phase map",
+      "Spatial support overlay"
+    ],
+    "requires": [
+      "2.1"
+    ],
+    "selected": true,
+    "implementation": "planned",
+    "view": "source"
+  },
+  {
+    "id": "2.4",
+    "title": "Displaced earlier grids",
+    "subtitle": "Search for crop and translation traces",
+    "group": "Grid analysis",
+    "description": "Configure a future search for an earlier JPEG lattice displaced from the current one. Candidate integer phases and support would be evaluated separately. A shifted grid alone does not establish a local content edit.",
+    "parameters": [
+      {
+        "key": "phase_search",
+        "label": "Phase search",
+        "type": "select",
+        "options": [
+          "All 64 integer phases",
+          "Method-defined phase search"
+        ],
+        "default": "All 64 integer phases"
+      },
+      {
+        "key": "window_size",
+        "label": "Proposed window size (pixels)",
+        "type": "number",
+        "min": 16,
+        "max": 1024,
+        "step": 1,
+        "default": 128
+      },
+      {
+        "key": "retain_candidates",
+        "label": "Retain competing grid candidates",
+        "type": "checkbox",
+        "default": true
+      }
+    ],
+    "outputs": [
+      "Candidate prior phases",
+      "Periodicity responses",
+      "Support regions"
+    ],
+    "requires": [
+      "2.1"
+    ],
+    "selected": false,
+    "implementation": "planned",
+    "view": "source"
+  },
+  {
+    "id": "2.5",
+    "title": "Calibration & recompression",
+    "subtitle": "Explicitly derived comparison images",
+    "group": "Calibration",
+    "description": "Reserve method-specific reconstructions, shifted crops and controlled recompressions. Every derived copy must retain its encoder and transform settings. A bright recompression residual is not an editing probability.",
+    "parameters": [
+      {
+        "key": "operation",
+        "label": "Comparison operation",
+        "type": "select",
+        "options": [
+          "Method-defined calibration",
+          "Controlled recompression",
+          "Shifted-crop comparison"
+        ],
+        "default": "Method-defined calibration"
+      },
+      {
+        "key": "quality",
+        "label": "Candidate encoder quality setting",
+        "type": "number",
+        "min": 1,
+        "max": 100,
+        "step": 1,
+        "default": 90
+      },
+      {
+        "key": "sampling",
+        "label": "Sampling preference",
+        "type": "select",
+        "options": [
+          "Record method-defined sampling",
+          "Match source when supported",
+          "4:4:4 candidate"
+        ],
+        "default": "Record method-defined sampling"
+      }
+    ],
+    "outputs": [
+      "Derived-copy manifest",
+      "Comparison images",
+      "Residual measurements"
+    ],
+    "requires": [
+      "2.1"
+    ],
+    "selected": false,
+    "implementation": "planned",
+    "view": "source"
+  },
+  {
+    "id": "2.6",
+    "title": "Regional compression",
+    "subtitle": "Compare supported local measurements",
+    "group": "Regional analysis",
+    "description": "Plan regional comparisons of compression traces with explicit window support. Texture and sample size can change the response without different processing histories. The regional method and valid sample requirements are not yet selected.",
+    "parameters": [
+      {
+        "key": "tile_size",
+        "label": "Proposed tile size (pixels)",
+        "type": "number",
+        "min": 16,
+        "max": 1024,
+        "step": 1,
+        "default": 128
+      },
+      {
+        "key": "stride",
+        "label": "Proposed tile stride (pixels)",
+        "type": "number",
+        "min": 1,
+        "max": 512,
+        "step": 1,
+        "default": 64
+      },
+      {
+        "key": "record_coverage",
+        "label": "Report valid and excluded regions",
+        "type": "checkbox",
+        "default": true
+      }
+    ],
+    "outputs": [
+      "Regional evidence map",
+      "Coverage mask",
+      "Per-region measurement table"
+    ],
+    "requires": [
+      "2.1"
+    ],
+    "selected": false,
+    "implementation": "planned",
+    "view": "source"
+  },
+  {
+    "id": "2.7",
+    "title": "Main image vs previews",
+    "subtitle": "Register embedded images before comparison",
+    "group": "Comparison",
+    "description": "Plan comparison with separately extracted thumbnails or previews. Registration must account for crop, orientation, resolution and tone differences. A stale preview may have an ordinary export explanation. Extraction and registration are pending.",
+    "parameters": [
+      {
+        "key": "registration",
+        "label": "Registration model",
+        "type": "select",
+        "options": [
+          "Awaiting method selection",
+          "Similarity transform candidate",
+          "Affine transform candidate"
+        ],
+        "default": "Awaiting method selection"
+      },
+      {
+        "key": "comparison_size",
+        "label": "Maximum comparison dimension (pixels)",
+        "type": "number",
+        "min": 64,
+        "max": 2048,
+        "step": 1,
+        "default": 512
+      },
+      {
+        "key": "record_overlap",
+        "label": "Record registered overlap and exclusions",
+        "type": "checkbox",
+        "default": true
+      }
+    ],
+    "outputs": [
+      "Registered image pair",
+      "Difference view",
+      "Registration record"
+    ],
+    "requires": [
+      "1.6",
+      "2.1"
+    ],
+    "selected": false,
+    "implementation": "planned",
+    "view": "source"
+  },
+  {
+    "id": "2.8",
+    "title": "Scaled earlier grids",
+    "subtitle": "Search for candidate non-eight-pixel periods",
+    "group": "Geometry",
+    "description": "Configure a future search for scaled traces of an older JPEG lattice, including fractional spacing. Interpolation, scene repetition and the final grid can produce competing responses. No scale is currently estimated.",
+    "parameters": [
+      {
+        "key": "minimum_period",
+        "label": "Minimum candidate period (pixels)",
+        "type": "number",
+        "min": 1,
+        "max": 128,
+        "step": 0.25,
+        "default": 4
+      },
+      {
+        "key": "maximum_period",
+        "label": "Maximum candidate period (pixels)",
+        "type": "number",
+        "min": 1,
+        "max": 128,
+        "step": 0.25,
+        "default": 32
+      },
+      {
+        "key": "period_increment",
+        "label": "Proposed period increment (pixels)",
+        "type": "number",
+        "min": 0.25,
+        "max": 4,
+        "step": 0.25,
+        "default": 0.5
+      }
+    ],
+    "outputs": [
+      "Spacing response curve",
+      "Conditional scale candidates",
+      "Support overlay"
+    ],
+    "requires": [
+      "2.1"
+    ],
+    "selected": false,
+    "implementation": "planned",
+    "view": "source"
+  },
+  {
+    "id": "2.9",
+    "title": "Rotated earlier grids",
+    "subtitle": "Angle, spacing and phase candidates",
+    "group": "Geometry",
+    "description": "Plan orientation-sensitive earlier-grid analysis, beginning with rotation alone. A joint geometry search and its false alarms require validation. Right-angle lossless transforms and interpolated rotations need different controls.",
+    "parameters": [
+      {
+        "key": "minimum_angle",
+        "label": "Minimum candidate angle (degrees)",
+        "type": "number",
+        "min": -90,
+        "max": 90,
+        "step": 0.25,
+        "default": -45
+      },
+      {
+        "key": "maximum_angle",
+        "label": "Maximum candidate angle (degrees)",
+        "type": "number",
+        "min": -90,
+        "max": 90,
+        "step": 0.25,
+        "default": 45
+      },
+      {
+        "key": "angle_increment",
+        "label": "Proposed angle increment (degrees)",
+        "type": "number",
+        "min": 0.25,
+        "max": 15,
+        "step": 0.25,
+        "default": 1
+      }
+    ],
+    "outputs": [
+      "Angle response plot",
+      "Candidate lattice overlay",
+      "Geometry uncertainty record"
+    ],
+    "requires": [
+      "2.1"
+    ],
+    "selected": false,
+    "implementation": "planned",
+    "view": "source"
+  },
+  {
+    "id": "2.10",
+    "title": "Threshold & directional study",
+    "subtitle": "Published baseline and later comparisons",
+    "group": "Method study",
+    "description": "Reserve a comparison workspace for Robert Grou-Szabo's published dynamic-threshold work and applicable baselines. Method replication comes first. Future extensions remain proposals; no threshold or directional analysis is executed here.",
+    "parameters": [
+      {
+        "key": "method",
+        "label": "Study mode",
+        "type": "select",
+        "options": [
+          "Published-method review pending",
+          "Baseline comparison pending"
+        ],
+        "default": "Published-method review pending"
+      },
+      {
+        "key": "operator",
+        "label": "Candidate edge operator",
+        "type": "select",
+        "options": [
+          "Awaiting method review",
+          "Sobel candidate",
+          "Scharr candidate"
+        ],
+        "default": "Awaiting method review"
+      },
+      {
+        "key": "threshold_count",
+        "label": "Proposed threshold count",
+        "type": "number",
+        "min": 2,
+        "max": 128,
+        "step": 1,
+        "default": 16
+      }
+    ],
+    "outputs": [
+      "Method response curves",
+      "Baseline comparison table",
+      "Documented failure cases"
+    ],
+    "requires": [
+      "2.1"
+    ],
+    "selected": false,
+    "implementation": "planned",
+    "view": "source"
+  },
+  {
+    "id": "2.11",
+    "title": "Spatial JPEG report",
+    "subtitle": "Evidence, coordinates and limitations",
+    "group": "Report",
+    "description": "Configure the future spatial-evidence assembler, linking measurements to their regions and coordinate systems. The framework phase summary below already reports execution status; this Python analysis step is not connected.",
+    "parameters": [
+      {
+        "key": "include_maps",
+        "label": "Request regional graphics and overlays",
+        "type": "checkbox",
+        "default": true
+      },
+      {
+        "key": "include_alternatives",
+        "label": "Include competing explanations",
+        "type": "checkbox",
+        "default": true
+      },
+      {
+        "key": "include_coverage",
+        "label": "Include applicability and coverage",
+        "type": "checkbox",
+        "default": true
+      }
+    ],
+    "outputs": [
+      "Spatial evidence report",
+      "Linked graphics and tables",
+      "Limitations and applicability"
+    ],
+    "requires": [
+      "2.1"
+    ],
+    "selected": false,
+    "implementation": "planned",
+    "view": "source"
+  }
+]

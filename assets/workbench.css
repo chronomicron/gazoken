@@ -1,4 +1,4 @@
-:root{
+:root {
   color-scheme:light dark;
   --paper:#f5f5f0;
   --surface:#fff;
@@ -8,441 +8,552 @@
   --accent:#3652bc;
   --tint:#edf0fa;
   --stage:#e9ece8;
-  --danger:#a33338}
-  *{
-    box-sizing:border-box}
-    body{
-      margin:0;
-      background:var(--paper);
-      color:var(--ink);
-      font:15px/1.6 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-      a{
-        color:var(--accent);
-        text-underline-offset:4px}
-        a:hover{
-          text-decoration-thickness:2px}
-          button,input,select{
-            font:inherit}
-            button,a,input,select,summary{
-              touch-action:manipulation}
-              button{
-                cursor:pointer}
-                button:disabled{
-                  cursor:not-allowed;
-                  opacity:.45}
-                  a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,.button:has(input:focus-visible){
-                    outline:3px solid var(--accent);
-                    outline-offset:4px}
-                    button,input,select{
-                      accent-color:var(--accent)}
-                      [hidden]{
-                        display:none!important}
-                        .page{
-                          width:min(1360px,100% - 80px);
-                          margin:auto}
-                          header,footer,.header-links{
-                            display:flex;
-                            align-items:center;
-                            justify-content:space-between;
-                            gap:28px}
-                            header{
-                              padding:24px 0;
-                              border-bottom:1px solid var(--line)}
-                              .brand{
-                                color:var(--ink);
-                                text-decoration:none;
-                                display:flex;
-                                align-items:baseline;
-                                gap:14px}
-                                .brand strong{
-                                  letter-spacing:-.03em;
-                                  font-size:21px}
-                                  .brand>span{
-                                    font-size:13px;
-                                    font-weight:650}
-                                    .header-links{
-                                      font-size:12px}
-                                      .lab{
-                                        color:var(--muted)}
-                                        .intro{
-                                          padding:42px 0 28px}
-                                          .eyebrow{
-                                            font-size:11px;
-                                            font-weight:750;
-                                            letter-spacing:.15em;
-                                            color:var(--accent);
-                                            margin:0 0 12px}
-                                            h1{
-                                              font-size:clamp(36px,5vw,58px);
-                                              line-height:1.1;
-                                              letter-spacing:-.045em;
-                                              margin:0 0 12px}
-                                              .subtitle{
-                                                font-size:16px;
-                                                margin:0}
-                                                .subtitle span{
-                                                  font-size:12px;
-                                                  color:var(--muted);
-                                                  margin-left:14px}
-                                                  .lead{
-                                                    margin:12px 0 10px;
-                                                    color:var(--muted)}
-                                                    .local-note{
-                                                      display:flex;
-                                                      align-items:center;
-                                                      gap:8px;
-                                                      margin:0;
-                                                      font-size:12px;
-                                                      color:var(--muted)}
-                                                      .dot{
-                                                        width:6px;
-                                                        height:6px;
-                                                        border-radius:50%;
-                                                        background:var(--accent);
-                                                        flex:none}
-                                                        .workspace{
-                                                          display:grid;
-                                                          grid-template-columns:minmax(0,1.2fr) minmax(360px,1fr);
-                                                          gap:24px;
-                                                          align-items:start}
-                                                          .panel{
-                                                            border:1px solid var(--line);
-                                                            background:var(--surface);
-                                                            border-radius:8px;
-                                                            overflow:hidden}
-                                                            .panel-heading{
-                                                              padding:20px 22px;
-                                                              display:flex;
-                                                              justify-content:space-between;
-                                                              align-items:center;
-                                                              gap:12px;
-                                                              border-bottom:1px solid var(--line)}
-                                                              h2{
-                                                                font-size:16px;
-                                                                margin:0;
-                                                                letter-spacing:-.02em}
-                                                                .step{
-                                                                  font-size:11px;
-                                                                  letter-spacing:.04em;
-                                                                  color:var(--muted);
-                                                                  margin-right:12px;
-                                                                  font-weight:500}
-                                                                  .tag{
-                                                                    color:var(--muted);
-                                                                    font-size:10px;
-                                                                    letter-spacing:.035em;
-                                                                    border:1px solid var(--line);
-                                                                    border-radius:20px;
-                                                                    padding:3px 9px}
-                                                                    .drop-zone{
-                                                                      margin:22px;
-                                                                      background:var(--stage);
-                                                                      border:1px dashed var(--line);
-                                                                      border-radius:4px;
-                                                                      min-height:340px;
-                                                                      display:flex;
-                                                                      align-items:center;
-                                                                      justify-content:center;
-                                                                      overflow:hidden}
-                                                                      .drop-zone.dragover{
-                                                                        outline:3px solid var(--accent);
-                                                                        outline-offset:-3px}
-                                                                        .empty-source{
-                                                                          text-align:center;
-                                                                          padding:30px;
-                                                                          color:var(--muted)}
-                                                                          .empty-source svg{
-                                                                            color:var(--accent);
-                                                                            margin-bottom:14px}
-                                                                            .empty-source h3{
-                                                                              font-size:16px;
-                                                                              color:var(--ink);
-                                                                              margin:0 0 6px}
-                                                                              .empty-source p{
-                                                                                font-size:13px;
-                                                                                margin:0}
-                                                                                .drop-zone canvas{
-                                                                                  display:block;
-                                                                                  width:100%;
-                                                                                  height:auto;
-                                                                                  object-fit:contain;
-                                                                                  max-height:600px}
-                                                                                  .source-actions{
-                                                                                    margin:0 22px;
-                                                                                    display:flex;
-                                                                                    align-items:center;
-                                                                                    gap:20px}
-                                                                                    .button{
-                                                                                      display:inline-flex;
-                                                                                      justify-content:center;
-                                                                                      align-items:center;
-                                                                                      gap:24px;
-                                                                                      border-radius:4px;
-                                                                                      padding:11px 18px;
-                                                                                      text-decoration:none;
-                                                                                      font-weight:650;
-                                                                                      font-size:13px;
-                                                                                      cursor:pointer;
-                                                                                      position:relative}
-                                                                                      .secondary{
-                                                                                        border:1px solid var(--line);
-                                                                                        background:var(--surface);
-                                                                                        color:var(--ink)}
-                                                                                        .secondary:hover{
-                                                                                          border-color:var(--accent)}
-                                                                                          .file-input{
-                                                                                            position:absolute;
-                                                                                            width:1px;
-                                                                                            height:1px;
-                                                                                            opacity:0;
-                                                                                            overflow:hidden}
-                                                                                            .text-button{
-                                                                                              border:0;
-                                                                                              background:none;
-                                                                                              color:var(--accent);
-                                                                                              font-size:12px;
-                                                                                              padding:5px 0;
-                                                                                              text-decoration:underline;
-                                                                                              text-underline-offset:4px}
-                                                                                              .file-limits,.file-info,.fine-print{
-                                                                                                margin:12px 22px;
-                                                                                                font-size:12px;
-                                                                                                color:var(--muted);
-                                                                                                overflow-wrap:anywhere}
-                                                                                                .file-info{
-                                                                                                  color:var(--ink);
-                                                                                                  font-variant-numeric:tabular-nums}
-                                                                                                  .fine-print{
-                                                                                                    border-top:1px solid var(--line);
-                                                                                                    padding-top:14px;
-                                                                                                    margin-bottom:22px}
-                                                                                                    .tool-options,fieldset{
-                                                                                                      margin:0;
-                                                                                                      border:0;
-                                                                                                      padding:0}
-                                                                                                      .tool{
-                                                                                                        padding:17px 22px;
-                                                                                                        border-bottom:1px solid var(--line)}
-                                                                                                        .tool-label{
-                                                                                                          display:flex;
-                                                                                                          align-items:flex-start;
-                                                                                                          gap:12px;
-                                                                                                          cursor:pointer}
-                                                                                                          .tool-label input{
-                                                                                                            width:17px;
-                                                                                                            height:17px;
-                                                                                                            margin:3px 0 0;
-                                                                                                            flex:none}
-                                                                                                            .tool-label strong{
-                                                                                                              display:block;
-                                                                                                              font-size:14px}
-                                                                                                              .tool-label span span{
-                                                                                                                display:block;
-                                                                                                                color:var(--muted);
-                                                                                                                font-size:12px;
-                                                                                                                margin-top:2px}
-                                                                                                                .parameters{
-                                                                                                                  display:flex;
-                                                                                                                  align-items:center;
-                                                                                                                  flex-wrap:wrap;
-                                                                                                                  gap:8px 12px;
-                                                                                                                  padding-left:29px;
-                                                                                                                  margin-top:12px;
-                                                                                                                  font-size:11px}
-                                                                                                                  .parameters input[type=range]{
-                                                                                                                    width:100px;
-                                                                                                                    min-width:60px;
-                                                                                                                    margin:0}
-                                                                                                                    .parameters output{
-                                                                                                                      min-width:20px;
-                                                                                                                      font-variant-numeric:tabular-nums}
-                                                                                                                      .parameters select{
-                                                                                                                        background:var(--paper);
-                                                                                                                        color:var(--ink);
-                                                                                                                        font-size:11px;
-                                                                                                                        padding:4px 6px;
-                                                                                                                        border:1px solid var(--line);
-                                                                                                                        border-radius:3px}
-                                                                                                                        .tool-note{
-                                                                                                                          font-size:11px;
-                                                                                                                          line-height:1.5;
-                                                                                                                          color:var(--muted);
-                                                                                                                          margin:9px 0 0 29px}
-                                                                                                                          .primary{
-                                                                                                                            background:var(--accent);
-                                                                                                                            color:white;
-                                                                                                                            border:1px solid var(--accent);
-                                                                                                                            width:calc(100% - 44px);
-                                                                                                                            margin:20px 22px 0;
-                                                                                                                            justify-content:space-between}
-                                                                                                                            .status{
-                                                                                                                              font-size:12px;
-                                                                                                                              color:var(--muted);
-                                                                                                                              margin:12px 22px 18px;
-                                                                                                                              min-height:20px}
-                                                                                                                              .error{
-                                                                                                                                color:var(--danger)!important}
-                                                                                                                                .results-section{
-                                                                                                                                  padding-top:36px}
-                                                                                                                                  .section-heading{
-                                                                                                                                    display:flex;
-                                                                                                                                    justify-content:space-between;
-                                                                                                                                    align-items:center;
-                                                                                                                                    gap:12px;
-                                                                                                                                    margin-bottom:16px}
-                                                                                                                                    .muted{
-                                                                                                                                      font-size:12px;
-                                                                                                                                      color:var(--muted)}
-                                                                                                                                      .evidence-note{
-                                                                                                                                        border-left:3px solid var(--accent);
-                                                                                                                                        background:var(--tint);
-                                                                                                                                        padding:12px 16px;
-                                                                                                                                        font-size:12px;
-                                                                                                                                        color:var(--muted);
-                                                                                                                                        margin-bottom:20px}
-                                                                                                                                        .evidence-note strong{
-                                                                                                                                          color:var(--ink)}
-                                                                                                                                          .results-grid{
-                                                                                                                                            display:grid;
-                                                                                                                                            grid-template-columns:repeat(2,minmax(0,1fr));
-                                                                                                                                            gap:24px}
-                                                                                                                                            .results-empty{
-                                                                                                                                              grid-column:1/-1;
-                                                                                                                                              text-align:center;
-                                                                                                                                              border:1px dashed var(--line);
-                                                                                                                                              border-radius:4px;
-                                                                                                                                              padding:36px 20px;
-                                                                                                                                              color:var(--muted);
-                                                                                                                                              font-size:13px;
-                                                                                                                                              margin:0}
-                                                                                                                                              .result{
-                                                                                                                                                border:1px solid var(--line);
-                                                                                                                                                border-radius:6px;
-                                                                                                                                                background:var(--surface);
-                                                                                                                                                overflow:hidden}
-                                                                                                                                                .result-top{
-                                                                                                                                                  padding:16px 20px;
-                                                                                                                                                  border-bottom:1px solid var(--line);
-                                                                                                                                                  display:flex;
-                                                                                                                                                  justify-content:space-between;
-                                                                                                                                                  align-items:center;
-                                                                                                                                                  gap:12px}
-                                                                                                                                                  .result h3{
-                                                                                                                                                    font-size:14px;
-                                                                                                                                                    margin:0}
-                                                                                                                                                    .result canvas{
-                                                                                                                                                      display:block;
-                                                                                                                                                      max-width:100%;
-                                                                                                                                                      width:100%;
-                                                                                                                                                      height:auto;
-                                                                                                                                                      background:#111}
-                                                                                                                                                      .result-body{
-                                                                                                                                                        padding:14px 20px}
-                                                                                                                                                        .result-body p{
-                                                                                                                                                          font-size:12px;
-                                                                                                                                                          margin:6px 0;
-                                                                                                                                                          color:var(--muted)}
-                                                                                                                                                          .result-body .settings{
-                                                                                                                                                            font-size:11px;
-                                                                                                                                                            letter-spacing:.02em;
-                                                                                                                                                            color:var(--ink)}
-                                                                                                                                                            .result-body .metric{
-                                                                                                                                                              font-variant-numeric:tabular-nums;
-                                                                                                                                                              color:var(--ink)}
-                                                                                                                                                              .about{
-                                                                                                                                                                margin:36px 0;
-                                                                                                                                                                color:var(--muted);
-                                                                                                                                                                font-size:12px}
-                                                                                                                                                                .about summary{
-                                                                                                                                                                  cursor:pointer;
-                                                                                                                                                                  color:var(--ink)}
-                                                                                                                                                                  .about-columns{
-                                                                                                                                                                    display:grid;
-                                                                                                                                                                    grid-template-columns:1fr 1fr;
-                                                                                                                                                                    gap:32px}
-                                                                                                                                                                    .about p{
-                                                                                                                                                                      margin:16px 0 0}
-                                                                                                                                                                      footer{
-                                                                                                                                                                        padding:22px 0 28px;
-                                                                                                                                                                        border-top:1px solid var(--line);
-                                                                                                                                                                        font-size:11px;
-                                                                                                                                                                        color:var(--muted)}
-                                                                                                                                                                        footer nav{
-                                                                                                                                                                          display:flex;
-                                                                                                                                                                          gap:24px}
-                                                                                                                                                                          .sr-only,.skip-link:not(:focus){
-                                                                                                                                                                            position:absolute;
-                                                                                                                                                                            width:1px;
-                                                                                                                                                                            height:1px;
-                                                                                                                                                                            overflow:hidden;
-                                                                                                                                                                            clip-path:inset(50%)}
-                                                                                                                                                                            .skip-link:focus{
-                                                                                                                                                                              display:block;
-                                                                                                                                                                              padding:12px}
-                                                                                                                                                                              .source-panel[aria-busy=true]{
-                                                                                                                                                                                opacity:.7}
-                                                                                                                                                                                @media(max-width:900px){
-                                                                                                                                                                                  .page{
-                                                                                                                                                                                    width:calc(100% - 40px)}
-                                                                                                                                                                                    .workspace{
-                                                                                                                                                                                      grid-template-columns:minmax(0,1fr)}
-                                                                                                                                                                                      .drop-zone{
-                                                                                                                                                                                        min-height:260px}
-                                                                                                                                                                                        .drop-zone canvas{
-                                                                                                                                                                                          max-height:450px}
-                                                                                                                                                                                          .lab{
-                                                                                                                                                                                            display:none}
-                                                                                                                                                                                            .intro{
-                                                                                                                                                                                              padding-top:30px}
-                                                                                                                                                                                              .subtitle span{
-                                                                                                                                                                                                display:block;
-                                                                                                                                                                                                margin:4px 0 0}
-                                                                                                                                                                                              }
-                                                                                                                                                                                              @media(max-width:560px){
-                                                                                                                                                                                                .page{
-                                                                                                                                                                                                  width:calc(100% - 28px)}
-                                                                                                                                                                                                  header{
-                                                                                                                                                                                                    gap:12px;
-                                                                                                                                                                                                    padding:18px 0}
-                                                                                                                                                                                                    .brand{
-                                                                                                                                                                                                      gap:8px}
-                                                                                                                                                                                                      .brand strong{
-                                                                                                                                                                                                        font-size:18px}
-                                                                                                                                                                                                        .brand>span{
-                                                                                                                                                                                                          font-size:11px}
-                                                                                                                                                                                                          .results-grid,.about-columns{
-                                                                                                                                                                                                            grid-template-columns:1fr}
-                                                                                                                                                                                                            .panel-heading,.tool{
-                                                                                                                                                                                                              padding-left:16px;
-                                                                                                                                                                                                              padding-right:16px}
-                                                                                                                                                                                                              .drop-zone{
-                                                                                                                                                                                                                margin:16px}
-                                                                                                                                                                                                                .local-note{
-                                                                                                                                                                                                                  align-items:flex-start}
-                                                                                                                                                                                                                  .dot{
-                                                                                                                                                                                                                    margin-top:7px}
-                                                                                                                                                                                                                    .section-heading{
-                                                                                                                                                                                                                      align-items:flex-start}
-                                                                                                                                                                                                                      .tag{
-                                                                                                                                                                                                                        font-size:9px}
-                                                                                                                                                                                                                        footer{
-                                                                                                                                                                                                                          flex-direction:column;
-                                                                                                                                                                                                                          align-items:flex-start;
-                                                                                                                                                                                                                          gap:12px}
-                                                                                                                                                                                                                          .results-section{
-                                                                                                                                                                                                                            padding-top:28px}
-                                                                                                                                                                                                                          }
-                                                                                                                                                                                                                          @media(prefers-color-scheme:dark){
-                                                                                                                                                                                                                            :root{
-                                                                                                                                                                                                                              --paper:#171d22;
-                                                                                                                                                                                                                              --surface:#1e262d;
-                                                                                                                                                                                                                              --ink:#e7edeb;
-                                                                                                                                                                                                                              --muted:#a9b6bf;
-                                                                                                                                                                                                                              --line:#3b474f;
-                                                                                                                                                                                                                              --accent:#a8baff;
-                                                                                                                                                                                                                              --tint:#252f43;
-                                                                                                                                                                                                                              --stage:#141b20;
-                                                                                                                                                                                                                              --danger:#ffb1b5}
-                                                                                                                                                                                                                              .primary{
-                                                                                                                                                                                                                                color:#172043}
-                                                                                                                                                                                                                              }
+  --danger:#a33338;
+}
+* {
+  box-sizing:border-box;
+}
+body {
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font:15px/1.6 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+a {
+  color:var(--accent);
+  text-underline-offset:4px;
+}
+a:hover {
+  text-decoration-thickness:2px;
+}
+button,input,select {
+  font:inherit;
+}
+button,a,input,select,summary {
+  touch-action:manipulation;
+}
+button {
+  cursor:pointer;
+}
+button:disabled {
+  cursor:not-allowed;
+  opacity:.45;
+}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,.button:has(input:focus-visible) {
+  outline:3px solid var(--accent);
+  outline-offset:4px;
+}
+button,input,select {
+  accent-color:var(--accent);
+}
+[hidden] {
+  display:none!important;
+}
+.page {
+  width:min(1360px,100% - 80px);
+  margin:auto;
+}
+header,footer,.header-links {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:28px;
+}
+header {
+  padding:24px 0;
+  border-bottom:1px solid var(--line);
+}
+.brand {
+  color:var(--ink);
+  text-decoration:none;
+  display:flex;
+  align-items:baseline;
+  gap:14px;
+}
+.brand strong {
+  letter-spacing:-.03em;
+  font-size:21px;
+}
+.brand>span {
+  font-size:13px;
+  font-weight:650;
+}
+.header-links {
+  font-size:12px;
+}
+.lab {
+  color:var(--muted);
+}
+.intro {
+  padding:42px 0 28px;
+}
+.eyebrow {
+  font-size:11px;
+  font-weight:750;
+  letter-spacing:.15em;
+  color:var(--accent);
+  margin:0 0 12px;
+}
+h1 {
+  font-size:clamp(36px,5vw,58px);
+  line-height:1.1;
+  letter-spacing:-.045em;
+  margin:0 0 12px;
+}
+.subtitle {
+  font-size:16px;
+  margin:0;
+}
+.subtitle span {
+  font-size:12px;
+  color:var(--muted);
+  margin-left:14px;
+}
+.lead {
+  margin:12px 0 10px;
+  color:var(--muted);
+}
+.local-note {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin:0;
+  font-size:12px;
+  color:var(--muted);
+}
+.dot {
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:var(--accent);
+  flex:none;
+}
+.workspace {
+  display:grid;
+  grid-template-columns:minmax(0,1.2fr) minmax(360px,1fr);
+  gap:24px;
+  align-items:start;
+}
+.panel {
+  border:1px solid var(--line);
+  background:var(--surface);
+  border-radius:8px;
+  overflow:hidden;
+}
+.panel-heading {
+  padding:20px 22px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  border-bottom:1px solid var(--line);
+}
+h2 {
+  font-size:16px;
+  margin:0;
+  letter-spacing:-.02em;
+}
+.step {
+  font-size:11px;
+  letter-spacing:.04em;
+  color:var(--muted);
+  margin-right:12px;
+  font-weight:500;
+}
+.tag {
+  color:var(--muted);
+  font-size:10px;
+  letter-spacing:.035em;
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:3px 9px;
+}
+.drop-zone {
+  margin:22px;
+  background:var(--stage);
+  border:1px dashed var(--line);
+  border-radius:4px;
+  min-height:340px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+.drop-zone.dragover {
+  outline:3px solid var(--accent);
+  outline-offset:-3px;
+}
+.empty-source {
+  text-align:center;
+  padding:30px;
+  color:var(--muted);
+}
+.empty-source svg {
+  color:var(--accent);
+  margin-bottom:14px;
+}
+.empty-source h3 {
+  font-size:16px;
+  color:var(--ink);
+  margin:0 0 6px;
+}
+.empty-source p {
+  font-size:13px;
+  margin:0;
+}
+.drop-zone canvas {
+  display:block;
+  width:100%;
+  height:auto;
+  object-fit:contain;
+  max-height:600px;
+}
+.source-actions {
+  margin:0 22px;
+  display:flex;
+  align-items:center;
+  gap:20px;
+}
+.button {
+  display:inline-flex;
+  justify-content:center;
+  align-items:center;
+  gap:24px;
+  border-radius:4px;
+  padding:11px 18px;
+  text-decoration:none;
+  font-weight:650;
+  font-size:13px;
+  cursor:pointer;
+  position:relative;
+}
+.secondary {
+  border:1px solid var(--line);
+  background:var(--surface);
+  color:var(--ink);
+}
+.secondary:hover {
+  border-color:var(--accent);
+}
+.file-input {
+  position:absolute;
+  width:1px;
+  height:1px;
+  opacity:0;
+  overflow:hidden;
+}
+.text-button {
+  border:0;
+  background:none;
+  color:var(--accent);
+  font-size:12px;
+  padding:5px 0;
+  text-decoration:underline;
+  text-underline-offset:4px;
+}
+.file-limits,.file-info,.fine-print {
+  margin:12px 22px;
+  font-size:12px;
+  color:var(--muted);
+  overflow-wrap:anywhere;
+}
+.file-info {
+  color:var(--ink);
+  font-variant-numeric:tabular-nums;
+}
+.fine-print {
+  border-top:1px solid var(--line);
+  padding-top:14px;
+  margin-bottom:22px;
+}
+.tool-options,fieldset {
+  margin:0;
+  border:0;
+  padding:0;
+}
+.tool {
+  padding:17px 22px;
+  border-bottom:1px solid var(--line);
+}
+.tool-label {
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  cursor:pointer;
+}
+.tool-label input {
+  width:17px;
+  height:17px;
+  margin:3px 0 0;
+  flex:none;
+}
+.tool-label strong {
+  display:block;
+  font-size:14px;
+}
+.tool-label span span {
+  display:block;
+  color:var(--muted);
+  font-size:12px;
+  margin-top:2px;
+}
+.parameters {
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px 12px;
+  padding-left:29px;
+  margin-top:12px;
+  font-size:11px;
+}
+.parameters input[type=range] {
+  width:100px;
+  min-width:60px;
+  margin:0;
+}
+.parameters output {
+  min-width:20px;
+  font-variant-numeric:tabular-nums;
+}
+.parameters select {
+  background:var(--paper);
+  color:var(--ink);
+  font-size:11px;
+  padding:4px 6px;
+  border:1px solid var(--line);
+  border-radius:3px;
+}
+.tool-note {
+  font-size:11px;
+  line-height:1.5;
+  color:var(--muted);
+  margin:9px 0 0 29px;
+}
+.primary {
+  background:var(--accent);
+  color:white;
+  border:1px solid var(--accent);
+  width:calc(100% - 44px);
+  margin:20px 22px 0;
+  justify-content:space-between;
+}
+.status {
+  font-size:12px;
+  color:var(--muted);
+  margin:12px 22px 18px;
+  min-height:20px;
+}
+.error {
+  color:var(--danger)!important;
+}
+.results-section {
+  padding-top:36px;
+}
+.section-heading {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-bottom:16px;
+}
+.muted {
+  font-size:12px;
+  color:var(--muted);
+}
+.evidence-note {
+  border-left:3px solid var(--accent);
+  background:var(--tint);
+  padding:12px 16px;
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:20px;
+}
+.evidence-note strong {
+  color:var(--ink);
+}
+.results-grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:24px;
+}
+.results-empty {
+  grid-column:1/-1;
+  text-align:center;
+  border:1px dashed var(--line);
+  border-radius:4px;
+  padding:36px 20px;
+  color:var(--muted);
+  font-size:13px;
+  margin:0;
+}
+.result {
+  border:1px solid var(--line);
+  border-radius:6px;
+  background:var(--surface);
+  overflow:hidden;
+}
+.result-top {
+  padding:16px 20px;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+}
+.result h3 {
+  font-size:14px;
+  margin:0;
+}
+.result canvas {
+  display:block;
+  max-width:100%;
+  width:100%;
+  height:auto;
+  background:#111;
+}
+.result-body {
+  padding:14px 20px;
+}
+.result-body p {
+  font-size:12px;
+  margin:6px 0;
+  color:var(--muted);
+}
+.result-body .settings {
+  font-size:11px;
+  letter-spacing:.02em;
+  color:var(--ink);
+}
+.result-body .metric {
+  font-variant-numeric:tabular-nums;
+  color:var(--ink);
+}
+.about {
+  margin:36px 0;
+  color:var(--muted);
+  font-size:12px;
+}
+.about summary {
+  cursor:pointer;
+  color:var(--ink);
+}
+.about-columns {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:32px;
+}
+.about p {
+  margin:16px 0 0;
+}
+footer {
+  padding:22px 0 28px;
+  border-top:1px solid var(--line);
+  font-size:11px;
+  color:var(--muted);
+}
+footer nav {
+  display:flex;
+  gap:24px;
+}
+.sr-only,.skip-link:not(:focus) {
+  position:absolute;
+  width:1px;
+  height:1px;
+  overflow:hidden;
+  clip-path:inset(50%);
+}
+.skip-link:focus {
+  display:block;
+  padding:12px;
+}
+.source-panel[aria-busy=true] {
+  opacity:.7;
+}
+@media(max-width:900px) {
+  .page {
+    width:calc(100% - 40px);
+  }
+  .workspace {
+    grid-template-columns:minmax(0,1fr);
+  }
+  .drop-zone {
+    min-height:260px;
+  }
+  .drop-zone canvas {
+    max-height:450px;
+  }
+  .lab {
+    display:none;
+  }
+  .intro {
+    padding-top:30px;
+  }
+  .subtitle span {
+    display:block;
+    margin:4px 0 0;
+  }
+}
+@media(max-width:560px) {
+  .page {
+    width:calc(100% - 28px);
+  }
+  header {
+    gap:12px;
+    padding:18px 0;
+  }
+  .brand {
+    gap:8px;
+  }
+  .brand strong {
+    font-size:18px;
+  }
+  .brand>span {
+    font-size:11px;
+  }
+  .results-grid,.about-columns {
+    grid-template-columns:1fr;
+  }
+  .panel-heading,.tool {
+    padding-left:16px;
+    padding-right:16px;
+  }
+  .drop-zone {
+    margin:16px;
+  }
+  .local-note {
+    align-items:flex-start;
+  }
+  .dot {
+    margin-top:7px;
+  }
+  .section-heading {
+    align-items:flex-start;
+  }
+  .tag {
+    font-size:9px;
+  }
+  footer {
+    flex-direction:column;
+    align-items:flex-start;
+    gap:12px;
+  }
+  .results-section {
+    padding-top:28px;
+  }
+}
+@media(prefers-color-scheme:dark) {
+  :root {
+    --paper:#171d22;
+    --surface:#1e262d;
+    --ink:#e7edeb;
+    --muted:#a9b6bf;
+    --line:#3b474f;
+    --accent:#a8baff;
+    --tint:#252f43;
+    --stage:#141b20;
+    --danger:#ffb1b5;
+  }
+  .primary {
+    color:#172043;
+  }
+}

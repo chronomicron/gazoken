@@ -84,7 +84,126 @@ Proposals remain separate until agreed. The initial handoff predates this log;
   in [first workbench](first-workbench.md). This does not select the future
   Python/C/C++ integration or replace paper-specific replication studies.
 
+## D007 — Automatic and expert image-investigation workflows
+
+- Status: accepted direction; 2026-11-03; not implemented by this decision.
+- Basis: user clarification in the project's phone-based research conversation.
+- Decision: start with images and support two workflows: an automatic action
+  that runs multiple analyses for non-specialists, and expert exploration with
+  selectable tools and adjustable parameters. Expert questions include image
+  features, modification traces, and possible concealed information.
+- Rationale: serve both accessible individual-image investigation and informed
+  research exploration within Gazoken.
+- Consequences: choose and evaluate the automatic suite and its interpretation
+  before claiming detection performance or calibrated probabilities. Preserve
+  method details for expert inspection. Audio and video are future ambitions;
+  this decision does not select server uploads, evidence-combination rules, or
+  change the current browser-local prototype. See the
+  private research conversation synopsis in the sibling `gazoken-research` checkout.
+
+## D008 — Preserve input and an immutable decoded reference
+
+- Status: accepted direction; 2026-11-03.
+- Basis: user's description of importing images and using an immutable in-memory
+  bitmap for analysis while preserving the original input.
+- Decision: preserve the source file and keep a decoded pixel reference unchanged;
+  analyses operate on derived working representations.
+- Rationale: enable tools to examine the same reference without modifying it.
+- Consequences: describe derived representations explicitly. Decoder, color and
+  orientation handling, pixel format, and supported input formats remain open.
+  Retain encoded source data for analyses that need file-specific information;
+  decoding does not establish a clean or unaltered camera original.
+
+## D009 — JPEG file inspection as the first focused research direction
+
+- Status: accepted research direction; 2026-11-03; not implemented or validated.
+- Basis: user selection during the research conversation.
+- Decision: first investigate information available from original JPEG bytes
+  before pixel rendering: structure, metadata, quantization tables, and possible
+  camera/software encoding signatures, including hex-level inspection.
+- Rationale: establish observable file evidence before interpreting processing
+  history or combining detector outputs.
+- Consequences: separate direct extraction from attribution hypotheses. Review
+  existing projects and signature evidence; no unique encoder identification,
+  authenticity probability, parser stack, or integration choice is established.
+  This defines a first investigation within the broader automatic-analysis goal.
+
+## D010 — Raw JPEG inspection with metadata and graphical statistics
+
+- Status: accepted scope; local structural prototype implemented, 2026-11-03.
+- Basis: user approval of read-only JPEG inspection treating the original file
+  as encoded data, explicitly including Exif and graphical table/statistical views.
+- Decision: retain original bytes and provide a separate inspector without pixel
+  rendering. Display quantization tables and distributions, coding structures,
+  encoded-byte statistics, Exif, hex offsets, and an observation-based interpretation.
+- Rationale: establish testable raw-file evidence before statistical history or
+  source-attribution research.
+- Consequences: supersedes the earlier EXIF deferral. The interpretation is
+  rule-based and identifies unresolved history; no signature database, coefficient
+  entropy decoder, learned detector, or calibrated probability is implemented.
+  See [coverage and verification](jpeg-inspector.md).
+
+## D011 — Repository responsibilities and selective deep research
+
+- Status: accepted; 2026-11-03.
+- Basis: user's clarification after adding private research folder access.
+- Decision: keep code, tools, implementations, software tests, and implementation
+  documentation in `gazoken`. Keep papers, literature, research data, proposals,
+  unpublished results, and manuscript material in `gazoken-research`.
+- Rationale: preserve the public development workflow and a private research record.
+- Consequences: uncommitted research-only drafts were relocated to the private
+  checkout; historical published commits are not rewritten. Reuse existing
+  summaries for routine work and reserve Mentat for focused difficult questions.
+  Private material is released only when explicitly selected by the user.
+
+## D012 — Python research toolkit with a local browser interface
+
+- Status: accepted direction and initial framework implemented locally; 2026-11-04.
+- Basis: user prioritizes Python tools for research data collection and asks for
+  a visual framework with parameter groups for all Phase 1 steps before methods
+  are complete.
+- Decision: use a reusable Python analysis package, a FastAPI local server, and
+  a custom browser UI. Preserve original bytes, typed per-step configurations,
+  run records, and explicit unimplemented states. Static public tools remain
+  a separate supported subset; public Python hosting is not selected.
+- Rationale: enable research packages and repeatable measurements while providing
+  image/data visualization without a separate desktop GUI implementation.
+- Consequences: first framework has twelve parameter groups, two elementary
+  Python handlers, browser-derived structural previews, and JSON export/import.
+  Scientific validation, long-job execution, dependencies between future handlers,
+  C/C++ integration, and distribution remain later work. See
+  [local workbench](local-workbench.md). No private paper text or findings were
+  transferred to public documentation.
+
+## D013 — Phase 2 framework shares source, preserves separate records
+
+- Status: accepted and framework implemented locally; 2026-11-04.
+- Basis: user requests the same controls, explanations and report cards for the
+  decoded-image phase, using the Phase 1 image, before implementing its methods.
+- Decision: add eleven configurable Phase 2 steps and selectable phase workspaces
+  sharing original JPEG bytes and source identity. Preserve per-phase settings,
+  selections, report cards and summaries; export both phases in one session.
+- Rationale: establish method interfaces and traceable experiment configuration
+  without presenting browser display pixels as a reproducible Python reference.
+- Consequences: all Phase 2 handlers remain unimplemented and produce no analytical
+  outputs. Decoder choices and expected artifacts are explicitly provisional.
+  Session schema 2 supports both phases; legacy Phase 1 settings import initializes
+  Phase 2 defaults. A backend restart is needed to load the expanded catalog.
+  See [coverage and usage](local-workbench.md).
+
 ## Pending proposals
+
+
+### D007 implementation priority clarification — 2026-11-03
+
+The user prioritizes an automatic prototype that runs tools sequentially,
+assesses their outputs statistically, and ultimately presents an estimated
+probability of doctoring or AI generation. The user's example of 75% specifies
+the desired presentation, not an established performance result. Defining the
+target event and validating and calibrating the estimate remain necessary
+research work. Expert exploration remains in the broader accepted direction.
+This clarification does not replace the existing local prototype or establish
+that its exploratory visualizations can produce that probability.
 
 | Proposal | Status | Next evidence or decision needed |
 | --- | --- | --- |

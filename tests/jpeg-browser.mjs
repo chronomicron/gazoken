@@ -1,0 +1,70 @@
+const frame=document.getElementById('app'),log=document.getElementById('log'),lines=[];
+const assert=(condition,message)=>{if(!condition)throw new Error(message);};
+async function until(check,label) {
+  const start=Date.now();
+  while(!check()) {if(Date.now()-start>15000)throw new Error(`Timed out: ${label}`);await new Promise(r=>setTimeout(r,40));}
+}
+try {
+  await until(()=>frame.contentDocument?.readyState==='complete'&&frame.contentDocument.getElementById('jpeg-file'),'inspector load');
+  const doc=frame.contentDocument,win=frame.contentWindow,$=id=>doc.getElementById(id);
+  const pass=label=>{lines.push(`PASS: ${label}`);log.textContent=lines.join('\n');};
+  win.createImageBitmap=()=>{throw new Error('Pixel decoding must not be called by the file inspector.');};
+  win.HTMLCanvasElement.prototype.getContext=()=>{throw new Error('Pixel canvas must not be used by the file inspector.');};
+  const choose=file=>{const transfer=new DataTransfer();transfer.items.add(file);$('jpeg-file').files=transfer.files;$('jpeg-file').dispatchEvent(new Event('change',{bubbles:true}));};
+  const fixture=async name=>{
+    const response=await fetch(`./fixtures/jpeg-inspector/${name}`);
+    if(!response.ok)throw new Error('Missing fixture');
+    return new File([await response.blob()],name,{type:'image/jpeg'});
+  };
+  const expected=await (await fetch('./fixtures/jpeg-inspector/expected.json')).json();
+  choose(await fixture('baseline-exif.jpg'));
+  await until(()=>!$('jpeg-report').hidden,'baseline report');
+  assert(doc.querySelectorAll('canvas,img').length===0,'Inspector renders pixels');
+  assert($('jpeg-summary').textContent.includes('32 × 24'),'Wrong frame dimensions');
+  pass('Raw JPEG inspection works while all pixel decoding is blocked');
+  assert(doc.querySelectorAll('.quant-cell').length===128,'Quantization heatmaps missing');
+  assert($('jpeg-bytes').querySelectorAll('svg').length===2,'Encoded byte charts missing');
+  assert($('jpeg-coding').textContent.includes('Huffman'),'Huffman details missing');
+  pass('Quantization, byte-distribution, and coding visualizations rendered');
+  assert($('jpeg-metadata').textContent.includes('Gazoken fixture generator'),'Software not displayed');
+  assert($('jpeg-metadata').textContent.includes('DateTimeOriginal'),'Exif sub-IFD not displayed');
+  assert($('jpeg-opinion').textContent.includes('not independently verified'),'Metadata presented as proof');
+  pass('Exif values and interpretation retain their evidentiary distinction');
+  assert($('jpeg-hash').textContent.endsWith(expected.files['baseline-exif.jpg'].sha256),'Input hash mismatch');
+  const dqt=[...$('jpeg-segments').querySelectorAll('button')].find(b=>b.textContent.startsWith('DQT'));
+  dqt.click();
+  assert($('hex-caption').textContent.startsWith('DQT begins here'),'Segment link did not update hex');
+  $('hex-offset').value='0x0';$('hex-form').dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));
+  assert($('jpeg-hex').textContent.startsWith('00000000  ff d8'),'Hex jump does not read source bytes');
+  pass('SHA-256 and segment-linked hex refer to the untouched source');
+  let exported;
+  const create=win.URL.createObjectURL.bind(win.URL);
+  win.URL.createObjectURL=blob=>{exported=blob;return create(blob);};
+  const click=win.HTMLAnchorElement.prototype.click;
+  win.HTMLAnchorElement.prototype.click=()=>{};
+  $('jpeg-export').click();
+  const saved=JSON.parse(await exported.text());
+  assert(saved.sha256===expected.files['baseline-exif.jpg'].sha256&&saved.exif.length===1,'Incorrect JSON export');
+  win.HTMLAnchorElement.prototype.click=click;
+  win.URL.createObjectURL=create;
+  pass('JSON export serializes source identity and extracted report');
+  choose(await fixture('progressive-optimized.jpg'));
+  await until(()=>!$('jpeg-report').hidden&&$('jpeg-summary').textContent.includes('Progressive'),'progressive report');
+  assert($('jpeg-metadata').textContent.includes('No recognized Exif'),'Stale Exif after file replacement');
+  pass('Progressive input replaces earlier tables and metadata');
+  choose(await fixture('truncated.jpg'));
+  await until(()=>!$('jpeg-report').hidden&&$('jpeg-status').textContent.includes('Partial report'),'truncated report');
+  assert($('jpeg-warnings').textContent.includes('Truncated'),'Missing truncation warning');
+  pass('Truncation produces a partial report rather than a clean bill of health');
+  choose(new File(['not JPEG'],'invalid.jpg',{type:'image/jpeg'}));
+  await until(()=>$('jpeg-status').classList.contains('error'),'invalid input');
+  assert($('jpeg-report').hidden,'Invalid file retains previous report');
+  pass('Non-JPEG input rejected and previous report cleared');
+  choose(await fixture('trailing-data.jpg'));
+  await until(()=>!$('jpeg-report').hidden,'trailing data report');
+  assert($('jpeg-warnings').textContent.includes('20 bytes follow EOI'),'Trailing bytes not reported');
+  $('jpeg-clear').click();
+  assert($('jpeg-report').hidden&&$('jpeg-status').textContent==='No JPEG loaded.','Clear failed');
+  pass('Trailing data and clear behavior are explicit');
+  log.textContent+='\n\nALL JPEG BROWSER CHECKS PASSED';
+} catch(error){log.textContent=`${lines.join('\n')}\nFAIL: ${error.message}`;console.error(error);}
