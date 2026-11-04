@@ -1,0 +1,37 @@
+[
+  {
+    "id": "reference",
+    "file": "02-reference-q90.jpg",
+    "title": "Reference JPEG \u00b7 quality 90",
+    "description": "Start here. Inspect quantization tables, byte statistics, edges and residuals.",
+    "mime": "image/jpeg"
+  },
+  {
+    "id": "recompressed",
+    "file": "03-recompressed-q55.jpg",
+    "title": "Recompressed JPEG \u00b7 quality 55",
+    "description": "Reference JPEG decoded and saved again at quality 55. Compare tables and file size; this is ordinary recompression.",
+    "mime": "image/jpeg"
+  },
+  {
+    "id": "smoothed",
+    "file": "05-local-smoothing-q90.jpg",
+    "title": "Local smoothing \u00b7 JPEG quality 90",
+    "description": "A known rectangle was blurred before JPEG encoding. Explore edge/residual differences; no implemented tool automatically detects this edit.",
+    "mime": "image/jpeg"
+  },
+  {
+    "id": "lsb-control",
+    "file": "07-red-lsb-control.png",
+    "title": "Red bit 0 \u00b7 blank control",
+    "description": "In the browser workbench select Red / bit 0: the image should be black.",
+    "mime": "image/png"
+  },
+  {
+    "id": "lsb-pattern",
+    "file": "08-red-lsb-pattern.png",
+    "title": "Red bit 0 \u00b7 known pattern",
+    "description": "In the browser workbench select Red / bit 0 to reveal the constructed GAZOKEN pattern. This lossless PNG example is not a general hidden-message detector.",
+    "mime": "image/png"
+  }
+]

@@ -1,3 +1,4 @@
+import { installSamples } from './samples.mjs';
 const $=(id)=>document.getElementById(id);
 const node=(tag,text='',className='')=>{const e=document.createElement(tag);e.textContent=text;e.className=className;return e;};
 const SVG='http://www.w3.org/2000/svg';
@@ -199,3 +200,5 @@ $('jpeg-export').onclick=()=>{
   const blob=new Blob([JSON.stringify({fileName,...report},null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob),link=node('a');link.href=url;link.download=`${fileName}-gazoken-report.json`;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);
 };
+
+installSamples({container: document.getElementById('sample-gallery'), load:load, status, jpegOnly:true});

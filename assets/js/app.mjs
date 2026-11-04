@@ -1,3 +1,4 @@
+import { installSamples } from './samples.mjs';
 const $ = (id) => document.getElementById(id);
 const original = $('original');
 const ctx = original.getContext('2d', { willReadFrequently: true });
@@ -280,3 +281,5 @@ $('demo').addEventListener('click', async () => {
   finally { $('demo').disabled = false; }
 });
 controls();
+
+installSamples({container: document.getElementById('sample-gallery'), load:loadFile, status});

@@ -331,3 +331,27 @@ try {
   for(const step of state.catalog){state.settings[step.id]=Object.fromEntries(step.parameters.map(p=>[p.key,p.default]));if(step.selected)state.selected.add(step.id);}
   $('connection').textContent='Python connected · local';renderSteps();showEvidence();updateReferenceBanner();
 }catch(e){state.catalog=[];$('connection').textContent='Python unavailable / restart needed';$('run-status').textContent=e.message;notify(e.message+' Start or restart the local Gazoken Python app.');}
+
+// Bundled, documented fixtures use the same load/reset path as user files.
+let samples = [];
+async function openSample(id) {
+  const entry = samples.find(item => item.id === id);
+  if (!entry) return;
+  $('open-sample').disabled = true;
+  try {
+    const response = await fetch(`/api/sample?id=${encodeURIComponent(id)}`);
+    if (!response.ok) throw new Error('Sample unavailable.');
+    await load(new File([await response.blob()], entry.file, {type: entry.mime}));
+  } catch (error) { notify(error.message); }
+  finally { $('open-sample').disabled = !$('sample-choice').value; }
+}
+$('sample-choice').addEventListener('change', () => {
+  const entry = samples.find(item => item.id === $('sample-choice').value);
+  $('sample-description').textContent = entry?.description || 'Known inputs for exploration, not a detector benchmark.';
+  $('open-sample').disabled = !entry;
+});
+$('open-sample').addEventListener('click', () => openSample($('sample-choice').value));
+fetch('/api/samples').then(response => { if (!response.ok) throw new Error(); return response.json(); }).then(items => {
+  samples = items;
+  for (const item of items) $('sample-choice').add(new Option(item.title, item.id));
+}).catch(() => { $('sample-description').textContent = 'Sample catalog unavailable. You can still load your own JPEG.'; });

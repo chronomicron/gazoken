@@ -65,3 +65,11 @@ manifest and review differences when regenerating with another environment.
 Keep future inputs small, attributable, and documented. Store large or restricted
 research datasets elsewhere and track their manifests in the appropriate
 repository. Save analysis outputs separately from these reference inputs.
+
+## User-facing gallery
+
+`assets/samples.json` selects five of these existing files with concise exploration
+notes. The static pixel workbench offers all five; the JPEG inspector and local
+Python workbench offer the three JPEG cases. The PNG bit-plane pair must remain
+lossless. Samples illustrate measurements and controlled constructions, not
+validated detection performance. No new image data was generated for this gallery.

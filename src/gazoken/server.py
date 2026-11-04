@@ -84,9 +84,22 @@ def home():
     return FileResponse(WEB / "index.html")
 
 
+def sample_catalog():
+    return [item for item in json.loads((ROOT / "assets/samples.json").read_text())
+            if item["mime"] == "image/jpeg"]
+
+
+@app.get("/api/samples")
+def samples():
+    return sample_catalog()
+
+
 @app.get("/api/sample")
-def sample():
-    return FileResponse(ROOT / "tests/fixtures/images/02-reference-q90.jpg", media_type="image/jpeg")
+def sample(id: str = "reference"):
+    entry = next((item for item in sample_catalog() if item["id"] == id), None)
+    if entry is None:
+        raise HTTPException(404, "Unknown sample.")
+    return FileResponse(ROOT / "tests/fixtures/images" / entry["file"], media_type=entry["mime"])
 
 
 app.mount("/ui", StaticFiles(directory=WEB), name="ui")

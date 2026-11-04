@@ -311,3 +311,26 @@ outputs, and continuing after an adapter failure. Desktop browser verification
 loaded the synthetic reference and ran 1.1 and 1.7 through the registry in order;
 the selected call list and per-tool input records were inspected. No new detector
 or canonical decoder was added. Changes remain local and undeployed.
+
+## Bundled sample gallery
+
+The persistent **Explore a sample** selector offers the reference quality-90
+JPEG, its quality-55 recompression, and a JPEG with a known locally blurred region.
+Each describes its construction and an appropriate comparison. Opening a sample
+uses the ordinary source replacement path, clearing previous run history while
+retaining settings. Only implemented measurements execute; the blur example does
+not enable an automatic edit detector. `/api/samples` lists the public JPEG cases;
+`/api/sample?id=reference|recompressed|smoothed` serves allowlisted files.
+
+The separate static workbench also offers blank/pattern red-bit-0 PNG controls.
+Select Red / bit 0 there to explore the known pattern. The Python framework and
+raw JPEG inspector accept JPEG only. See [fixtures](../tests/fixtures/README.md)
+for ground truth and [distribution options](publishing.md#browser-demo-and-full-local-app)
+for browser versus local use.
+
+Gallery verification (2026-11-04): 18 Python API/contract checks and 37 JavaScript
+checks passed. API checks compare all three served JPEGs with their documented
+fixture bytes and reject unknown sample IDs. Browser checks loaded recompressed
+and smoothed JPEGs in the local app, parsed the smoothed JPEG in the static
+inspector, and completed Red / bit 0 analysis on the pattern PNG in the static
+workbench. Desktop gallery appearance was inspected. No deployment was performed.

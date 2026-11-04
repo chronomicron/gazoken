@@ -92,3 +92,39 @@ See [GitHub: what is GitHub Pages?](https://docs.github.com/en/pages/getting-sta
 
 If the root domain is served elsewhere, confirm path routing with that host
 before selecting an alternative deployment route.
+
+## Browser demo and full local app
+
+Checked 2026-11-04 against the current checkout and
+[GitHub Pages documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages).
+Pages hosts static HTML/CSS/JavaScript; it does not execute our Python API.
+
+| Entry point | Runs where | Current capabilities |
+| --- | --- | --- |
+| `index.html` | Visitor's browser; no Python installation | ELA, local-mean residual, Sobel edges, bit planes; sample gallery including a known PNG bit pattern. |
+| `jpeg.html` | Visitor's browser; no Python installation | Raw JPEG segments, metadata, quantization/Huffman tables, scan structure, hex view, byte statistics; three JPEG samples. |
+| `gazoken` command | User's local Python server and browser | Three-phase module framework, original-byte identity and distribution measurements, parameter/result/session records; most planned adapters remain unimplemented. |
+
+The static pages already provide a working subset, rather than a disabled copy of
+the Python framework. A useful public portal can link these two demos, describe
+the local app's additional workflow, and link installation instructions/source.
+Sharing a visual shell/catalog later is possible, but each executable capability
+must declare its browser/Python availability. Browser decode results and local
+Python outputs need explicit provenance and parity checks before being equated.
+
+For the full app today, users can clone the repository **or download its source
+ZIP**, install Python 3.11+, create a virtual environment, install the checkout
+with `pip install -e .`, and run `gazoken`. See
+[local setup](local-workbench.md). A source checkout is currently needed because
+shared assets and fixtures live outside the Python package. No standalone wheel,
+PyPI release, or desktop installer is promised by these instructions.
+
+A future installer could remove the source-download requirement. A hosted Python
+service is also possible, but requires a separate backend and explicit upload,
+resource-limit and retention decisions. Neither is implemented here. Python in
+WebAssembly is another future option, not required for the existing JavaScript demo.
+
+The gallery reads `assets/samples.json` and loads existing generated fixtures.
+Publish that file and `assets/js/samples.mjs` with the existing complete assets and
+fixture directories. The current changes are local; public deployment has not
+been verified or changed by this increment.

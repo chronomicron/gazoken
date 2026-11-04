@@ -557,3 +557,5 @@ footer nav {
     color:#172043;
   }
 }
+
+.sample-gallery{margin:16px 0;padding:12px;border:1px solid var(--line,#d8ded8);border-radius:6px}.sample-gallery select{max-width:100%;padding:8px;margin:6px 8px 6px 0}.sample-gallery .fine-print{margin-bottom:0}

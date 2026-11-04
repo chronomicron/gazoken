@@ -38,6 +38,21 @@ class WorkbenchTests(unittest.TestCase):
         self.assertEqual(counts[255], self.data.count(255))
         self.assertEqual(self.data, FIXTURE.read_bytes())
 
+    def test_sample_gallery_has_distinct_known_jpegs_and_no_arbitrary_paths(self):
+        entries = self.client.get('/api/samples').json()
+        self.assertEqual([entry['id'] for entry in entries], ['reference', 'recompressed', 'smoothed'])
+        hashes = set()
+        for entry in entries:
+            response = self.client.get('/api/sample', params={'id': entry['id']})
+            self.assertEqual(response.status_code, 200)
+            expected = Path(__file__).parent / 'fixtures/images' / entry['file']
+            self.assertEqual(response.content, expected.read_bytes())
+            hashes.add(hashlib.sha256(response.content).hexdigest())
+        self.assertEqual(len(hashes), 3)
+        self.assertEqual(self.client.get('/api/sample?id=../../README.md').status_code, 404)
+        self.assertEqual(self.client.get('/api/sample').content,
+                         (Path(__file__).parent / 'fixtures/images/02-reference-q90.jpg').read_bytes())
+
     def test_known_entropy(self):
         self.assertEqual(byte_distribution(bytes(range(256)))["entropy_bits_per_byte"], 8)
         self.assertEqual(byte_distribution(b"aaaa")["entropy_bits_per_byte"], 0)
