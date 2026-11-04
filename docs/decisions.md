@@ -240,6 +240,22 @@ Proposals remain separate until agreed. The initial handoff predates this log;
   callers; broader scientific schemas and evaluated specialist evidence remain open.
 - Guide: [evidence report](evidence-report.md).
 
+## D017 — Optional stored-coefficient package and bounded reader — 2026-11-04
+
+- Status: accepted implementation increment, based on the user's instruction to
+  implement 1.9 after the evidence report and keep it independently revertible.
+- Decision: add immutable source-bound quantized DCT packages and a jpeglib 0.14.0
+  adapter using explicitly selected libjpeg 6b in a temporary subprocess. Keep the
+  dependency optional; retain the existing interface with additive package fields.
+- Rationale: expose stored coefficients to future statistics while containing
+  documented native process exits and preserving the original bytes/pixel boundary.
+- Consequences: baseline/progressive 8-bit grayscale/three-component scope only,
+  explicit geometry/time/output limits, source/table/shape validation, and atomic
+  derived-input publication. Missing dependencies and unsupported inputs fail clearly.
+  No IDCT, permanent artifacts, browser coefficient decoder or 1.10 method is added.
+  The worker is not a security sandbox; cross-platform native behavior remains to test.
+- Guide: [stored coefficients](stored-coefficients.md).
+
 ## Pending proposals
 
 

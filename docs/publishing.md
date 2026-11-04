@@ -128,3 +128,7 @@ The gallery reads `assets/samples.json` and loads existing generated fixtures.
 Publish that file and `assets/js/samples.mjs` with the existing complete assets and
 fixture directories. The current changes are local; public deployment has not
 been verified or changed by this increment.
+
+The optional [1.9 native coefficient reader](stored-coefficients.md) runs only in
+the local Python app; install `.[coefficients]` separately. Its buffers are not
+available to the static JavaScript demo. No public backend was added.

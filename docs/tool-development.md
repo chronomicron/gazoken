@@ -25,6 +25,7 @@ src/gazoken/
 │   │   ├── embedded_images.py    Step 1.6, registered
 │   │   ├── quantization_tables.py Step 1.4, registered
 │   │   ├── byte_distribution.py  Step 1.7, registered
+│   │   ├── stored_coefficients.py Step 1.9, registered (optional extra)
 │   │   └── evidence_report.py    Step 1.12, registered
 │   ├── decoded/                  Phase 2: reference provider and spatial tools
 │   └── history/                  Phase 3: processing-history specialists
@@ -75,7 +76,7 @@ integration needs source-bound lifecycle/transport tests and a renderer/storage
 choice, in addition to its adapter. The notebook API can already accept an
 explicitly constructed package; no pixels are inferred from a filename.
 
-Other declared inputs (coefficients, sensor references, weights, evaluated evidence)
+Other declared inputs (sensor references, weights, evaluated evidence)
 are extension points, currently unavailable. Add provenance-checked typed packages
 and resource handling before registering a method that needs them. A text field
 containing a manifest name does not load that resource.
@@ -169,9 +170,9 @@ node tests/session.test.mjs
 node --check src/gazoken/web/workbench.mjs
 ```
 
-The two existing byte tools were moved without changing their measurements. No
-new forensic algorithm, Python decode, resource loader, background queue, plugin
-installer, persistent artifact store or C/C++ ABI is introduced. Python tests use
+The original foundation moved two byte tools without changing their measurements.
+Later registered adapters are listed below. No Python pixel decoder, background
+queue, plugin installer, persistent artifact store or C/C++ ABI is implemented. Python tests use
 synthetic test-only providers to exercise future handoff; those are not registered
 production methods. Keep C/C++ integration behind this Python adapter boundary
 when requirements justify it; language bindings remain undecided.
@@ -185,14 +186,15 @@ Updated 2026-11-04. Completed Python adapters, in implementation order:
 [1.3 Metadata inventory](metadata-inventory.md), then
 [1.5 Entropy coding](entropy-coding.md), then
 [1.6 Embedded images](embedded-images.md), then
-[1.12 Evidence report](evidence-report.md). All use the same version 1 input
+[1.12 Evidence report](evidence-report.md), then
+[1.9 Stored coefficients](stored-coefficients.md). All use the same version 1 input
 contract and explicit registry. Existing browser-only tools have separate coverage.
 
 The bounded header adapters on Gopher's initial shortlist are now implemented.
 Embedded JPEG preview extraction (1.6) is also implemented. Coefficient reader
-1.9 is a larger prerequisite before coefficient analysis; encoder profiles 1.8
+1.9 provides the optional coefficient package before coefficient analysis; encoder profiles 1.8
 need explicit reference data and matching scope before implementation.
-Coefficient statistics 1.10 needs reader 1.9 first; decoded methods need 2.1.
+Coefficient statistics 1.10 can now consume the declared package after 1.9; decoded methods need 2.1.
 This is implementation priority, not execution order: selected tools still run
 in numeric phase/step order. Research-heavy detection methods remain later work.
 
@@ -202,5 +204,14 @@ earlier records of the current run only to tools declaring `run_evidence`;
 no history payload is accepted from HTTP callers. Report 1.12 filters Phase 1,
 excludes itself, and never invokes missing steps. It is separate from the future
 Phase 3 `evaluated_evidence` input. See [report scope](evidence-report.md).
-Next implementation priority is 1.9 Stored DCT arrays, then 1.10 statistics;
+Next implementation priority is 1.10 coefficient statistics;
 1.8 profile data and 1.11 method evaluation remain research-led work.
+
+`tools/coefficients.py` defines immutable signed-int16-LE component buffers with
+block-row/block-column/v/u layout and source/reader/quantization provenance.
+`ToolInputs.coefficients` and `ToolOutput.coefficients` use that package; catalog
+1.9 is its declared provider. Publish all derived input packages only after the
+entire tool output validates. `ToolError` is reserved for adapter-owned safe
+user diagnostics; unexpected exception details stay hidden. Full buffers are not
+transported as JSON. Native code belongs behind the documented bounded worker;
+see [reader setup and boundaries](stored-coefficients.md).

@@ -1,7 +1,7 @@
 # Local Python research workbench
 
 Updated: 2026-11-04  
-Version: 0.5.0 — modular tool foundation; eight registered Python tools
+Version: 0.5.0 — modular tool foundation; nine registered Python tools (1.9 requires an optional extra)
 
 ## Launch
 
@@ -105,6 +105,7 @@ Python decoded reference and prerequisites are not automatically executed.
 | 1.5 Entropy coding | Implemented | Stored Huffman definitions, canonical codes, chronological scan assignments and partial-data warnings. See [coverage](entropy-coding.md). |
 | 1.6 Embedded images | Implemented | Bounded Exif IFD1/JFXX JPEG range extraction, hashes and optional nested structure. See [coverage](embedded-images.md). |
 | 1.7 Byte distribution | Implemented | Exact 256-bin whole-file histogram and Shannon entropy in bits/byte. Descriptive only. |
+| 1.9 Stored coefficients | Implemented; optional extra | Original quantized DCT arrays, fixed source-bound package, component/table provenance and first-block samples. See [setup and limits](stored-coefficients.md). |
 | 1.12 Evidence report | Implemented | Assemble earlier Phase 1 results within the same run, with coverage, provenance and optional raw measurements/warnings. See [usage](evidence-report.md). |
 | Other Phase 1 steps | Not implemented | Validated configuration and explicit status; no analytical output. |
 | All eleven Phase 2 steps | Not implemented | Parameter records linked to the same original JPEG; no Python decode or spatial analysis. |
@@ -232,7 +233,8 @@ Python process. There are no third-party fonts/scripts, telemetry, remote image
 uploads, browser storage, or external inference services. Request size is bounded
 before multipart parsing. Transient uploads may spool to the OS temporary
 directory and are closed after processing. The backend does not retain sources
-between requests. The browser holds the current source/journal until cleared,
+between requests. Step 1.9 additionally writes a private temporary source copy for
+its native worker, cleaned after the call; see its platform/process limits. The browser holds the current source/journal until cleared,
 replaced, or closed. Clearing retains settings; replacing clears old run records.
 
 Invalid replacements leave the previous source intact. Parameter edits do not
@@ -376,3 +378,10 @@ Step 1.12 added (2026-11-04): select tools and 1.12 together, then Run selected.
 The [evidence report](evidence-report.md) is assembled from earlier records of
 that run, with its own JSON download. Separate GUI runs are not merged. Current
 executable IDs: 1.1–1.7 and 1.12. Next: 1.9 coefficient reader, then 1.10 statistics.
+
+
+Step 1.9 added (2026-11-04): install `.[coefficients]` to enable the optional
+[stored-coefficient reader](stored-coefficients.md). It creates no Python pixels.
+Full arrays are passed only to later selected Python consumers; exports include
+descriptors and first-block samples. Current executable IDs: 1.1–1.7, 1.9, 1.12
+(with 1.9 failing clearly without its extra). Next: 1.10 statistics.

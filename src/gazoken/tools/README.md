@@ -1,7 +1,7 @@
 # Isolated tool adapters
 
 All tools use `run(ToolInputs, parameters) -> ToolOutput`. The original bytes and
-optional fixed pixel package are immutable; tools make their own working data.
+optional fixed pixel/coefficient packages are immutable; tools make their own working data.
 The GUI, HTTP endpoint and Python runner share this interface and catalog.
 
 - [Encoded tools](encoded/README.md): Phase 1 module inventory.

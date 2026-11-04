@@ -1,5 +1,6 @@
 """Framework contracts, upload boundaries and honest placeholder behavior."""
 import hashlib
+import importlib.metadata
 import json
 from pathlib import Path
 import unittest
@@ -26,7 +27,13 @@ class WorkbenchTests(unittest.TestCase):
         result = self.upload([{"id": s["id"]} for s in catalog])
         self.assertEqual(result.status_code, 200, result.text)
         records = result.json()["results"]
-        self.assertEqual([r["id"] for r in records if r["status"] == "completed"], ["1.1", "1.2", "1.3", "1.4", "1.5", "1.6", "1.7", "1.12"])
+        expected = ["1.1", "1.2", "1.3", "1.4", "1.5", "1.6", "1.7"]
+        try:
+            if importlib.metadata.version('jpeglib') == '0.14.0': expected.append('1.9')
+        except importlib.metadata.PackageNotFoundError:
+            pass
+        expected.append('1.12')
+        self.assertEqual([r['id'] for r in records if r['status'] == 'completed'], expected)
         self.assertTrue(all(r["output"] is None for r in records if r["status"] == "not_implemented"))
 
     def test_bytes_hash_and_parameter_record(self):

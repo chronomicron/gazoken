@@ -25,7 +25,7 @@ class ToolContractTests(TestCase):
             self.assertEqual(s['tool']['contract_version'], 1)
             self.assertTrue(s['tool']['inputs'])
             self.assertEqual(s['implementation']=='ready',s['tool']['key'] in REGISTRY)
-        self.assertEqual([s['id'] for s in CATALOG if s['tool']['provides']],['2.1'])
+        self.assertEqual([s['id'] for s in CATALOG if s['tool']['provides']],['1.9','2.1'])
 
     def test_shared_input_copies_mutable_buffers_and_rejects_foreign_pixels(self):
         buffer=bytearray(DATA);source=ImageSource(buffer,'test.jpg');buffer[-1]=0

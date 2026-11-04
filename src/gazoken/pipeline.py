@@ -13,8 +13,9 @@ from types import MappingProxyType
 
 from . import __version__
 from .catalog import CATALOG, BY_ID
-from .tools.contracts import MAX_BYTES, ImageSource, PixelPackage, ToolInputs, ToolOutput, RunEvidence
+from .tools.contracts import MAX_BYTES, ImageSource, PixelPackage, ToolInputs, ToolOutput, RunEvidence, ToolError
 from .tools.registry import lookup
+from .tools.coefficients import CoefficientPackage
 from .tools.encoded.byte_distribution import measure as byte_distribution
 
 
@@ -59,7 +60,7 @@ def validate_plan(plan: list) -> list:
     return sorted(normalized, key=lambda x: tuple(map(int, x["id"].split("."))))
 
 
-def run_plan(data: bytes, filename: str, plan: list, *, pixels: PixelPackage | None = None) -> dict:
+def run_plan(data: bytes, filename: str, plan: list, *, pixels: PixelPackage | None = None, coefficients: CoefficientPackage | None = None) -> dict:
     """Run selected adapters in stable phase/step order on the same input packet.
 
     Dependencies are not run implicitly. The API supplies bytes only; future Python
@@ -67,7 +68,7 @@ def run_plan(data: bytes, filename: str, plan: list, *, pixels: PixelPackage | N
     parameters and return JSON measurements; a failure does not poison later tools.
     """
     plan = validate_plan(plan)
-    inputs = ToolInputs(ImageSource(data, filename), pixels)
+    inputs = ToolInputs(ImageSource(data, filename), pixels, coefficients=coefficients)
     source = inputs.source.record()
     results = []
     for item in plan:
@@ -79,7 +80,7 @@ def run_plan(data: bytes, filename: str, plan: list, *, pixels: PixelPackage | N
         produced_inputs = {}
         spec = BY_ID[item['id']]
         registration = lookup(spec['tool']['key'])
-        available = {'jpeg_bytes'} | ({'pixels'} if inputs.pixels else set()) | ({'run_evidence'} if inputs.evidence is not None else set())
+        available = {'jpeg_bytes'} | ({'pixels'} if inputs.pixels else set()) | ({'run_evidence'} if inputs.evidence is not None else set()) | ({'coefficients'} if inputs.coefficients is not None else set())
         missing = [kind for kind in spec['tool']['inputs'] if kind not in available]
         status, output, warnings, error_type = 'not_implemented', None, [], None
         message = 'Configuration recorded; Python method not connected. No analysis result produced.'
@@ -96,19 +97,29 @@ def run_plan(data: bytes, filename: str, plan: list, *, pixels: PixelPackage | N
                         raise TypeError('Tool warnings must be a tuple of strings.')
                     # Detach results immediately and reject nonfinite / non-JSON values.
                     payload = json.loads(json.dumps({'measurements': result.measurements, 'warnings':result.warnings}, allow_nan=False))
+                    next_inputs = inputs
                     if result.pixels is not None:
                         if 'pixels' not in spec['tool']['provides']:
                             raise ValueError('This tool is not a declared pixel provider.')
-                        next_inputs = ToolInputs(inputs.source, result.pixels)
+                        next_inputs = replace(next_inputs, pixels=result.pixels)
                         if inputs.pixels is not None and inputs.pixels.record() != result.pixels.record():
                             raise ValueError('A fixed decoded reference cannot be replaced during a plan.')
                         produced_inputs = {'pixels': result.pixels.record()}
-                        inputs = next_inputs
+                    if result.coefficients is not None:
+                        if 'coefficients' not in spec['tool']['provides']:
+                            raise ValueError('This tool is not a declared coefficient provider.')
+                        next_inputs = replace(next_inputs, coefficients=result.coefficients)
+                        if inputs.coefficients is not None and inputs.coefficients.record()!=result.coefficients.record():
+                            raise ValueError('A fixed coefficient reference cannot be replaced during a plan.')
+                        produced_inputs['coefficients'] = result.coefficients.record()
+                    inputs = next_inputs
                     output, warnings, status = payload['measurements'], payload['warnings'], 'completed'
                     message = 'Tool completed on declared inputs. Source preserved.'
                 except Exception as exc:
+                    produced_inputs = {}
                     status, error_type = 'failed', type(exc).__name__
                     message = f'Tool failed ({error_type}); no output committed. Later selected tools may continue.'
+                    if isinstance(exc, ToolError): message += ' '+str(exc)[:240]
         results.append({**deepcopy(item), 'tool_key': spec['tool']['key'],
                         'input_contract_version': 1, 'inputs': deepcopy(input_record),
                         'required_inputs': list(spec['tool']['inputs']), 'missing_inputs': missing,
@@ -123,6 +134,6 @@ def run_plan(data: bytes, filename: str, plan: list, *, pixels: PixelPackage | N
             'source': source, 'results': results}
 
 
-def run_step(data: bytes, filename: str, step_id: str, parameters: dict | None = None, *, pixels: PixelPackage | None = None) -> dict:
+def run_step(data: bytes, filename: str, step_id: str, parameters: dict | None = None, *, pixels: PixelPackage | None = None, coefficients: CoefficientPackage | None = None) -> dict:
     """Same entry point for one tool, notebooks and future batch callers."""
-    return run_plan(data, filename, [{'id':step_id, 'parameters':parameters or {}}], pixels=pixels)
+    return run_plan(data, filename, [{'id':step_id, 'parameters':parameters or {}}], pixels=pixels, coefficients=coefficients)

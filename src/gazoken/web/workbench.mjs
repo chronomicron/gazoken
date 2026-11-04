@@ -54,7 +54,7 @@ const inputLabel = kind => ({jpeg_bytes:'Original JPEG bytes',pixels:'Python pix
 function toolBoundary(step) {
   const tool=step.tool;
   if(!tool)return '';
-  return `<div class="tool-boundary"><strong>Common tool interface · v${esc(tool.contract_version)}</strong><code>${esc(tool.module)}</code><span>${step.implementation==='ready'?'Registered adapter':'Reserved module · not implemented'}</span><ul>${tool.inputs.map(kind=>`<li>${esc(inputLabel(kind))}: ${kind==='jpeg_bytes'?(state.source?'source ready for submission':'load a source'):kind==='run_evidence'?'assembled by runner; may be empty':'not provided by this framework'}</li>`).join('')}</ul></div>`;
+  return `<div class="tool-boundary">${step.id==='1.9'?'<p>Optional reader: install with pip install -e &quot;.[coefficients]&quot;. Arrays remain in Python; exports contain descriptors and first-block samples.</p>':''}<strong>Common tool interface · v${esc(tool.contract_version)}</strong><code>${esc(tool.module)}</code><span>${step.implementation==='ready'?'Registered adapter':'Reserved module · not implemented'}</span><ul>${tool.inputs.map(kind=>`<li>${esc(inputLabel(kind))}: ${kind==='jpeg_bytes'?(state.source?'source ready for submission':'load a source'):kind==='run_evidence'?'assembled by runner; may be empty':kind==='coefficients'?'provided only after selected 1.9 succeeds in this run':'not provided by this framework'}</li>`).join('')}</ul></div>`;
 }
 function renderSteps() {
   const open = state.openByPhase[state.phase];
@@ -99,7 +99,10 @@ function showEvidence(id = state.active) {
     body=`<div class="config-note">${state.source?'Uses the same preserved source as Phase 1.':'Load a source once in any phase.'} Python decoded reference: not created. This step records configuration only. Provisional settings are not validated experimental parameters.</div><h3 class="artifact-heading">Expected outputs · not generated</h3><ul class="artifact-slots">${(step.outputs||[]).map(label=>`<li>${esc(label)}</li>`).join('')}</ul>${step.requires?.length?`<p class="muted">Planned inputs from steps ${esc(step.requires.join(', '))}. Dependencies are declared, not automatically executed.</p>`:''}`;
   }
   else if (id === '1.1' && state.source) body = definitionList(Object.entries(measured?.output || state.source));
-  else if (id === '1.12' && measured) {
+  else if (id === '1.9' && measured) {
+    const o=measured.output,p=o.package;
+    body=`<p>Stored quantized DCT · ${esc(p.reader)} ${esc(p.reader_version)} · libjpeg ${esc(p.codec_version)}</p>`+table(['Component ID','Blocks (rows × columns)','Table','Bytes'],p.components.map(c=>[c.component_id,c.shape[0]+' × '+c.shape[1],c.table_id,c.byte_count]))+`<details><summary>Coefficient provenance and first blocks</summary><pre>${esc(JSON.stringify(o,null,2))}</pre></details><p class="warning-note">${esc(o.interpretation)}</p>`;
+  } else if (id === '1.12' && measured) {
     const o=measured.output;
     body=`<p>${o.record_count} earlier records · ${o.completed_count} completed steps · ${o.warning_count} warnings</p><button id="download-evidence-report" class="button subtle">Download assembled report ↗</button><p class="muted">${esc(o.scope)}</p>`+table(['Step','Execution','Partial extraction','Warnings'],o.coverage.map(r=>[r.id,r.status,r.partial_extraction?'Yes':'No',r.has_warnings?'Yes':'No']))+`<details><summary>Assembled evidence report</summary><pre>${esc(JSON.stringify(o,null,2))}</pre></details><p class="warning-note">${esc(o.interpretation)}</p>`+(measured.warnings||[]).map(w=>`<p class="warning-note">${esc(w)}</p>`).join('');
   } else if (id === '1.6' && measured) {

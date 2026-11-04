@@ -95,3 +95,9 @@ or restricted datasets. Artifact storage remains an open decision.
 The [evidence assembler](evidence-report.md) adds optional source-bound current-run
 records to the shared input packet. Follow its documented scope when adding report
 consumers; do not import unverified browser history into measurement provenance.
+
+Optional native coefficient integration uses `.[coefficients]`; see
+[stored coefficients](stored-coefficients.md) for pinned versions, licensing,
+worker limits, platform verification and native tests. Ordinary base installation
+does not install this extra. Add and test representation changes before consuming
+coefficient buffers in another method.

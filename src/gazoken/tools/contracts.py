@@ -7,6 +7,11 @@ from dataclasses import dataclass, field
 import hashlib
 import json
 from typing import Mapping, Protocol
+from .coefficients import CoefficientPackage
+
+class ToolError(ValueError):
+    """An adapter-owned, bounded diagnostic safe to display to the user."""
+
 
 CONTRACT_VERSION = 1
 MAX_BYTES = 25 * 1024 * 1024
@@ -115,6 +120,7 @@ class ToolInputs:
     source: ImageSource
     pixels: PixelPackage | None = None
     evidence: RunEvidence | None = None
+    coefficients: CoefficientPackage | None = None
 
     def __post_init__(self):
         if not isinstance(self.source, ImageSource):
@@ -125,10 +131,14 @@ class ToolInputs:
         if self.evidence is not None and (not isinstance(self.evidence, RunEvidence) or self.evidence.source_sha256 != self.source.sha256):
             raise ValueError('Evidence package does not belong to this source.')
 
+        if self.coefficients is not None and (not isinstance(self.coefficients, CoefficientPackage) or self.coefficients.source_sha256 != self.source.sha256):
+            raise ValueError('Coefficient package does not belong to this source.')
+
     def record(self):
         return {"contract_version": CONTRACT_VERSION, "source_sha256": self.source.sha256,
                 "pixels": self.pixels.record() if self.pixels else None,
-                "evidence": self.evidence.record() if self.evidence else None}
+                "evidence": self.evidence.record() if self.evidence else None,
+                "coefficients": self.coefficients.record() if self.coefficients else None}
 
 
 @dataclass(frozen=True)
@@ -136,6 +146,7 @@ class ToolOutput:
     measurements: dict
     warnings: tuple[str, ...] = ()
     pixels: PixelPackage | None = None
+    coefficients: CoefficientPackage | None = None
 
 
 class ToolHandler(Protocol):

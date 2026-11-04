@@ -288,8 +288,8 @@
     "title": "Stored DCT arrays",
     "subtitle": "Entropy decode, without IDCT",
     "group": "Coefficients",
-    "description": "Configure a future coefficient reader. No DCT coefficients are extracted yet; reconstructed pixel DCTs are a different representation.",
-    "implementation": "planned",
+    "description": "Read stored quantized DCT arrays using the optional jpeglib backend in a bounded worker. Supports 8-bit baseline/progressive grayscale or three-component JPEG; no pixel decode.",
+    "implementation": "ready",
     "view": "quantization",
     "selected": false,
     "parameters": [
@@ -298,11 +298,13 @@
         "label": "Reader preference",
         "type": "select",
         "options": [
+          "Auto (jpeglib)",
+          "jpeglib",
           "Not selected",
           "jpegio candidate",
           "jpeglib candidate"
         ],
-        "default": "Not selected"
+        "default": "Auto (jpeglib)"
       },
       {
         "key": "components",
@@ -322,7 +324,9 @@
       "inputs": [
         "jpeg_bytes"
       ],
-      "provides": []
+      "provides": [
+        "coefficients"
+      ]
     }
   },
   {
