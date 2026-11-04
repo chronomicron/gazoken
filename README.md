@@ -63,6 +63,8 @@ Gazoken（ガゾケン）は、ソフトウェア開発と研究を両輪とす�
 
 **Local research app / ローカル研究アプリ:** The Python-backed three-phase framework
 provides grouped step controls, image/byte/table views, and session exports.
+Python adapters currently measure source identity, byte distribution, and
+[exact quantization tables](docs/quantization-tables.md).
 See [setup and coverage](docs/local-workbench.md). From an installed checkout,
 run `.venv/bin/gazoken` and open `http://127.0.0.1:8765/`.
 

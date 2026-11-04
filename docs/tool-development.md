@@ -19,6 +19,7 @@ src/gazoken/
 │   ├── registry.py               Explicit executable-adapter allowlist
 │   ├── encoded/                  Phase 1: original file and compressed-domain tools
 │   │   ├── source_identity.py    Step 1.1, registered
+│   │   ├── quantization_tables.py Step 1.4, registered
 │   │   └── byte_distribution.py  Step 1.7, registered
 │   ├── decoded/                  Phase 2: reference provider and spatial tools
 │   └── history/                  Phase 3: processing-history specialists
@@ -169,3 +170,16 @@ installer, persistent artifact store or C/C++ ABI is introduced. Python tests us
 synthetic test-only providers to exercise future handoff; those are not registered
 production methods. Keep C/C++ integration behind this Python adapter boundary
 when requirements justify it; language bindings remain undecided.
+
+## Implementation progress
+
+Updated 2026-11-04. Completed Python adapters, in implementation order:
+1.1 Source identity, 1.7 Byte distribution, then
+[1.4 Quantization atlas](quantization-tables.md). All use the same version 1 input
+contract and explicit registry. Existing browser-only tools have separate coverage.
+
+Following Gopher's easier-first shortlist, the next bounded adapter is 1.2 File
+structure, followed by bounded 1.3 Metadata inventory and 1.5 Entropy coding.
+Coefficient statistics 1.10 needs reader 1.9 first; decoded methods need 2.1.
+This is implementation priority, not execution order: selected tools still run
+in numeric phase/step order. Research-heavy detection methods remain later work.

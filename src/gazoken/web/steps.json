@@ -112,8 +112,8 @@
     "title": "Quantization atlas",
     "subtitle": "The encoder's frequency choices",
     "group": "Structure",
-    "description": "Configure exact table extraction and component assignments. Browse actual table values in the browser preview while the Python adapter is pending.",
-    "implementation": "planned",
+    "description": "Extract exact stored quantization tables, frame component assignments and scan-time table definitions without decoding pixels. Partial files retain complete definitions with warnings.",
+    "implementation": "ready",
     "view": "quantization",
     "selected": true,
     "parameters": [
@@ -122,10 +122,10 @@
         "label": "Value layout",
         "type": "select",
         "options": [
-          "Natural 8 \u00d7 8",
+          "Natural 8 × 8",
           "Stored zigzag"
         ],
-        "default": "Natural 8 \u00d7 8"
+        "default": "Natural 8 × 8"
       },
       {
         "key": "retain_history",
@@ -218,7 +218,7 @@
     "title": "Byte distribution",
     "subtitle": "Measure the original byte stream",
     "group": "Measurements",
-    "description": "Compute exact counts for byte values 0\u2013255 and descriptive Shannon entropy over the whole file. This is not a tampering score.",
+    "description": "Compute exact counts for byte values 0–255 and descriptive Shannon entropy over the whole file. This is not a tampering score.",
     "implementation": "ready",
     "view": "bytes",
     "selected": true,
@@ -2105,11 +2105,11 @@
         "label": "Proposed sequence pair",
         "type": "select",
         "options": [
-          "Resize \u2192 JPEG vs JPEG \u2192 resize \u2192 JPEG",
-          "Blur \u2192 resize vs resize \u2192 blur",
+          "Resize → JPEG vs JPEG → resize → JPEG",
+          "Blur → resize vs resize → blur",
           "Tone mapping before vs after final JPEG"
         ],
-        "default": "Resize \u2192 JPEG vs JPEG \u2192 resize \u2192 JPEG"
+        "default": "Resize → JPEG vs JPEG → resize → JPEG"
       },
       {
         "key": "evidence_policy",

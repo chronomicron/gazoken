@@ -1,7 +1,7 @@
 # Local Python research workbench
 
 Updated: 2026-11-04  
-Version: 0.5.0 — modular tool foundation; two basic Python measurements
+Version: 0.5.0 — modular tool foundation; three registered Python measurements
 
 ## Launch
 
@@ -99,6 +99,7 @@ Python decoded reference and prerequisites are not automatically executed.
 | Step | Python handler | Result |
 | --- | --- | --- |
 | 1.1 Source identity | Implemented; automatic on load and independently runnable | Filename, byte count, SHA-256, SOI signature, acquisition note. Signature recognition is not full JPEG validation. |
+| 1.4 Quantization atlas | Implemented | Exact DQT values, precision, layouts, component assignments, scan-time definition references and partial-data warnings. See [coverage](quantization-tables.md). |
 | 1.7 Byte distribution | Implemented | Exact 256-bin whole-file histogram and Shannon entropy in bits/byte. Descriptive only. |
 | Other Phase 1 steps | Not implemented | Validated configuration and explicit status; no analytical output. |
 | All eleven Phase 2 steps | Not implemented | Parameter records linked to the same original JPEG; no Python decode or spatial analysis. |
@@ -334,3 +335,10 @@ fixture bytes and reject unknown sample IDs. Browser checks loaded recompressed
 and smoothed JPEGs in the local app, parsed the smoothed JPEG in the static
 inspector, and completed Red / bit 0 analysis on the pattern PNG in the static
 workbench. Desktop gallery appearance was inspected. No deployment was performed.
+
+
+Step 1.4 added (2026-11-04): the [quantization atlas](quantization-tables.md) is
+now a registered Python measurement. Implemented adapters are 1.1, 1.4 and 1.7;
+other steps remain configuration-only. It records exact tables and assignments,
+partial-data warnings, and optional definition history. Earlier verification counts
+above describe their dated increments. Restart the server for catalog changes.

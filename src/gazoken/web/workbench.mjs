@@ -112,6 +112,8 @@ function showEvidence(id = state.active) {
     const entries = preview.exif.flatMap(e => e.entries).filter(e => state.settings[id].include_gps || !e.ifd.startsWith('GPS')).slice(0,100);
     body = entries.length ? table(['Directory','Tag','Stored value'], entries.map(e => [e.ifd,e.name, typeof e.value === 'object' ? JSON.stringify(e.value) : e.value])) : '<p class="muted">No readable EXIF entries in this preview. Other metadata formats and vendor data are not decoded here.</p>';
     body += '<p class="warning-note">Stored declarations are not verified provenance. GPS preview rows are hidden unless enabled above. Browser values are not exported as Python results.</p>';
+  } else if (id === '1.4' && measured) {
+    body = `<p>${esc(measured.output.extraction_status)} extraction · ${measured.output.definition_count} table definitions</p>` + table(['Table / definition','Precision','Min / max','Mean'], measured.output.tables.map(t => [t.table_id+' / '+t.definition_index, t.precision_bits+'-bit', t.minimum+' / '+t.maximum, t.mean.toFixed(2)])) + `<p class="muted">${esc(measured.output.interpretation)}</p><details><summary>Exact tables and component assignments</summary><pre>${esc(JSON.stringify(measured.output,null,2))}</pre></details>` + (measured.warnings||[]).map(w=>`<p class="warning-note">${esc(w)}</p>`).join('');
   } else if (id === '1.4' && preview) {
     body = table(['Table','Precision','Min / max','Mean'], preview.quantizationTables.map(t => [t.id,`${t.precision}-bit`,`${t.statistics.minimum} / ${t.statistics.maximum}`,t.statistics.mean.toFixed(2)]));
     body += '<p class="muted">The atlas above shows actual stored quantization steps, not DCT coefficient samples.</p>';
