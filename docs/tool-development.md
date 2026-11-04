@@ -21,6 +21,7 @@ src/gazoken/
 │   │   ├── source_identity.py    Step 1.1, registered
 │   │   ├── file_structure.py     Step 1.2, registered
 │   │   ├── metadata_inventory.py Step 1.3, registered
+│   │   ├── entropy_coding.py     Step 1.5, registered
 │   │   ├── quantization_tables.py Step 1.4, registered
 │   │   └── byte_distribution.py  Step 1.7, registered
 │   ├── decoded/                  Phase 2: reference provider and spatial tools
@@ -179,10 +180,13 @@ Updated 2026-11-04. Completed Python adapters, in implementation order:
 1.1 Source identity, 1.7 Byte distribution, then
 [1.4 Quantization atlas](quantization-tables.md), then
 [1.2 File structure](file-structure.md), then
-[1.3 Metadata inventory](metadata-inventory.md). All use the same version 1 input
+[1.3 Metadata inventory](metadata-inventory.md), then
+[1.5 Entropy coding](entropy-coding.md). All use the same version 1 input
 contract and explicit registry. Existing browser-only tools have separate coverage.
 
-Following Gopher's easier-first shortlist, the next bounded adapter is 1.5 Entropy coding.
+The bounded header adapters on Gopher's initial shortlist are now implemented.
+A further small candidate is 1.6 Embedded images; coefficient reader 1.9 is a
+larger prerequisite before coefficient analysis.
 Coefficient statistics 1.10 needs reader 1.9 first; decoded methods need 2.1.
 This is implementation priority, not execution order: selected tools still run
 in numeric phase/step order. Research-heavy detection methods remain later work.

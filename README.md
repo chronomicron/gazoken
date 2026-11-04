@@ -66,7 +66,8 @@ provides grouped step controls, image/byte/table views, and session exports.
 Python adapters currently measure source identity,
 [JPEG file structure](docs/file-structure.md),
 [bounded metadata](docs/metadata-inventory.md), byte distribution, and
-[exact quantization tables](docs/quantization-tables.md).
+[exact quantization tables](docs/quantization-tables.md), plus
+[Huffman codebooks and scan assignments](docs/entropy-coding.md).
 See [setup and coverage](docs/local-workbench.md). From an installed checkout,
 run `.venv/bin/gazoken` and open `http://127.0.0.1:8765/`.
 

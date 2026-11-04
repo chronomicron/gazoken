@@ -123,6 +123,9 @@ function showEvidence(id = state.active) {
   } else if (id === '1.4' && preview) {
     body = table(['Table','Precision','Min / max','Mean'], preview.quantizationTables.map(t => [t.id,`${t.precision}-bit`,`${t.statistics.minimum} / ${t.statistics.maximum}`,t.statistics.mean.toFixed(2)]));
     body += '<p class="muted">The atlas above shows actual stored quantization steps, not DCT coefficient samples.</p>';
+  } else if (id === '1.5' && measured) {
+    const o=measured.output;
+    body=`<p>${esc(o.extraction_status)} extraction · ${o.definition_count} definitions · ${o.scan_count} scans</p>`+table(['Class','Table / definition','Symbols'],o.definitions.map(t=>[t.class,t.table_id+' / '+t.definition_index,t.symbol_count]))+`<details><summary>Codebooks and scan assignments</summary><pre>${esc(JSON.stringify(o,null,2))}</pre></details><p class="muted">${esc(o.interpretation)}</p>`+(measured.warnings||[]).map(w=>`<p class="warning-note">${esc(w)}</p>`).join('');
   } else if (id === '1.5' && preview) {
     body = table(['Class','Table','Assigned symbols'], preview.huffmanTables.map(t => [t.class ? 'AC' : 'DC',t.id,t.total]));
     body += '<p class="muted">Definitions only; actual symbol usage is not measured.</p>';

@@ -151,8 +151,8 @@
     "title": "Entropy coding",
     "subtitle": "Codebooks & scan choices",
     "group": "Structure",
-    "description": "Plan Huffman definitions and scan-script extraction. Actual encoded-symbol usage needs a separate entropy-event reader.",
-    "implementation": "planned",
+    "description": "Extract stored Huffman definitions, canonical codes and scan-time assignments. Symbol usage, compression efficiency and optimized-encoder identification are not measured.",
+    "implementation": "ready",
     "view": "structure",
     "selected": false,
     "parameters": [
