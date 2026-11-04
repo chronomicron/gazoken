@@ -1,32 +1,35 @@
 import {sessionRecord, readSettings, phaseReport, phaseSteps} from './session.mjs';
 const $ = id => document.getElementById(id);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const state = {phase:1, activeByPhase:{1:'1.1',2:'2.1'}, openByPhase:{1:new Set(['1.1']),2:new Set(['2.1'])}, modeByPhase:{1:'source',2:'source'}, catalog: [], settings: {}, selected: new Set(), file: null, bytes: null, preview: null, runs: [], mode: 'source', active: '1.1', url: null, worker: null, busy: false, generation: 0, source: null};
+const state = {phase:1, activeByPhase:{1:'1.1',2:'2.1',3:'3.1'}, openByPhase:{1:new Set(['1.1']),2:new Set(['2.1']),3:new Set(['3.1'])}, modeByPhase:{1:'source',2:'source',3:'source'}, catalog: [], settings: {}, selected: new Set(), file: null, bytes: null, preview: null, runs: [], mode: 'source', active: '1.1', url: null, worker: null, busy: false, generation: 0, source: null};
 const visibleSteps = () => phaseSteps(state.catalog,state.phase);
 const visibleRuns = () => state.runs.map((run,runIndex)=>({run:{...run,results:run.results.filter(r=>r.id.startsWith(`${state.phase}.`))},runIndex})).filter(({run})=>run.results.length);
 const visibleRecords = () => visibleRuns().flatMap(({run,runIndex})=>run.results.map(result=>({run,result,runIndex})));
 function updateReferenceBanner() {
-  $('reference-banner').hidden=state.phase!==2;
+  $('reference-banner').hidden=state.phase===1;
+  $('reference-kicker').textContent=`PHASE 0${state.phase} / SHARED SOURCE`;
+  $('reference-title').textContent=state.phase===3?'Same JPEG. Processing-history configuration.':'Same JPEG. A separate decoded-reference plan.';
+  $('reference-status').textContent=state.phase===3?'METHODS & REFERENCES PENDING':'PYTHON DECODER PENDING';
   $('reference-note').textContent=state.source
     ? `Linked to ${state.source.filename} · SHA-256 ${state.source.sha256.slice(0,16)}… The image is a browser display preview. Step 2.1 has not created Python reference pixels.`
-    : 'Load a JPEG in either phase. The original bytes and source identity will be shared; a Python decoded reference is not yet implemented.';
+    : 'Load a JPEG in any phase. The original bytes and source identity will be shared; a Python decoded reference is not yet implemented.';
 }
 function switchPhase(phase) {
-  if(state.busy || !state.catalog.length || phase===state.phase)return;
+  if(state.busy || !state.catalog.length || ![1,2,3].includes(phase) || phase===state.phase)return;
   state.activeByPhase[state.phase]=state.active;state.modeByPhase[state.phase]=state.mode;
   state.phase=phase;state.active=state.activeByPhase[phase];
   document.querySelectorAll('[data-phase]').forEach(button=>{
     const active=Number(button.dataset.phase)===phase;button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active));
     if(active)button.setAttribute('aria-current','step');else button.removeAttribute('aria-current');
   });
-  $('steps-kicker').textContent=phase===1?'PHASE 01 / ENCODED FILE':'PHASE 02 / DECODED IMAGE';
+  $('steps-kicker').textContent={1:'PHASE 01 / ENCODED FILE',2:'PHASE 02 / DECODED IMAGE',3:'PHASE 03 / PROCESSING HISTORY'}[phase];
   $('steps-panel').setAttribute('aria-label',`Phase ${phase} step configuration`);
   $('reports-kicker').textContent=`PHASE 0${phase} / RECORDED OUTPUTS`;
   $('phase-summary-kicker').textContent=`PHASE 0${phase} / SUMMARY`;
   $('phase-report-title').textContent=`Phase ${phase} evidence report`;
-  $('run-help').textContent=phase===2?'Configuration only. No Phase 2 method or Python decode runs yet.':'Other steps record configuration only.';
-  $('run').innerHTML=phase===2?'Record selected plan <span>→</span>':'Run selected <span>→</span>';
-  $('run-status').textContent=phase===2?'Configure the decoded-image steps. Source and Phase 1 records are retained.':state.file?'Original source retained. Choose your next steps.':'Load a JPEG to begin.';
+  $('run-help').textContent=phase!==1?`Configuration only. Phase ${phase} methods and prerequisites are pending.`:'Other steps record configuration only.';
+  $('run').innerHTML=phase!==1?'Record selected plan <span>→</span>':'Run selected <span>→</span>';
+  $('run-status').textContent=phase!==1?`Configure Phase ${phase}. Source and other phases’ records are retained.`:state.file?'Original source retained. Choose your next steps.':'Load a JPEG to begin.';
   renderSteps();renderJournal();setMode(state.modeByPhase[phase]);showEvidence();updateReferenceBanner();
 }
 function selectVisible(kind) {
@@ -47,23 +50,30 @@ function control(p, id) {
   else widget = `<input data-step="${id}" data-param="${p.key}" id="${key}" type="${p.type}" value="${esc(value)}" ${p.type === 'number' ? `min="${p.min}" max="${p.max}" step="${p.step}"` : 'maxlength="2000"'} placeholder="${esc(p.placeholder || '')}">`;
   return `<label class="param" for="${key}"><span>${esc(p.label)}</span>${widget}</label>`;
 }
+const inputLabel = kind => ({jpeg_bytes:'Original JPEG bytes',pixels:'Python pixel package',coefficients:'Stored coefficient package',sensor_reference:'Enrolled sensor reference',model_weights:'Versioned model weights',evaluated_evidence:'Evaluated specialist evidence'}[kind] || kind);
+function toolBoundary(step) {
+  const tool=step.tool;
+  if(!tool)return '';
+  return `<div class="tool-boundary"><strong>Common tool interface · v${esc(tool.contract_version)}</strong><code>${esc(tool.module)}</code><span>${step.implementation==='ready'?'Registered adapter':'Reserved module · not implemented'}</span><ul>${tool.inputs.map(kind=>`<li>${esc(inputLabel(kind))}: ${kind==='jpeg_bytes'?(state.source?'source ready for submission':'load a source'):'not provided by this framework'}</li>`).join('')}</ul></div>`;
+}
 function renderSteps() {
   const open = state.openByPhase[state.phase];
   $('steps').innerHTML = visibleSteps().map(s => `<details class="step-card ${state.selected.has(s.id) ? 'selected' : ''}" data-step="${s.id}" ${open.has(s.id) ? 'open' : ''}>
     <summary><span class="step-number">${s.id}</span><span class="step-info"><strong>${esc(s.title)}</strong><small>${esc(s.subtitle)}</small></span><span class="step-state ${s.implementation === 'ready' ? 'ready' : ''}">${s.implementation === 'ready' ? 'PYTHON' : 'PLANNED'}</span><span class="chevron">›</span></summary>
-    <fieldset class="step-controls"><legend>STEP ${s.id} / PARAMETERS</legend><p class="step-description">${esc(s.description)}</p>${s.parameters.map(p => control(p, s.id)).join('')}
-    <div class="step-actions"><label><input type="checkbox" data-select="${s.id}" ${state.selected.has(s.id) ? 'checked' : ''}> Include step</label><button type="button" class="button" data-inspect="${s.id}">Inspect view ↗</button><button type="button" class="button" data-run="${s.id}" ${(s.implementation !== 'ready' && state.phase!==2) || !state.file || state.busy ? 'disabled' : ''}>${state.phase===2?'Record settings':'Run step'}</button></div>
-    ${s.implementation !== 'ready' ? `<p class="step-hint">Configuration only · Python method not connected.${s.requires ? ` Requires ${s.requires.join(', ')}.` : ''}</p>` : ''}</fieldset></details>`).join('');
+    <fieldset class="step-controls"><legend>STEP ${s.id} / PARAMETERS${s.implementation==='ready'?'':' · PROVISIONAL'}</legend><p class="step-description">${esc(s.description)}</p>${toolBoundary(s)}${s.parameters.map(p => control(p, s.id)).join('')}
+    <div class="step-actions"><label><input type="checkbox" data-select="${s.id}" ${state.selected.has(s.id) ? 'checked' : ''}> Include step</label><button type="button" class="button" data-inspect="${s.id}">Inspect view ↗</button><button type="button" class="button" data-run="${s.id}" ${!state.file || state.busy ? 'disabled' : ''}>${s.implementation==='ready'?'Run step':'Record settings'}</button></div>
+    ${s.implementation !== 'ready' ? `<p class="step-hint">Configuration only · Python method not connected.${s.requires ? ` Planned prerequisites: ${s.requires.join(', ')} (not executed or verified).` : ''}</p>` : ''}</fieldset></details>`).join('');
   updateSelection();
 }
 function updateSelection() {
   const selected=visibleSteps().filter(s=>state.selected.has(s.id));
   $('selected-count').textContent = `${selected.length} selected`;
+  $('execution-plan').innerHTML=selected.length?selected.map(s=>`<li><b>${esc(s.id)} ${esc(s.title)}</b><code>${esc(s.tool?.key||'Unassigned')}</code><span>${s.implementation==='ready'?'Call registered adapter':'Record planned settings only'} · ${esc((s.tool?.inputs||[]).map(inputLabel).join(' + '))}</span></li>`).join(''):'<li>No tools selected in this phase.</li>';
   const ready = selected.filter(s=>s.implementation==='ready').length;
   $('ready-count').textContent = `${ready} implemented · ${selected.length-ready} configuration only`;
   $('run').disabled = !state.file || !selected.length || state.busy;
   document.querySelectorAll('[data-phase]').forEach(b=>b.disabled=state.busy);
-  document.querySelectorAll('[data-run]').forEach(b => b.disabled = !state.file || state.busy || (state.phase!==2 && state.catalog.find(s => s.id === b.dataset.run)?.implementation !== 'ready'));
+  document.querySelectorAll('[data-run]').forEach(b => b.disabled = !state.file || state.busy);
   document.querySelectorAll('.step-card').forEach(e => e.classList.toggle('selected', state.selected.has(e.dataset.step)));
 }
 function latest(id) {
@@ -85,8 +95,8 @@ function showEvidence(id = state.active) {
   const measured = latest(id), preview = state.preview;
   let body = '';
   $('evidence-origin').textContent = measured ? 'PYTHON MEASUREMENT' : preview && ['1.2','1.3','1.4','1.5'].includes(id) ? 'BROWSER PREVIEW' : 'CONFIGURATION';
-  if(id.startsWith('2.')) {
-    body=`<div class="config-note">${state.source?'Uses the same preserved source as Phase 1.':'Load a source once in either phase.'} Python decoded reference: not created. This step records configuration only.</div><h3 class="artifact-heading">Expected outputs · not generated</h3><ul class="artifact-slots">${(step.outputs||[]).map(label=>`<li>${esc(label)}</li>`).join('')}</ul>${step.requires?.length?`<p class="muted">Planned inputs from steps ${esc(step.requires.join(', '))}. Dependencies are declared, not automatically executed.</p>`:''}`;
+  if(!id.startsWith('1.')) {
+    body=`<div class="config-note">${state.source?'Uses the same preserved source as Phase 1.':'Load a source once in any phase.'} Python decoded reference: not created. This step records configuration only. Provisional settings are not validated experimental parameters.</div><h3 class="artifact-heading">Expected outputs · not generated</h3><ul class="artifact-slots">${(step.outputs||[]).map(label=>`<li>${esc(label)}</li>`).join('')}</ul>${step.requires?.length?`<p class="muted">Planned inputs from steps ${esc(step.requires.join(', '))}. Dependencies are declared, not automatically executed.</p>`:''}`;
   }
   else if (id === '1.1' && state.source) body = definitionList(Object.entries(measured?.output || state.source));
   else if (id === '1.7' && (measured || preview?.statistics)) {
@@ -222,24 +232,26 @@ async function run(ids) {
   const plan=visibleSteps().filter(s=>ids.includes(s.id)).map(s=>({id:s.id,parameters:structuredClone(state.settings[s.id])}));
   if(!plan.length)return notify('Select at least one step.');
   if(![...document.querySelectorAll('.param input')].every(i=>i.checkValidity()))return notify('Check the highlighted parameter ranges.');
-  const token=state.generation;state.busy=true;updateSelection();$('run-status').textContent=state.phase===2?'Recording Phase 2 configuration in Python…':'Running selected plan in Python…';
+  const token=state.generation;state.busy=true;updateSelection();$('run-status').textContent=state.phase!==1?`Recording Phase ${state.phase} configuration in Python…`:'Running selected plan in Python…';
   try {
     const result=await requestRun(state.file,plan);
     if(token!==state.generation)return;
     state.runs.push(result);renderJournal();showEvidence();
     const complete=result.results.filter(r=>r.status==='completed').length;
-    $('run-status').textContent=`${complete} measured · ${result.results.length-complete} not implemented. Run recorded.`;
-    notify(`${complete} measurement(s) completed. Configuration saved for unconnected steps.`);
+    const planned=result.results.filter(r=>r.status==='not_implemented').length;
+    const issues=result.results.length-complete-planned;
+    $('run-status').textContent=`${complete} measured · ${planned} planned${issues?` · ${issues} blocked / failed`:''}. Run recorded.`;
+    notify('Tool calls recorded with their individual status and input provenance.');
   }catch(e){if(token===state.generation){notify(e.message);$('run-status').textContent='Run failed: '+e.message;}}
   finally{if(token===state.generation){state.busy=false;updateSelection();}}
 }
 function renderJournal() {
   const runs=visibleRuns();
   $('run-count').textContent=`${runs.length} PHASE ${state.phase} RUN${runs.length===1?'':'S'}`;
-  $('journal').innerHTML=runs.length ? [...runs].reverse().map(({run:r})=>`<div class="run-row"><span>↳</span><div>${esc(new Date(r.created_at).toLocaleTimeString())}<small>${r.results.map(s=>`${esc(s.id)} ${s.status==='completed'?'measured':'not implemented'}`).join(' · ')}</small></div><b class="${r.results.some(s=>s.status!=='completed')?'planned':''}">${r.results.filter(s=>s.status==='completed').length} MEASURED</b></div>`).join(''):'<p class="muted">No measurements in this session.</p>';
+  $('journal').innerHTML=runs.length ? [...runs].reverse().map(({run:r})=>`<div class="run-row"><span>↳</span><div>${esc(new Date(r.created_at).toLocaleTimeString())}<small>${r.results.map(s=>`${esc(s.id)} ${esc(statusLabel(s.status))}`).join(' · ')}</small></div><b class="${r.results.some(s=>s.status!=='completed')?'planned':''}">${r.results.filter(s=>s.status==='completed').length} MEASURED</b></div>`).join(''):'<p class="muted">No measurements in this session.</p>';
   renderReports();
 }
-const statusLabel = status => ({completed:'Measured',not_implemented:'Not implemented',not_run:'Not run'}[status] || status);
+const statusLabel = status => ({completed:'Measured',not_implemented:'Not implemented',not_run:'Not run',blocked:'Inputs unavailable',failed:'Failed'}[status] || status);
 function renderReports() {
   const records=visibleRecords();
   $('report-count').textContent=`${records.length} RECORD${records.length===1?'':'S'}`;
@@ -250,14 +262,14 @@ function renderReports() {
     else if(measured && r.id==='1.7') output=`<canvas class="chart" id="report-chart-${i}" aria-label="Run ${runIndex+1}, step 1.7: whole-file byte frequencies"></canvas><div class="chart-label"><span>BYTE VALUE 0 → 255</span><span>${r.output.entropy_bits_per_byte.toFixed(4)} BITS / BYTE</span></div><p class="muted">${esc(size(r.output.count))} measured · whole file · descriptive entropy, not a tampering score.</p>`;
     else if(measured) output=`<pre class="report-json">${esc(JSON.stringify(r.output,null,2))}</pre>`;
     else output=`<p class="muted">${esc(r.message)} No measurement or graphic was generated.</p>`;
-    return `<article class="result-card ${measured?'measured':'unimplemented'}"><div class="observation-head"><h3><span>${esc(r.id)}</span> ${esc(step?.title||r.id)}</h3><span class="mini-pill">${esc(statusLabel(r.status))}</span></div>${measured?'':'<details class="unconnected-record"><summary>Inspect configuration-only record</summary>'}<p class="result-provenance">Run ${runIndex+1} · ${esc(new Date(run.created_at).toLocaleString())} · ${esc(r.elapsed_ms)} ms · method ${esc(r.method_version)}</p><div class="result-output evidence-content">${output}</div><details class="record-parameters"><summary>Parameters used for this execution</summary>${definitionList(Object.entries(r.parameters))}</details>${measured?'':'</details>'}</article>`;
+    return `<article class="result-card ${measured?'measured':'unimplemented'}"><div class="observation-head"><h3><span>${esc(r.id)}</span> ${esc(step?.title||r.id)}</h3><span class="mini-pill">${esc(statusLabel(r.status))}</span></div>${measured?'':'<details class="unconnected-record"><summary>Inspect configuration-only record</summary>'}<p class="result-provenance">Run ${runIndex+1} · ${esc(new Date(run.created_at).toLocaleString())} · ${esc(r.elapsed_ms)} ms · method ${esc(r.method_version||'not registered')}</p><div class="result-output evidence-content">${output}</div><details class="record-parameters"><summary>Parameters used for this execution</summary>${definitionList(Object.entries(r.parameters))}</details>${r.inputs?`<details class="record-parameters"><summary>Tool input provenance</summary>${definitionList([['adapter',r.tool_key],['input contract',r.input_contract_version],['source SHA-256',r.inputs.source_sha256],['pixel package',r.inputs.pixels],['required inputs',r.required_inputs],['missing inputs',r.missing_inputs]])}</details>`:''}${measured?'':'</details>'}</article>`;
   }).join(''):'<p class="muted">Run a step to collect its measurements, plots, or tables here.</p>';
   records.forEach(({result:r},i)=>{if(r.status==='completed'&&r.id==='1.7')drawHistogram(r.output.histogram,$(`report-chart-${i}`));});
   const report=phaseReport(state.catalog,state.source,state.runs,state.phase);
   $('export-phase').disabled=!state.source;
   if(!state.source){$('phase-summary').innerHTML='<p class="muted">Load a source to begin a report. Unrun and unimplemented steps remain visible.</p>';return;}
   const c=report.coverage;
-  $('phase-summary').innerHTML=`<div class="coverage"><strong>${c.completed}<small>of ${c.total} steps measured</small></strong><div><b>${report.status==='complete'?'Execution complete':'Partial phase report'}</b><p>${c.not_implemented} not implemented · ${c.not_run} not run${c.other?` · ${c.other} other status`:''}</p></div></div><p class="report-source">${esc(state.source.filename)}<br><code>SHA-256 ${esc(state.source.sha256)}</code></p>${table(['Step','Latest execution','Attempts'],report.steps.map(s=>[`${s.id} ${s.title}`,statusLabel(s.status),s.attempt_count]))}<p class="warning-note">This is a framework summary of recorded outputs. Planned methods and browser previews do not count as completed Python steps. It is not an authenticity verdict or the future ${state.phase===1?'1.12':'2.11'} analysis adapter.</p>`;
+  $('phase-summary').innerHTML=`<div class="coverage"><strong>${c.completed}<small>of ${c.total} steps measured</small></strong><div><b>${report.status==='complete'?'Execution complete':'Partial phase report'}</b><p>${c.not_implemented} not implemented · ${c.not_run} not run${c.other?` · ${c.other} other status`:''}</p></div></div><p class="report-source">${esc(state.source.filename)}<br><code>SHA-256 ${esc(state.source.sha256)}</code></p>${table(['Step','Latest execution','Attempts'],report.steps.map(s=>[`${s.id} ${s.title}`,statusLabel(s.status),s.attempt_count]))}<p class="warning-note">This is a framework summary of recorded outputs. Planned methods and browser previews do not count as completed Python steps. It is not an authenticity verdict or the future ${state.phase===1?'1.12 analysis adapter':state.phase===2?'2.11 analysis adapter':'processing-history interpretation'}.</p>`;
 }
 function downloadJson(report,filename) {
   const url=URL.createObjectURL(new Blob([JSON.stringify(report,null,2)],{type:'application/json'}));
@@ -271,7 +283,7 @@ function exportSession() {
 function importSettings(report) {
   const imported=readSettings(report,state.catalog);
   state.settings=imported.settings;state.selected=imported.selected;renderSteps();showEvidence();if(state.mode==='quantization')drawQuantization();
-  notify(report.schema_version===1?'Phase 1 settings imported; Phase 2 initialized to defaults. Source and runs unchanged.':'Settings for both phases imported. Source and runs unchanged.');
+  notify(report.schema_version===1?'Phase 1 settings imported; Phases 2 and 3 initialized to defaults. Source and runs unchanged.':report.schema_version===2?'Phase 1 and 2 settings imported; Phase 3 initialized to defaults. Source and runs unchanged.':'Settings for all three phases imported. Source and runs unchanged.');
 }
 function clearSession() {
   if(state.busy)return notify('Wait for the current operation to finish.');
@@ -315,7 +327,7 @@ $('export-phase').addEventListener('click',()=>{downloadJson(phaseReport(state.c
 $('import').addEventListener('click',()=>$('config-file').click());
 $('config-file').addEventListener('change',async()=>{const f=$('config-file').files[0];$('config-file').value='';if(!f)return;try{if(f.size>2*1024*1024)throw new Error('Settings file exceeds 2 MiB.');importSettings(JSON.parse(await f.text()));}catch(e){notify(e.message);}});
 try {
-  const r=await fetch('/api/catalog');if(!r.ok)throw new Error('Python backend unavailable.');const catalog=await r.json();state.catalog=catalog.steps;if(!state.catalog.some(s=>s.id==='2.1'))throw new Error('Restart Gazoken to load the Phase 2 catalog, then refresh.');
+  const r=await fetch('/api/catalog');if(!r.ok)throw new Error('Python backend unavailable.');const catalog=await r.json();state.catalog=catalog.steps;if(!state.catalog.some(s=>s.id==='3.14') || !state.catalog.every(s=>s.tool?.contract_version===1))throw new Error('Restart Gazoken to load the tool-interface catalog, then refresh.');
   for(const step of state.catalog){state.settings[step.id]=Object.fromEntries(step.parameters.map(p=>[p.key,p.default]));if(step.selected)state.selected.add(step.id);}
   $('connection').textContent='Python connected · local';renderSteps();showEvidence();updateReferenceBanner();
 }catch(e){state.catalog=[];$('connection').textContent='Python unavailable / restart needed';$('run-status').textContent=e.message;notify(e.message+' Start or restart the local Gazoken Python app.');}

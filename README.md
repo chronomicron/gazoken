@@ -61,11 +61,12 @@ Gazoken（ガゾケン）は、ソフトウェア開発と研究を両輪とす�
 
 **Status / 現状:** Initial workbench implemented locally / 初期ワークベンチ実装済み（ローカル）
 
-**Local research app / ローカル研究アプリ:** The Python-backed Phase 1 and Phase 2 framework
+**Local research app / ローカル研究アプリ:** The Python-backed three-phase framework
 provides grouped step controls, image/byte/table views, and session exports.
 See [setup and coverage](docs/local-workbench.md). From an installed checkout,
 run `.venv/bin/gazoken` and open `http://127.0.0.1:8765/`.
 
+- [Tool modules and contributor guide](docs/tool-development.md)
 - [Documentation / ドキュメント](docs/README.md)
 - [Prototype methods / 試作版の手法](docs/first-workbench.md)
 - [JPEG inspector / JPEG インスペクター](docs/jpeg-inspector.md)

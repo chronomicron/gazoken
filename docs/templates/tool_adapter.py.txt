@@ -1,0 +1,13 @@
+# Copy into the reserved tools/<phase>/<name>.py module when implementing it.
+# This template is not imported or registered.
+from gazoken.tools.contracts import ToolInputs, ToolOutput
+
+VERSION = "0.1.0"
+
+
+def run(inputs: ToolInputs, parameters) -> ToolOutput:
+    # Parameters have been type/range validated. Validate method-specific
+    # relationships and applicability here. Derive working data without
+    # modifying inputs.source.data or inputs.pixels.data.
+    # Implement real measurements and documented units before registering.
+    raise NotImplementedError("Implement and test the selected method first.")

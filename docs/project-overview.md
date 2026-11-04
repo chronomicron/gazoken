@@ -52,9 +52,11 @@ See [first workbench](first-workbench.md) for precise methods and verification.
 The updated workbench has not been pushed or its public deployment verified.
 A separate read-only [JPEG inspector](jpeg-inspector.md) now extracts original
 encoding structures and EXIF, with graphical tables, byte statistics, and hex
-inspection. A local [Python framework](local-workbench.md) now adds Phase 1 and Phase 2
+inspection. A local [Python framework](local-workbench.md) now provides all three phases of
 controls, shared-source visual previews, two basic byte measurements, and session
-exports. All Phase 2 analyses remain configuration-only.
+exports. A [modular tool interface](tool-development.md) now isolates adapters,
+preserves source identity, declares prerequisites, and shows selected call order.
+All Phase 2 and Phase 3 analyses remain configuration-only.
 No calibrated detector, scientific benchmark, C/C++ package, or paper is
 implemented yet.
 

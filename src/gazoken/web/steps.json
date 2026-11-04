@@ -16,7 +16,16 @@
         "default": "",
         "placeholder": "Where did this file come from?"
       }
-    ]
+    ],
+    "tool": {
+      "key": "encoded.source_identity",
+      "module": "gazoken.tools.encoded.source_identity",
+      "contract_version": 1,
+      "inputs": [
+        "jpeg_bytes"
+      ],
+      "provides": []
+    }
   },
   {
     "id": "1.2",
@@ -43,7 +52,16 @@
         "type": "checkbox",
         "default": true
       }
-    ]
+    ],
+    "tool": {
+      "key": "encoded.file_structure",
+      "module": "gazoken.tools.encoded.file_structure",
+      "contract_version": 1,
+      "inputs": [
+        "jpeg_bytes"
+      ],
+      "provides": []
+    }
   },
   {
     "id": "1.3",
@@ -78,7 +96,16 @@
         "type": "checkbox",
         "default": false
       }
-    ]
+    ],
+    "tool": {
+      "key": "encoded.metadata_inventory",
+      "module": "gazoken.tools.encoded.metadata_inventory",
+      "contract_version": 1,
+      "inputs": [
+        "jpeg_bytes"
+      ],
+      "provides": []
+    }
   },
   {
     "id": "1.4",
@@ -95,10 +122,10 @@
         "label": "Value layout",
         "type": "select",
         "options": [
-          "Natural 8 × 8",
+          "Natural 8 \u00d7 8",
           "Stored zigzag"
         ],
-        "default": "Natural 8 × 8"
+        "default": "Natural 8 \u00d7 8"
       },
       {
         "key": "retain_history",
@@ -106,7 +133,16 @@
         "type": "checkbox",
         "default": true
       }
-    ]
+    ],
+    "tool": {
+      "key": "encoded.quantization_tables",
+      "module": "gazoken.tools.encoded.quantization_tables",
+      "contract_version": 1,
+      "inputs": [
+        "jpeg_bytes"
+      ],
+      "provides": []
+    }
   },
   {
     "id": "1.5",
@@ -130,7 +166,16 @@
         "type": "checkbox",
         "default": true
       }
-    ]
+    ],
+    "tool": {
+      "key": "encoded.entropy_coding",
+      "module": "gazoken.tools.encoded.entropy_coding",
+      "contract_version": 1,
+      "inputs": [
+        "jpeg_bytes"
+      ],
+      "provides": []
+    }
   },
   {
     "id": "1.6",
@@ -157,14 +202,23 @@
         "type": "checkbox",
         "default": true
       }
-    ]
+    ],
+    "tool": {
+      "key": "encoded.embedded_images",
+      "module": "gazoken.tools.encoded.embedded_images",
+      "contract_version": 1,
+      "inputs": [
+        "jpeg_bytes"
+      ],
+      "provides": []
+    }
   },
   {
     "id": "1.7",
     "title": "Byte distribution",
     "subtitle": "Measure the original byte stream",
     "group": "Measurements",
-    "description": "Compute exact counts for byte values 0–255 and descriptive Shannon entropy over the whole file. This is not a tampering score.",
+    "description": "Compute exact counts for byte values 0\u2013255 and descriptive Shannon entropy over the whole file. This is not a tampering score.",
     "implementation": "ready",
     "view": "bytes",
     "selected": true,
@@ -178,7 +232,16 @@
         ],
         "default": "Whole file"
       }
-    ]
+    ],
+    "tool": {
+      "key": "encoded.byte_distribution",
+      "module": "gazoken.tools.encoded.byte_distribution",
+      "contract_version": 1,
+      "inputs": [
+        "jpeg_bytes"
+      ],
+      "provides": []
+    }
   },
   {
     "id": "1.8",
@@ -207,7 +270,16 @@
         "type": "checkbox",
         "default": true
       }
-    ]
+    ],
+    "tool": {
+      "key": "encoded.encoder_profiles",
+      "module": "gazoken.tools.encoded.encoder_profiles",
+      "contract_version": 1,
+      "inputs": [
+        "jpeg_bytes"
+      ],
+      "provides": []
+    }
   },
   {
     "id": "1.9",
@@ -240,7 +312,16 @@
         ],
         "default": "All stored components"
       }
-    ]
+    ],
+    "tool": {
+      "key": "encoded.stored_coefficients",
+      "module": "gazoken.tools.encoded.stored_coefficients",
+      "contract_version": 1,
+      "inputs": [
+        "jpeg_bytes"
+      ],
+      "provides": []
+    }
   },
   {
     "id": "1.10",
@@ -270,7 +351,17 @@
         "type": "checkbox",
         "default": true
       }
-    ]
+    ],
+    "tool": {
+      "key": "encoded.coefficient_statistics",
+      "module": "gazoken.tools.encoded.coefficient_statistics",
+      "contract_version": 1,
+      "inputs": [
+        "jpeg_bytes",
+        "coefficients"
+      ],
+      "provides": []
+    }
   },
   {
     "id": "1.11",
@@ -303,7 +394,17 @@
         ],
         "default": "Aligned; no geometry changes"
       }
-    ]
+    ],
+    "tool": {
+      "key": "encoded.compression_history",
+      "module": "gazoken.tools.encoded.compression_history",
+      "contract_version": 1,
+      "inputs": [
+        "jpeg_bytes",
+        "coefficients"
+      ],
+      "provides": []
+    }
   },
   {
     "id": "1.12",
@@ -327,7 +428,16 @@
         "type": "checkbox",
         "default": true
       }
-    ]
+    ],
+    "tool": {
+      "key": "encoded.evidence_report",
+      "module": "gazoken.tools.encoded.evidence_report",
+      "contract_version": 1,
+      "inputs": [
+        "jpeg_bytes"
+      ],
+      "provides": []
+    }
   },
   {
     "id": "2.1",
@@ -382,7 +492,18 @@
     "requires": [],
     "selected": true,
     "implementation": "planned",
-    "view": "source"
+    "view": "source",
+    "tool": {
+      "key": "decoded.decoded_reference",
+      "module": "gazoken.tools.decoded.decoded_reference",
+      "contract_version": 1,
+      "inputs": [
+        "jpeg_bytes"
+      ],
+      "provides": [
+        "pixels"
+      ]
+    }
   },
   {
     "id": "2.2",
@@ -428,7 +549,16 @@
     ],
     "selected": true,
     "implementation": "planned",
-    "view": "source"
+    "view": "source",
+    "tool": {
+      "key": "decoded.spatial_measurements",
+      "module": "gazoken.tools.decoded.spatial_measurements",
+      "contract_version": 1,
+      "inputs": [
+        "pixels"
+      ],
+      "provides": []
+    }
   },
   {
     "id": "2.3",
@@ -476,7 +606,16 @@
     ],
     "selected": true,
     "implementation": "planned",
-    "view": "source"
+    "view": "source",
+    "tool": {
+      "key": "decoded.current_grid",
+      "module": "gazoken.tools.decoded.current_grid",
+      "contract_version": 1,
+      "inputs": [
+        "pixels"
+      ],
+      "provides": []
+    }
   },
   {
     "id": "2.4",
@@ -521,7 +660,16 @@
     ],
     "selected": false,
     "implementation": "planned",
-    "view": "source"
+    "view": "source",
+    "tool": {
+      "key": "decoded.displaced_grids",
+      "module": "gazoken.tools.decoded.displaced_grids",
+      "contract_version": 1,
+      "inputs": [
+        "pixels"
+      ],
+      "provides": []
+    }
   },
   {
     "id": "2.5",
@@ -572,7 +720,17 @@
     ],
     "selected": false,
     "implementation": "planned",
-    "view": "source"
+    "view": "source",
+    "tool": {
+      "key": "decoded.recompression",
+      "module": "gazoken.tools.decoded.recompression",
+      "contract_version": 1,
+      "inputs": [
+        "jpeg_bytes",
+        "pixels"
+      ],
+      "provides": []
+    }
   },
   {
     "id": "2.6",
@@ -616,7 +774,16 @@
     ],
     "selected": false,
     "implementation": "planned",
-    "view": "source"
+    "view": "source",
+    "tool": {
+      "key": "decoded.regional_compression",
+      "module": "gazoken.tools.decoded.regional_compression",
+      "contract_version": 1,
+      "inputs": [
+        "pixels"
+      ],
+      "provides": []
+    }
   },
   {
     "id": "2.7",
@@ -663,7 +830,17 @@
     ],
     "selected": false,
     "implementation": "planned",
-    "view": "source"
+    "view": "source",
+    "tool": {
+      "key": "decoded.preview_comparison",
+      "module": "gazoken.tools.decoded.preview_comparison",
+      "contract_version": 1,
+      "inputs": [
+        "jpeg_bytes",
+        "pixels"
+      ],
+      "provides": []
+    }
   },
   {
     "id": "2.8",
@@ -710,7 +887,16 @@
     ],
     "selected": false,
     "implementation": "planned",
-    "view": "source"
+    "view": "source",
+    "tool": {
+      "key": "decoded.scaled_grids",
+      "module": "gazoken.tools.decoded.scaled_grids",
+      "contract_version": 1,
+      "inputs": [
+        "pixels"
+      ],
+      "provides": []
+    }
   },
   {
     "id": "2.9",
@@ -757,7 +943,16 @@
     ],
     "selected": false,
     "implementation": "planned",
-    "view": "source"
+    "view": "source",
+    "tool": {
+      "key": "decoded.rotated_grids",
+      "module": "gazoken.tools.decoded.rotated_grids",
+      "contract_version": 1,
+      "inputs": [
+        "pixels"
+      ],
+      "provides": []
+    }
   },
   {
     "id": "2.10",
@@ -807,7 +1002,16 @@
     ],
     "selected": false,
     "implementation": "planned",
-    "view": "source"
+    "view": "source",
+    "tool": {
+      "key": "decoded.threshold_study",
+      "module": "gazoken.tools.decoded.threshold_study",
+      "contract_version": 1,
+      "inputs": [
+        "pixels"
+      ],
+      "provides": []
+    }
   },
   {
     "id": "2.11",
@@ -845,6 +1049,1121 @@
     ],
     "selected": false,
     "implementation": "planned",
-    "view": "source"
+    "view": "source",
+    "tool": {
+      "key": "decoded.spatial_report",
+      "module": "gazoken.tools.decoded.spatial_report",
+      "contract_version": 1,
+      "inputs": [
+        "pixels"
+      ],
+      "provides": []
+    }
+  },
+  {
+    "id": "3.1",
+    "title": "Resampling",
+    "subtitle": "Resize and rotation hypotheses",
+    "group": "Geometry",
+    "description": "Configure a future search for resampling correlations. Integer cropping and right-angle transforms may lack interpolation traces; periodic patterns do not uniquely establish a resize or rotation.",
+    "parameters": [
+      {
+        "key": "channel",
+        "label": "Proposed representation / channel",
+        "type": "select",
+        "options": [
+          "Luma candidate",
+          "RGB channels",
+          "Color differences",
+          "Awaiting method selection"
+        ],
+        "default": "Luma candidate"
+      },
+      {
+        "key": "method",
+        "label": "Method preference",
+        "type": "select",
+        "options": [
+          "Method review pending",
+          "Prediction-error candidate",
+          "Fixed-predictor spectral candidate"
+        ],
+        "default": "Method review pending"
+      },
+      {
+        "key": "window",
+        "label": "Provisional window size (pixels)",
+        "type": "number",
+        "default": 128,
+        "min": 16,
+        "max": 2048,
+        "step": 1
+      },
+      {
+        "key": "stride",
+        "label": "Provisional window stride (pixels)",
+        "type": "number",
+        "default": 64,
+        "min": 1,
+        "max": 1024,
+        "step": 1
+      },
+      {
+        "key": "minimum_scale",
+        "label": "Minimum candidate scale",
+        "type": "number",
+        "default": 0.5,
+        "min": 0.1,
+        "max": 4,
+        "step": 0.05
+      },
+      {
+        "key": "maximum_scale",
+        "label": "Maximum candidate scale",
+        "type": "number",
+        "default": 2,
+        "min": 0.1,
+        "max": 4,
+        "step": 0.05
+      },
+      {
+        "key": "include_response",
+        "label": "Request response maps",
+        "type": "checkbox",
+        "default": true
+      }
+    ],
+    "outputs": [
+      "Resampling response map",
+      "Conditional scale / angle candidates"
+    ],
+    "requires": [
+      "2.1"
+    ],
+    "selected": false,
+    "implementation": "planned",
+    "view": "source",
+    "tool": {
+      "key": "history.resampling",
+      "module": "gazoken.tools.history.resampling",
+      "contract_version": 1,
+      "inputs": [
+        "pixels"
+      ],
+      "provides": []
+    }
+  },
+  {
+    "id": "3.2",
+    "title": "Tonal mappings",
+    "subtitle": "Gamma, contrast and curves",
+    "group": "Tone",
+    "description": "Plan histogram and regional tests for a defined mapping family. Native camera curves, noise, clipping and JPEG can produce similar effects; exact historical curve recovery is not promised.",
+    "parameters": [
+      {
+        "key": "channel",
+        "label": "Proposed representation / channel",
+        "type": "select",
+        "options": [
+          "Luma candidate",
+          "RGB channels",
+          "Color differences",
+          "Awaiting method selection"
+        ],
+        "default": "Luma candidate"
+      },
+      {
+        "key": "method",
+        "label": "Mapping family preference",
+        "type": "select",
+        "options": [
+          "Method review pending",
+          "Gamma candidate",
+          "Contrast candidate",
+          "Equalization candidate"
+        ],
+        "default": "Method review pending"
+      },
+      {
+        "key": "bins",
+        "label": "Provisional histogram bins",
+        "type": "number",
+        "default": 256,
+        "min": 16,
+        "max": 1024,
+        "step": 1
+      },
+      {
+        "key": "window",
+        "label": "Provisional window size (pixels)",
+        "type": "number",
+        "default": 128,
+        "min": 16,
+        "max": 2048,
+        "step": 1
+      },
+      {
+        "key": "include_histograms",
+        "label": "Request histogram comparison",
+        "type": "checkbox",
+        "default": true
+      }
+    ],
+    "outputs": [
+      "Histogram / spectral measurements",
+      "Mapping-family evidence and alternatives"
+    ],
+    "requires": [
+      "2.1"
+    ],
+    "selected": false,
+    "implementation": "planned",
+    "view": "source",
+    "tool": {
+      "key": "history.tonal_mappings",
+      "module": "gazoken.tools.history.tonal_mappings",
+      "contract_version": 1,
+      "inputs": [
+        "pixels"
+      ],
+      "provides": []
+    }
+  },
+  {
+    "id": "3.3",
+    "title": "Hue & channel relationships",
+    "subtitle": "Color dependencies and clipping",
+    "group": "Color",
+    "description": "Configure descriptive color relationships and a future method-specific test. Hue is unreliable near zero saturation; color conversion and camera-pipeline assumptions must be recorded.",
+    "parameters": [
+      {
+        "key": "representation",
+        "label": "Color representation preference",
+        "type": "select",
+        "options": [
+          "RGB differences",
+          "HSV candidate",
+          "Awaiting color policy"
+        ],
+        "default": "RGB differences"
+      },
+      {
+        "key": "method",
+        "label": "Method preference",
+        "type": "select",
+        "options": [
+          "Descriptive comparison pending",
+          "Wavelet-ratio candidate"
+        ],
+        "default": "Descriptive comparison pending"
+      },
+      {
+        "key": "saturation_floor",
+        "label": "Provisional minimum saturation (normalized)",
+        "type": "number",
+        "default": 0.05,
+        "min": 0,
+        "max": 1,
+        "step": 0.01
+      },
+      {
+        "key": "region",
+        "label": "Proposed spatial scope",
+        "type": "select",
+        "options": [
+          "Whole image",
+          "Overlapping windows",
+          "User regions (future)"
+        ],
+        "default": "Whole image"
+      },
+      {
+        "key": "window",
+        "label": "Provisional window size (pixels)",
+        "type": "number",
+        "default": 128,
+        "min": 16,
+        "max": 2048,
+        "step": 1
+      },
+      {
+        "key": "include_channels",
+        "label": "Request channel relationship plots",
+        "type": "checkbox",
+        "default": true
+      }
+    ],
+    "outputs": [
+      "Color relationship plots",
+      "Method-specific color response"
+    ],
+    "requires": [
+      "2.1"
+    ],
+    "selected": false,
+    "implementation": "planned",
+    "view": "source",
+    "tool": {
+      "key": "history.color_relationships",
+      "module": "gazoken.tools.history.color_relationships",
+      "contract_version": 1,
+      "inputs": [
+        "pixels"
+      ],
+      "provides": []
+    }
+  },
+  {
+    "id": "3.4",
+    "title": "White balance & illumination",
+    "subtitle": "Regional chromaticity checks",
+    "group": "Color",
+    "description": "Plan regional illumination comparisons. Mixed lighting and colored surfaces are confounders. A metadata-dependent method needs a supported white-point declaration; none is enrolled by this form.",
+    "parameters": [
+      {
+        "key": "method",
+        "label": "Method preference",
+        "type": "select",
+        "options": [
+          "Method review pending",
+          "Regional chromaticity candidate",
+          "Metadata white-point comparison candidate"
+        ],
+        "default": "Method review pending"
+      },
+      {
+        "key": "region",
+        "label": "Proposed spatial scope",
+        "type": "select",
+        "options": [
+          "Whole image",
+          "Overlapping windows",
+          "User regions (future)"
+        ],
+        "default": "Whole image"
+      },
+      {
+        "key": "window",
+        "label": "Provisional window size (pixels)",
+        "type": "number",
+        "default": 128,
+        "min": 16,
+        "max": 2048,
+        "step": 1
+      },
+      {
+        "key": "metadata_policy",
+        "label": "Missing metadata policy",
+        "type": "select",
+        "options": [
+          "Record unmet requirement",
+          "Use image-only method if implemented"
+        ],
+        "default": "Record unmet requirement"
+      },
+      {
+        "key": "include_alternatives",
+        "label": "Request mixed-light alternatives",
+        "type": "checkbox",
+        "default": true
+      }
+    ],
+    "outputs": [
+      "Regional chromaticity estimates",
+      "Metadata applicability record"
+    ],
+    "requires": [
+      "2.1",
+      "1.3"
+    ],
+    "selected": false,
+    "implementation": "planned",
+    "view": "source",
+    "tool": {
+      "key": "history.illumination",
+      "module": "gazoken.tools.history.illumination",
+      "contract_version": 1,
+      "inputs": [
+        "pixels"
+      ],
+      "provides": []
+    }
+  },
+  {
+    "id": "3.5",
+    "title": "Blur & local sharpness",
+    "subtitle": "Conditional blur measurements",
+    "group": "Detail",
+    "description": "Configure sharpness views and a specified blur model. Optical defocus, motion, resampling and denoising can resemble each other. Insufficient edges should lead to abstention.",
+    "parameters": [
+      {
+        "key": "channel",
+        "label": "Proposed representation / channel",
+        "type": "select",
+        "options": [
+          "Luma candidate",
+          "RGB channels",
+          "Color differences",
+          "Awaiting method selection"
+        ],
+        "default": "Luma candidate"
+      },
+      {
+        "key": "method",
+        "label": "Measurement preference",
+        "type": "select",
+        "options": [
+          "Method review pending",
+          "Gradient-energy candidate",
+          "Laplacian-energy candidate",
+          "Edge-spread candidate"
+        ],
+        "default": "Method review pending"
+      },
+      {
+        "key": "blur_model",
+        "label": "Proposed blur model",
+        "type": "select",
+        "options": [
+          "No model selected",
+          "Linear motion candidate",
+          "Defocus candidate"
+        ],
+        "default": "No model selected"
+      },
+      {
+        "key": "window",
+        "label": "Provisional window size (pixels)",
+        "type": "number",
+        "default": 128,
+        "min": 16,
+        "max": 2048,
+        "step": 1
+      },
+      {
+        "key": "stride",
+        "label": "Provisional window stride (pixels)",
+        "type": "number",
+        "default": 64,
+        "min": 1,
+        "max": 1024,
+        "step": 1
+      },
+      {
+        "key": "include_support",
+        "label": "Request texture / edge support",
+        "type": "checkbox",
+        "default": true
+      }
+    ],
+    "outputs": [
+      "Sharpness measurements",
+      "Conditional blur parameters and support"
+    ],
+    "requires": [
+      "2.1"
+    ],
+    "selected": false,
+    "implementation": "planned",
+    "view": "source",
+    "tool": {
+      "key": "history.blur_sharpness",
+      "module": "gazoken.tools.history.blur_sharpness",
+      "contract_version": 1,
+      "inputs": [
+        "pixels"
+      ],
+      "provides": []
+    }
+  },
+  {
+    "id": "3.6",
+    "title": "Filtering & denoising",
+    "subtitle": "Defined operation families",
+    "group": "Filtering",
+    "description": "Plan tests for one filter family. Median-filter evidence cannot be assumed to detect Gaussian, bilateral or learned denoising. Later compression and low texture require separate controls.",
+    "parameters": [
+      {
+        "key": "channel",
+        "label": "Proposed representation / channel",
+        "type": "select",
+        "options": [
+          "Luma candidate",
+          "RGB channels",
+          "Color differences",
+          "Awaiting method selection"
+        ],
+        "default": "Luma candidate"
+      },
+      {
+        "key": "method",
+        "label": "Filter family preference",
+        "type": "select",
+        "options": [
+          "Method review pending",
+          "Median-filter candidate",
+          "Gaussian smoothing candidate",
+          "Denoising residual candidate"
+        ],
+        "default": "Method review pending"
+      },
+      {
+        "key": "kernel_size",
+        "label": "Provisional kernel width (pixels)",
+        "type": "number",
+        "default": 3,
+        "min": 1,
+        "max": 31,
+        "step": 1
+      },
+      {
+        "key": "window",
+        "label": "Provisional window size (pixels)",
+        "type": "number",
+        "default": 128,
+        "min": 16,
+        "max": 2048,
+        "step": 1
+      },
+      {
+        "key": "include_residual",
+        "label": "Request residual measurements",
+        "type": "checkbox",
+        "default": true
+      }
+    ],
+    "outputs": [
+      "Filter-specific response",
+      "Residual statistics and limitations"
+    ],
+    "requires": [
+      "2.1"
+    ],
+    "selected": false,
+    "implementation": "planned",
+    "view": "source",
+    "tool": {
+      "key": "history.filtering",
+      "module": "gazoken.tools.history.filtering",
+      "contract_version": 1,
+      "inputs": [
+        "pixels"
+      ],
+      "provides": []
+    }
+  },
+  {
+    "id": "3.7",
+    "title": "Sharpening",
+    "subtitle": "Halos and edge profiles",
+    "group": "Detail",
+    "description": "Plan descriptive overshoot, ringing and edge-profile measurements. JPEG ringing, optics and interpolation are competing explanations. No sharpening classifier has been selected.",
+    "parameters": [
+      {
+        "key": "channel",
+        "label": "Proposed representation / channel",
+        "type": "select",
+        "options": [
+          "Luma candidate",
+          "RGB channels",
+          "Color differences",
+          "Awaiting method selection"
+        ],
+        "default": "Luma candidate"
+      },
+      {
+        "key": "method",
+        "label": "Method preference",
+        "type": "select",
+        "options": [
+          "Descriptive profiles pending",
+          "Overshoot candidate",
+          "Residual-correlation candidate"
+        ],
+        "default": "Descriptive profiles pending"
+      },
+      {
+        "key": "profile_radius",
+        "label": "Provisional profile radius (pixels)",
+        "type": "number",
+        "default": 8,
+        "min": 1,
+        "max": 64,
+        "step": 1
+      },
+      {
+        "key": "window",
+        "label": "Provisional window size (pixels)",
+        "type": "number",
+        "default": 128,
+        "min": 16,
+        "max": 2048,
+        "step": 1
+      },
+      {
+        "key": "include_profiles",
+        "label": "Request isolated-edge profiles",
+        "type": "checkbox",
+        "default": true
+      }
+    ],
+    "outputs": [
+      "Edge profiles",
+      "Candidate enhancement traces"
+    ],
+    "requires": [
+      "2.1"
+    ],
+    "selected": false,
+    "implementation": "planned",
+    "view": "source",
+    "tool": {
+      "key": "history.sharpening",
+      "module": "gazoken.tools.history.sharpening",
+      "contract_version": 1,
+      "inputs": [
+        "pixels"
+      ],
+      "provides": []
+    }
+  },
+  {
+    "id": "3.8",
+    "title": "Noise consistency",
+    "subtitle": "Signal-dependent regional behavior",
+    "group": "Noise",
+    "description": "Configure future noise-curve and regional comparisons. Texture is not noise; lighting, ISO, HDR, local tone mapping and denoising can change measured residuals.",
+    "parameters": [
+      {
+        "key": "channel",
+        "label": "Proposed representation / channel",
+        "type": "select",
+        "options": [
+          "Luma candidate",
+          "RGB channels",
+          "Color differences",
+          "Awaiting method selection"
+        ],
+        "default": "Luma candidate"
+      },
+      {
+        "key": "method",
+        "label": "Method preference",
+        "type": "select",
+        "options": [
+          "Method review pending",
+          "Noise-curve candidate",
+          "Regional residual candidate"
+        ],
+        "default": "Method review pending"
+      },
+      {
+        "key": "patch_size",
+        "label": "Provisional patch size (pixels)",
+        "type": "number",
+        "default": 32,
+        "min": 8,
+        "max": 256,
+        "step": 1
+      },
+      {
+        "key": "minimum_patches",
+        "label": "Provisional minimum patch count",
+        "type": "number",
+        "default": 20,
+        "min": 2,
+        "max": 10000,
+        "step": 1
+      },
+      {
+        "key": "region",
+        "label": "Proposed spatial scope",
+        "type": "select",
+        "options": [
+          "Whole image",
+          "Overlapping windows",
+          "User regions (future)"
+        ],
+        "default": "Whole image"
+      },
+      {
+        "key": "include_curve",
+        "label": "Request noise curve and support",
+        "type": "checkbox",
+        "default": true
+      }
+    ],
+    "outputs": [
+      "Noise curve / regional measurements",
+      "Eligibility and sample support"
+    ],
+    "requires": [
+      "2.1"
+    ],
+    "selected": false,
+    "implementation": "planned",
+    "view": "source",
+    "tool": {
+      "key": "history.noise_consistency",
+      "module": "gazoken.tools.history.noise_consistency",
+      "contract_version": 1,
+      "inputs": [
+        "pixels"
+      ],
+      "provides": []
+    }
+  },
+  {
+    "id": "3.9",
+    "title": "CFA & demosaicing",
+    "subtitle": "Interpolation consistency",
+    "group": "Acquisition",
+    "description": "Plan periodic inter-channel consistency tests where a compatible camera pipeline is plausible. Resizing, JPEG and non-Bayer or synthetic inputs can invalidate assumptions; missing traces do not establish synthetic origin.",
+    "parameters": [
+      {
+        "key": "method",
+        "label": "Method preference",
+        "type": "select",
+        "options": [
+          "Method review pending",
+          "CFA interpolation candidate"
+        ],
+        "default": "Method review pending"
+      },
+      {
+        "key": "pattern",
+        "label": "Proposed CFA assumption",
+        "type": "select",
+        "options": [
+          "Unknown / test eligibility",
+          "Bayer candidate"
+        ],
+        "default": "Unknown / test eligibility"
+      },
+      {
+        "key": "window",
+        "label": "Provisional window size (pixels)",
+        "type": "number",
+        "default": 128,
+        "min": 16,
+        "max": 2048,
+        "step": 1
+      },
+      {
+        "key": "stride",
+        "label": "Provisional window stride (pixels)",
+        "type": "number",
+        "default": 64,
+        "min": 1,
+        "max": 1024,
+        "step": 1
+      },
+      {
+        "key": "include_consistency",
+        "label": "Request regional consistency map",
+        "type": "checkbox",
+        "default": true
+      }
+    ],
+    "outputs": [
+      "CFA consistency response",
+      "Pipeline applicability record"
+    ],
+    "requires": [
+      "2.1"
+    ],
+    "selected": false,
+    "implementation": "planned",
+    "view": "source",
+    "tool": {
+      "key": "history.demosaicing",
+      "module": "gazoken.tools.history.demosaicing",
+      "contract_version": 1,
+      "inputs": [
+        "pixels"
+      ],
+      "provides": []
+    }
+  },
+  {
+    "id": "3.10",
+    "title": "Sensor / device references",
+    "subtitle": "Requires independent enrollment",
+    "group": "Reference traces",
+    "description": "Record a plan for reference-dependent sensor comparison. A single unknown image cannot enroll its own trustworthy sensor fingerprint. No reference loading, fingerprint extraction or matching is implemented.",
+    "parameters": [
+      {
+        "key": "method",
+        "label": "Method preference",
+        "type": "select",
+        "options": [
+          "Reference method review pending",
+          "PRNU comparison candidate"
+        ],
+        "default": "Reference method review pending"
+      },
+      {
+        "key": "reference_id",
+        "label": "Reference manifest identifier (note only; not loaded)",
+        "type": "text",
+        "default": ""
+      },
+      {
+        "key": "reference_status",
+        "label": "Declared reference availability",
+        "type": "select",
+        "options": [
+          "Not supplied / requirement unmet",
+          "External references documented (not loaded)"
+        ],
+        "default": "Not supplied / requirement unmet"
+      },
+      {
+        "key": "alignment",
+        "label": "Proposed alignment",
+        "type": "select",
+        "options": [
+          "Alignment review pending",
+          "Translation candidate",
+          "Scale and crop candidate"
+        ],
+        "default": "Alignment review pending"
+      },
+      {
+        "key": "minimum_references",
+        "label": "Provisional minimum reference images",
+        "type": "number",
+        "default": 20,
+        "min": 2,
+        "max": 1000,
+        "step": 1
+      },
+      {
+        "key": "include_eligibility",
+        "label": "Request reference applicability record",
+        "type": "checkbox",
+        "default": true
+      }
+    ],
+    "outputs": [
+      "Reference-dependent match evidence",
+      "Alignment and enrollment provenance"
+    ],
+    "requires": [
+      "2.1"
+    ],
+    "selected": false,
+    "implementation": "planned",
+    "view": "source",
+    "tool": {
+      "key": "history.sensor_references",
+      "module": "gazoken.tools.history.sensor_references",
+      "contract_version": 1,
+      "inputs": [
+        "pixels",
+        "sensor_reference"
+      ],
+      "provides": []
+    }
+  },
+  {
+    "id": "3.11",
+    "title": "Learned forensic traces",
+    "subtitle": "Optional model-specific comparison",
+    "group": "Optional models",
+    "description": "Describe a future model comparison. No model or weights are installed or selected by these controls. Model scores are not calibrated authenticity probabilities; terms, version and distribution shifts need review.",
+    "parameters": [
+      {
+        "key": "model",
+        "label": "Model preference (not available here)",
+        "type": "select",
+        "options": [
+          "No model selected",
+          "Noiseprint candidate",
+          "TruFor candidate"
+        ],
+        "default": "No model selected"
+      },
+      {
+        "key": "model_manifest",
+        "label": "Weights / version manifest identifier (note only)",
+        "type": "text",
+        "default": ""
+      },
+      {
+        "key": "tile_size",
+        "label": "Provisional input tile size (pixels)",
+        "type": "number",
+        "default": 256,
+        "min": 64,
+        "max": 2048,
+        "step": 1
+      },
+      {
+        "key": "overlap",
+        "label": "Provisional tile overlap (pixels)",
+        "type": "number",
+        "default": 32,
+        "min": 0,
+        "max": 512,
+        "step": 1
+      },
+      {
+        "key": "include_map",
+        "label": "Request model-specific response map",
+        "type": "checkbox",
+        "default": true
+      }
+    ],
+    "outputs": [
+      "Model-specific maps / scores",
+      "Weights and preprocessing provenance"
+    ],
+    "requires": [
+      "2.1"
+    ],
+    "selected": false,
+    "implementation": "planned",
+    "view": "source",
+    "tool": {
+      "key": "history.learned_traces",
+      "module": "gazoken.tools.history.learned_traces",
+      "contract_version": 1,
+      "inputs": [
+        "pixels",
+        "model_weights"
+      ],
+      "provides": []
+    }
+  },
+  {
+    "id": "3.12",
+    "title": "Copy-move candidates",
+    "subtitle": "Geometrically consistent pairs",
+    "group": "Duplication",
+    "description": "Plan correspondence tests between regions of the same image. Natural repetition is a negative control. Scale, rotation and compression robustness must be evaluated separately.",
+    "parameters": [
+      {
+        "key": "channel",
+        "label": "Proposed representation / channel",
+        "type": "select",
+        "options": [
+          "Luma candidate",
+          "RGB channels",
+          "Color differences",
+          "Awaiting method selection"
+        ],
+        "default": "Luma candidate"
+      },
+      {
+        "key": "method",
+        "label": "Method preference",
+        "type": "select",
+        "options": [
+          "Method review pending",
+          "Block-descriptor candidate",
+          "Local-keypoint candidate"
+        ],
+        "default": "Method review pending"
+      },
+      {
+        "key": "block_size",
+        "label": "Provisional descriptor block size (pixels)",
+        "type": "number",
+        "default": 16,
+        "min": 4,
+        "max": 128,
+        "step": 1
+      },
+      {
+        "key": "minimum_separation",
+        "label": "Provisional minimum separation (pixels)",
+        "type": "number",
+        "default": 32,
+        "min": 1,
+        "max": 4096,
+        "step": 1
+      },
+      {
+        "key": "minimum_matches",
+        "label": "Provisional minimum consistent matches",
+        "type": "number",
+        "default": 8,
+        "min": 2,
+        "max": 10000,
+        "step": 1
+      },
+      {
+        "key": "include_pairs",
+        "label": "Request paired-region overlays",
+        "type": "checkbox",
+        "default": true
+      }
+    ],
+    "outputs": [
+      "Paired candidate regions",
+      "Geometric transform and support"
+    ],
+    "requires": [
+      "2.1"
+    ],
+    "selected": false,
+    "implementation": "planned",
+    "view": "source",
+    "tool": {
+      "key": "history.copy_move",
+      "module": "gazoken.tools.history.copy_move",
+      "contract_version": 1,
+      "inputs": [
+        "pixels"
+      ],
+      "provides": []
+    }
+  },
+  {
+    "id": "3.13",
+    "title": "Compositing & physical consistency",
+    "subtitle": "Explicit regional hypotheses",
+    "group": "Consistency",
+    "description": "Configure a defined consistency question, not a sum of heatmaps. Geometry, lens correction and regional processing complicate interpretation; several tests require scene assumptions or references not supplied here.",
+    "parameters": [
+      {
+        "key": "method",
+        "label": "Consistency question",
+        "type": "select",
+        "options": [
+          "Method review pending",
+          "Regional trace comparison candidate",
+          "Chromatic-aberration candidate",
+          "Illumination candidate",
+          "Perspective / shadow candidate"
+        ],
+        "default": "Method review pending"
+      },
+      {
+        "key": "region",
+        "label": "Proposed spatial scope",
+        "type": "select",
+        "options": [
+          "Whole image",
+          "Overlapping windows",
+          "User regions (future)"
+        ],
+        "default": "Whole image"
+      },
+      {
+        "key": "window",
+        "label": "Provisional window size (pixels)",
+        "type": "number",
+        "default": 128,
+        "min": 16,
+        "max": 2048,
+        "step": 1
+      },
+      {
+        "key": "assumptions",
+        "label": "Scene / reference assumptions (note only)",
+        "type": "text",
+        "default": ""
+      },
+      {
+        "key": "include_alternatives",
+        "label": "Request competing explanations",
+        "type": "checkbox",
+        "default": true
+      }
+    ],
+    "outputs": [
+      "Method-specific consistency tests",
+      "Supporting regions and alternatives"
+    ],
+    "requires": [
+      "2.1"
+    ],
+    "selected": false,
+    "implementation": "planned",
+    "view": "source",
+    "tool": {
+      "key": "history.physical_consistency",
+      "module": "gazoken.tools.history.physical_consistency",
+      "contract_version": 1,
+      "inputs": [
+        "pixels"
+      ],
+      "provides": []
+    }
+  },
+  {
+    "id": "3.14",
+    "title": "Operation-order hypotheses",
+    "subtitle": "Limited candidate histories",
+    "group": "History",
+    "description": "Record a finite comparison of processing sequences after individual methods are evaluated. Prerequisites remain unmet; this does not reconstruct arbitrary image history or execute earlier steps.",
+    "parameters": [
+      {
+        "key": "hypotheses",
+        "label": "Proposed sequence pair",
+        "type": "select",
+        "options": [
+          "Resize \u2192 JPEG vs JPEG \u2192 resize \u2192 JPEG",
+          "Blur \u2192 resize vs resize \u2192 blur",
+          "Tone mapping before vs after final JPEG"
+        ],
+        "default": "Resize \u2192 JPEG vs JPEG \u2192 resize \u2192 JPEG"
+      },
+      {
+        "key": "evidence_policy",
+        "label": "Prerequisite policy",
+        "type": "select",
+        "options": [
+          "Require evaluated specialists (pending)"
+        ],
+        "default": "Require evaluated specialists (pending)"
+      },
+      {
+        "key": "candidate_limit",
+        "label": "Provisional maximum candidate sequences",
+        "type": "number",
+        "default": 4,
+        "min": 2,
+        "max": 32,
+        "step": 1
+      },
+      {
+        "key": "include_unresolved",
+        "label": "Request unresolved alternatives",
+        "type": "checkbox",
+        "default": true
+      },
+      {
+        "key": "include_provenance",
+        "label": "Request linked evidence provenance",
+        "type": "checkbox",
+        "default": true
+      }
+    ],
+    "outputs": [
+      "Compatible tested sequences",
+      "Unresolved histories / erased traces"
+    ],
+    "requires": [
+      "2.1",
+      "3.1",
+      "3.2",
+      "3.5"
+    ],
+    "selected": false,
+    "implementation": "planned",
+    "view": "source",
+    "tool": {
+      "key": "history.operation_order",
+      "module": "gazoken.tools.history.operation_order",
+      "contract_version": 1,
+      "inputs": [
+        "pixels",
+        "evaluated_evidence"
+      ],
+      "provides": []
+    }
   }
 ]

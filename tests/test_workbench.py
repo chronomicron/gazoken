@@ -20,9 +20,9 @@ class WorkbenchTests(unittest.TestCase):
         return self.client.post("/api/run", files={"image": ("source.jpg", self.data if data is None else data, "image/jpeg")},
                                 data={"configuration": json.dumps(plan)}, headers=headers)
 
-    def test_catalog_has_ordered_phase_one_and_two(self):
+    def test_catalog_has_all_three_ordered_phases(self):
         catalog = self.client.get("/api/catalog").json()["steps"]
-        self.assertEqual([s["id"] for s in catalog], [f"1.{i}" for i in range(1,13)] + [f"2.{i}" for i in range(1,12)])
+        self.assertEqual([s["id"] for s in catalog], [f"1.{i}" for i in range(1,13)] + [f"2.{i}" for i in range(1,12)] + [f"3.{i}" for i in range(1,15)])
         result = self.upload([{"id": s["id"]} for s in catalog])
         self.assertEqual(result.status_code, 200, result.text)
         records = result.json()["results"]
@@ -48,6 +48,23 @@ class WorkbenchTests(unittest.TestCase):
         self.assertEqual(first["source"]["sha256"], second["source"]["sha256"])
         self.assertEqual(len(second["results"]), 11)
         self.assertTrue(all(r["status"] == "not_implemented" and r["output"] is None for r in second["results"]))
+        self.assertEqual(self.data, FIXTURE.read_bytes())
+
+    def test_phase_three_is_typed_configuration_only_and_source_isolated(self):
+        first = self.upload([{"id":"1.1"}]).json()
+        plan = [{"id":f"3.{i}"} for i in range(1,15)]
+        response = self.upload(plan)
+        self.assertEqual(response.status_code, 200, response.text)
+        run = response.json()
+        self.assertEqual(run["source"], first["source"])
+        self.assertEqual(len(run["results"]),14)
+        self.assertTrue(all(r["status"] == "not_implemented" and r["output"] is None for r in run["results"]))
+        for value in [True, -1, 1.2, "20", float('inf')]:
+            self.assertEqual(self.upload([{"id":"3.10","parameters":{"minimum_references":value}}]).status_code,400)
+        for parameters in [{"include_response":"yes"},{"method":"installed detector"},{"minimum_scale":0}]:
+            self.assertEqual(self.upload([{"id":"3.1","parameters":parameters}]).status_code,400)
+        changed = self.upload(plan, data=self.data+b"different source").json()
+        self.assertNotEqual(changed["source"]["sha256"], run["source"]["sha256"])
         self.assertEqual(self.data, FIXTURE.read_bytes())
 
     def test_mixed_phase_order_and_fractional_parameters(self):

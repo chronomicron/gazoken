@@ -1,6 +1,6 @@
 # Development workflow
 
-Updated: 2026-11-03
+Updated: 2026-11-04
 
 ## Local work and GitHub
 
@@ -55,8 +55,10 @@ When introducing a package, document:
 - Attribution, dependency licenses, and known limitations.
 
 Keep method logic reusable apart from website presentation where practical. This
-is a design objective; the shared result contract and execution location still
-need a decision based on the first tool's requirements.
+is implemented locally through the [version 1 tool interface](tool-development.md).
+The wider scientific result schema, C/C++ bindings, and production execution
+location remain open. Add adapter checks under `tests/tools/`; run them with
+`.venv/bin/python -m unittest discover -s tests/tools -v`.
 
 ## Validation
 

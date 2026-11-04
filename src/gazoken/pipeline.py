@@ -2,30 +2,24 @@
 
 No pixel reconstruction is performed here. This module does not depend on the UI.
 """
-from collections import Counter
+from copy import deepcopy
 from datetime import datetime, timezone
-import hashlib
 import json
 import math
-from pathlib import Path
 import platform
 import time
+from types import MappingProxyType
 
 from . import __version__
-
-MAX_BYTES = 25 * 1024 * 1024
-CATALOG = json.loads((Path(__file__).parent / "web/steps.json").read_text())
-BY_ID = {step["id"]: step for step in CATALOG}
+from .catalog import CATALOG, BY_ID
+from .tools.contracts import MAX_BYTES, ImageSource, PixelPackage, ToolInputs, ToolOutput
+from .tools.registry import lookup
+from .tools.encoded.byte_distribution import measure as byte_distribution
 
 
 def source_identity(data: bytes, filename: str) -> dict:
-    if not data or len(data) > MAX_BYTES:
-        raise ValueError("Choose a non-empty JPEG no larger than 25 MiB.")
-    if not data.startswith(b"\xff\xd8"):
-        raise ValueError("JPEG SOI signature FF D8 is missing.")
-    return {"filename": filename[:255], "size": len(data),
-            "sha256": hashlib.sha256(data).hexdigest(),
-            "signature": "FF D8", "validation": "Signature only; not a conformance check"}
+    """Compatibility helper; tool execution uses the same immutable source class."""
+    return ImageSource(data, filename).record()
 
 
 def validate_plan(plan: list) -> list:
@@ -64,34 +58,67 @@ def validate_plan(plan: list) -> list:
     return sorted(normalized, key=lambda x: tuple(map(int, x["id"].split("."))))
 
 
-def byte_distribution(data: bytes) -> dict:
-    counts = Counter(data)
-    histogram = [counts[i] for i in range(256)]
-    entropy = -sum((n / len(data)) * math.log2(n / len(data)) for n in counts.values())
-    return {"scope": "whole_file", "count": len(data), "histogram": histogram,
-            "entropy_bits_per_byte": entropy,
-            "limitation": "Descriptive encoded-byte entropy; not a forensic probability."}
+def run_plan(data: bytes, filename: str, plan: list, *, pixels: PixelPackage | None = None) -> dict:
+    """Run selected adapters in stable phase/step order on the same input packet.
 
-
-def run_plan(data: bytes, filename: str, plan: list) -> dict:
-    """Execute declared real handlers; return explicit not_implemented elsewhere."""
+    Dependencies are not run implicitly. The API supplies bytes only; future Python
+    callers may supply a provenance-linked pixel package. Tools receive read-only
+    parameters and return JSON measurements; a failure does not poison later tools.
+    """
     plan = validate_plan(plan)
-    source = source_identity(data, filename)
+    inputs = ToolInputs(ImageSource(data, filename), pixels)
+    source = inputs.source.record()
     results = []
     for item in plan:
         started = time.perf_counter()
-        step_id = item["id"]
-        if step_id == "1.1":
-            status, output = "completed", {**source, "note": item["parameters"]["note"]}
-        elif step_id == "1.7":
-            status, output = "completed", byte_distribution(data)
-        else:
-            status, output = "not_implemented", None
-        results.append({**item, "method_version": __version__, "status": status,
-                        "output": output, "elapsed_ms": round((time.perf_counter()-started)*1000, 3),
-                        "message": "Measured original bytes." if output is not None else
-                        "Configuration recorded; Python method not connected. No analysis result produced."})
-    return {"schema_version": 1, "framework_version": __version__,
-            "environment": {"python": platform.python_version(), "implementation": platform.python_implementation()},
-            "created_at": datetime.now(timezone.utc).isoformat(),
-            "source": source, "results": results}
+        input_record = inputs.record()
+        produced_inputs = {}
+        spec = BY_ID[item['id']]
+        registration = lookup(spec['tool']['key'])
+        available = {'jpeg_bytes'} | ({'pixels'} if inputs.pixels else set())
+        missing = [kind for kind in spec['tool']['inputs'] if kind not in available]
+        status, output, warnings, error_type = 'not_implemented', None, [], None
+        message = 'Configuration recorded; Python method not connected. No analysis result produced.'
+        if registration:
+            if missing:
+                status = 'blocked'
+                message = 'Required inputs unavailable: '+', '.join(missing)+'. No prerequisites were executed.'
+            else:
+                try:
+                    result = registration.handler(inputs, MappingProxyType(deepcopy(item['parameters'])))
+                    if not isinstance(result, ToolOutput) or not isinstance(result.measurements, dict):
+                        raise TypeError('Tool must return ToolOutput with dictionary measurements.')
+                    if not isinstance(result.warnings, tuple) or any(not isinstance(w, str) for w in result.warnings):
+                        raise TypeError('Tool warnings must be a tuple of strings.')
+                    # Detach results immediately and reject nonfinite / non-JSON values.
+                    payload = json.loads(json.dumps({'measurements': result.measurements, 'warnings':result.warnings}, allow_nan=False))
+                    if result.pixels is not None:
+                        if 'pixels' not in spec['tool']['provides']:
+                            raise ValueError('This tool is not a declared pixel provider.')
+                        next_inputs = ToolInputs(inputs.source, result.pixels)
+                        if inputs.pixels is not None and inputs.pixels.record() != result.pixels.record():
+                            raise ValueError('A fixed decoded reference cannot be replaced during a plan.')
+                        produced_inputs = {'pixels': result.pixels.record()}
+                        inputs = next_inputs
+                    output, warnings, status = payload['measurements'], payload['warnings'], 'completed'
+                    message = 'Tool completed on declared inputs. Source preserved.'
+                except Exception as exc:
+                    status, error_type = 'failed', type(exc).__name__
+                    message = f'Tool failed ({error_type}); no output committed. Later selected tools may continue.'
+        results.append({**deepcopy(item), 'tool_key': spec['tool']['key'],
+                        'input_contract_version': 1, 'inputs': deepcopy(input_record),
+                        'required_inputs': list(spec['tool']['inputs']), 'missing_inputs': missing,
+                        'produced_inputs': produced_inputs,
+                        'method_version': registration.version if registration else None,
+                        'status': status, 'output': output, 'warnings': warnings,
+                        'error_type': error_type,
+                        'elapsed_ms': round((time.perf_counter()-started)*1000, 3), 'message': message})
+    return {'schema_version': 2, 'framework_version': __version__,
+            'environment': {'python': platform.python_version(), 'implementation': platform.python_implementation()},
+            'created_at': datetime.now(timezone.utc).isoformat(),
+            'source': source, 'results': results}
+
+
+def run_step(data: bytes, filename: str, step_id: str, parameters: dict | None = None, *, pixels: PixelPackage | None = None) -> dict:
+    """Same entry point for one tool, notebooks and future batch callers."""
+    return run_plan(data, filename, [{'id':step_id, 'parameters':parameters or {}}], pixels=pixels)

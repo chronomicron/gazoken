@@ -109,3 +109,15 @@ button.phase:disabled{opacity:.7}
 .artifact-slots{list-style:none;display:flex;gap:9px;flex-wrap:wrap;padding:0;margin:0 0 14px}
 .artifact-slots li{padding:9px 12px;border:1px dashed #a8bda0;border-radius:5px;background:#f4f8ef;color:#486145;font-size:12px;line-height:1.5}
 @media(max-width:830px){.reference-banner{align-items:flex-start;flex-direction:column;gap:10px}.reference-banner .mini-pill{white-space:normal}}
+
+/* Tool boundary and selected sequential plan use the existing readable controls. */
+.tool-boundary{padding:12px;background:#f1f5ed;border:1px solid #c5d2bd;border-radius:5px;font-size:11.5px;line-height:1.7;color:#40583f}
+.tool-boundary strong,.tool-boundary code,.tool-boundary>span{display:block}
+.tool-boundary code{font-size:11px;overflow-wrap:anywhere;margin:4px 0}
+.tool-boundary ul{margin:7px 0 0;padding-left:17px}
+.execution-plan{margin:0 18px 18px;padding:12px;border:1px solid #c5d2bd;border-radius:5px;background:#f7faf3}
+.execution-plan summary{font-size:12.5px;color:#31563b;cursor:pointer;line-height:1.7}
+.execution-plan p,.execution-plan li{font-size:11.5px;color:#425a44;line-height:1.7}
+.execution-plan p{margin:8px 0}.execution-plan ol{padding-left:20px;margin-bottom:0}
+.execution-plan li{margin:9px 0}.execution-plan li b,.execution-plan li span,.execution-plan li code{display:block}
+.execution-plan code{font-size:11px;overflow-wrap:anywhere}

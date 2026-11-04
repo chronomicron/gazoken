@@ -191,6 +191,39 @@ Proposals remain separate until agreed. The initial handoff predates this log;
   Phase 2 defaults. A backend restart is needed to load the expanded catalog.
   See [coverage and usage](local-workbench.md).
 
+## D014 — Complete the three-phase configuration framework
+
+- Status: accepted scope; implemented locally, 2026-11-04.
+- Basis: Robert's request, relayed in the Architect's scoped assignment, for the
+  third Processing history tab and the encompassing framework before methods.
+- Decision: add fourteen planned Phase 3 groups with editable provisional controls,
+  functional configuration recording and inspection, isolated phase reports, and
+  one preserved source across all phases. Extend export to schema 3 and explicitly
+  migrate settings from schemas 1 and 2.
+- Rationale: make future method requirements and planned outputs reviewable without
+  presenting unavailable algorithms or references as implemented capabilities.
+- Consequences: only 1.1 and 1.7 produce Python measurements. No Phase 2 decode,
+  Phase 3 analysis, reference enrollment, learned weights or automatic prerequisites
+  are implemented. Existing design is retained; launch/restart and verification
+  scope are documented in [local workbench](local-workbench.md).
+
+## D015 — Isolated adapters and common local inputs — 2026-11-04
+
+- Status: accepted for the local framework, based on the user's request to isolate
+  each step and give tools consistent original-byte or decoded-pixel inputs.
+- Decision: introduce a versioned Python tool interface, explicit adapter registry,
+  separate encoded/decoded/history folders, and matching GUI input declarations and
+  selected call order. Preserve stable step IDs and numeric execution order.
+- Rationale: implement and test methods one at a time without adding method branches
+  to the shared runner or changing the source supplied to other methods.
+- Consequences: source identity and byte distribution move into individual modules;
+  no new forensic detector is introduced. Pixels require explicit decoder provenance;
+  no decoder is registered in this increment. Missing prerequisites block registered
+  adapters, failures are recorded per adapter, and configuration-only steps stay
+  distinguishable from executed methods. The interface is cooperative in-process
+  isolation, not a security sandbox. Broader scientific schemas remain open.
+- Guide: [tool development](tool-development.md).
+
 ## Pending proposals
 
 

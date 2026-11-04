@@ -5,7 +5,8 @@ Image Forensics Workbench, under グルー研究室 · Grou-lab.
 
 | Document | Purpose |
 | --- | --- |
-| [Local Python workbench](local-workbench.md) | Launch instructions, Phase 1/2 controls, shared-source previews, reports, and extension points. |
+| [Local Python workbench](local-workbench.md) | Launch instructions, all three phases, shared-source previews, reports, session migration, and extension points. |
+| [Tool development](tool-development.md) | Common inputs, isolated phase modules, execution lifecycle, templates, and future-tool checklist. |
 | [Test fixtures](../tests/fixtures/README.md) | Synthetic inputs, known edits, masks, and regeneration instructions. |
 | [Private research workspace](https://github.com/chronomicron/gazoken-research) | Literature, papers, research data, study proposals, and unpublished results. |
 | [JPEG inspector](jpeg-inspector.md) | Raw JPEG/Exif inspection, graphical tables, byte statistics, and coverage. |

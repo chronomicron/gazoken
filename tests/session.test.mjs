@@ -11,7 +11,7 @@ test('session export snapshots settings and measurements without image bytes',()
   settings['1.1'].note='edited';runs[0].results[0].parameters.note='later mutation';
   assert.equal(record.configuration[0].parameters.note,'');
   assert.equal(record.runs[0].results[0].parameters.note,'at execution');
-  assert.equal(record.configuration.length,23);
+  assert.equal(record.configuration.length,37);
   assert.ok(!('bytes' in record));
 });
 test('settings roundtrip preserves values and never imports source or history',()=>{
@@ -56,7 +56,7 @@ test('reports isolate phase history while retaining global run numbers and sourc
   assert.equal(second.steps[0].latest.output,null);assert.equal(second.source.sha256,first.source.sha256);
   assert.equal(phaseReport(catalog,source,runs.slice(0,1),2).status,'not_started');
   const exported=sessionRecord(catalog,defaults(),new Set(['1.1','2.1']),source,runs);
-  assert.equal(exported.schema_version,2);assert.deepEqual(exported.phase_reports.map(r=>r.phase),[1,2]);
+  assert.equal(exported.schema_version,3);assert.deepEqual(exported.phase_reports.map(r=>r.phase),[1,2,3]);
 });
 test('legacy Phase 1 settings import initializes Phase 2 defaults without importing records',()=>{
   const legacyCatalog=phaseSteps(catalog,1), settings=defaults();settings['1.1'].note='Legacy source note';
@@ -74,5 +74,41 @@ test('Phase 2 fractional geometry settings roundtrip and invalid numerics are re
     const invalid=structuredClone(exported);
     invalid.configuration.find(s=>s.id==='2.8').parameters.period_increment=value;
     assert.throws(()=>readSettings(invalid,catalog));
+  }
+});
+
+test('schema 2 migrates both original phases and defaults Phase 3 explicitly',()=>{
+  const settings=defaults();settings['1.1'].note='v2 note';settings['2.9'].minimum_angle=-7.5;
+  const legacy={framework:'gazoken',schema_version:2,configuration:catalog.filter(s=>!s.id.startsWith('3.')).map(s=>({id:s.id,selected:s.id==='2.9',parameters:settings[s.id]}))};
+  const imported=readSettings(legacy,catalog);
+  assert.equal(imported.settings['1.1'].note,'v2 note');assert.equal(imported.settings['2.9'].minimum_angle,-7.5);
+  assert.deepEqual(imported.settings['3.1'],defaults()['3.1']);assert.ok(imported.selected.has('2.9'));
+  assert.ok(!imported.selected.has('3.1'));
+  const duplicate=structuredClone(legacy);duplicate.configuration[22]=duplicate.configuration[0];
+  assert.throws(()=>readSettings(duplicate,catalog));
+  const misassigned=structuredClone(legacy);misassigned.configuration[22]={id:'3.1',selected:true,parameters:settings['3.1']};
+  assert.throws(()=>readSettings(misassigned,catalog));
+});
+test('Phase 3 snapshots and reports remain isolated across phases and sources',()=>{
+  const settings=defaults();settings['3.1'].minimum_scale=.75;settings['3.10'].reference_id='not loaded';
+  const source={sha256:'current'};
+  const runs=[{source,results:[{id:'1.1',status:'completed'}]},
+    {source,results:[{id:'2.1',status:'not_implemented',output:null}]},
+    {source,results:[{id:'3.1',status:'not_implemented',output:null,parameters:{minimum_scale:.75}}]},
+    {source:{sha256:'old'},results:[{id:'3.2',status:'completed',output:{fake:true}}]}];
+  const record=sessionRecord(catalog,settings,new Set(['1.1','2.1','3.1']),source,runs);
+  assert.deepEqual(readSettings(record,catalog).settings,settings);
+  settings['3.1'].minimum_scale=2;runs[2].results[0].parameters.minimum_scale=2;
+  const report=record.phase_reports[2];
+  assert.deepEqual(report.coverage,{total:14,completed:0,not_implemented:1,not_run:13,other:0});
+  assert.equal(report.steps[0].latest.run_number,3);
+  assert.equal(report.steps[0].latest.parameters.minimum_scale,.75);
+  assert.equal(record.configuration.find(s=>s.id==='3.1').parameters.minimum_scale,.75);
+  assert.equal(phaseReport(catalog,{sha256:'replacement'},runs,3).status,'not_started');
+  assert.equal(phaseReport(catalog,null,runs,3).status,'no_source');
+  for(const mutate of [r=>r.configuration.find(s=>s.id==='3.1').parameters.minimum_scale=true,
+    r=>r.configuration.find(s=>s.id==='3.10').parameters.reference_id=3,
+    r=>r.configuration.find(s=>s.id==='3.1').parameters.unknown=1]){
+    const invalid=structuredClone(record);mutate(invalid);assert.throws(()=>readSettings(invalid,catalog));
   }
 });
