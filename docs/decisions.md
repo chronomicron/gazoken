@@ -256,6 +256,19 @@ Proposals remain separate until agreed. The initial handoff predates this log;
   The worker is not a security sandbox; cross-platform native behavior remains to test.
 - Guide: [stored coefficients](stored-coefficients.md).
 
+## D018 — Media expansion order and JPEG-only selector — 2026-11-05
+
+- Status: accepted direction, requested by Robert in this chat.
+- Decision: finish JPEG investigation first, then BMP/TIFF/other images, then
+  MP3/audio, then video. Show planned media workspaces in a dimmed menu with an
+  Under development explanation while JPEG remains the only active workspace.
+- Rationale: make future scope visible without implying unavailable parsers or
+  detectors are operational; retain encoded/decoded/further-analysis boundaries.
+- Consequences: no new format support, decoder, statistical steganalysis or signal
+  detector is implemented by this UI increment. Planned menu choices preserve the
+  current JPEG session. Format-specific contracts and validation remain open.
+- Roadmap: [media expansion](roadmap.md#media-expansion-direction--accepted-2026-11-05).
+
 ## Pending proposals
 
 

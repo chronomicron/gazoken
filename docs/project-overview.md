@@ -1,6 +1,6 @@
 # Gazoken project overview
 
-Updated: 2026-11-03
+Updated: 2026-11-05
 
 ## Purpose and identity
 
@@ -85,6 +85,16 @@ selection, response curves, and controlled comparisons. **This milestone was not
 accepted; the user's clarified starting direction is evaluating existing methods.**
 Low texture, contrast, noise, and scene content must be controlled before treating
 curve differences as blur evidence. Edge operators and threshold units remain open.
+
+## Confirmed media expansion
+
+Robert's 2026-11-05 direction is to complete the JPEG work first, then extend to
+BMP, TIFF and other images, followed by MP3/audio and then video. Each format
+should have raw-file inspection, explicit decoded representations and further
+history/concealed-information analysis as appropriate. Statistical steganalysis
+and known-message extraction are research goals, not current detectors. See the
+[media roadmap](roadmap.md#media-expansion-direction--accepted-2026-11-05).
+The local media selector displays planned workspaces but enables JPEG only.
 
 ## Open decisions
 

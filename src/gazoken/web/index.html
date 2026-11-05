@@ -4,7 +4,7 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#151d21">
   <title>Gazoken · Research workbench</title>
-  <link rel="stylesheet" href="/ui/workbench.css">
+  <link rel="stylesheet" href="/ui/workbench.css?v=20261105-media">
 </head>
 <body>
   <aside class="rail" aria-label="Project identity"><a href="/" class="logo" aria-label="Gazoken home">画<span>研</span></a><span class="rail-label">GAZOKEN / GROU-LAB</span><span class="rail-bottom">研究<br>0.5</span></aside>
@@ -12,6 +12,7 @@
     <header class="topbar"><div class="brand">gazoken<span>IMAGE FORENSICS WORKBENCH</span></div><div class="top-actions"><span class="connection" id="connection">Connecting to Python</span><button id="import" class="button subtle">Import settings</button><input id="config-file" type="file" accept="application/json,.json" hidden><button id="export" class="button subtle">↗ Export session</button></div></header>
     <main>
       <div class="heading"><div><p class="eyebrow">RESEARCH WORKSPACE <span>/</span> JPEG INVESTIGATION</p><h1>Look beyond the image<span>.</span></h1><p class="intro">One source. Every observation, traceable.</p></div><div class="session-tag"><span class="status-dot"></span> LOCAL SESSION <small>Original bytes preserved</small></div></div>
+      <details class="media-selector" id="media-selector"><summary>Media workspace <strong>JPEG</strong><span>▾</span></summary><div class="media-options" role="group" aria-label="Media workspaces"><button type="button" data-media="JPEG" aria-current="true" class="media-current"><span>JPEG</span><small>Current workspace</small></button><button type="button" data-media="BMP" aria-disabled="true" class="media-future"><span>BMP</span><small>Under development</small></button><button type="button" data-media="TIFF" aria-disabled="true" class="media-future"><span>TIFF</span><small>Under development</small></button><button type="button" data-media="PNG / other images" aria-disabled="true" class="media-future"><span>PNG / other images</span><small>Under development</small></button><button type="button" data-media="MP3 / audio" aria-disabled="true" class="media-future"><span>MP3 / audio</span><small>Under development</small></button><button type="button" data-media="Video" aria-disabled="true" class="media-future"><span>Video</span><small>Under development</small></button></div></details>
       <nav class="phases" aria-label="Investigation phases">
         <button type="button" class="phase active" data-phase="1" aria-pressed="true" aria-current="step"><span>01</span><div>Encoded file<small>Structure · metadata · coefficients</small></div><b>12 STEPS</b></button>
         <button type="button" class="phase" data-phase="2" aria-pressed="false"><span>02</span><div>Decoded image<small>Grids · spatial JPEG evidence</small></div><b>11 STEPS</b></button>
@@ -52,6 +53,7 @@
     </main>
   </div>
   <div id="notification" class="notification" role="status" aria-live="polite" hidden></div>
+  <dialog id="media-notice" aria-labelledby="media-notice-title" aria-describedby="media-notice-text"><h2 id="media-notice-title">Under development</h2><p id="media-notice-text"></p><form method="dialog"><button class="button primary">Continue with JPEG</button></form></dialog>
   <script type="module" src="/ui/workbench.mjs"></script>
 </body>
 </html>

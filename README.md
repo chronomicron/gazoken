@@ -77,6 +77,7 @@ See [setup and coverage](docs/local-workbench.md). From an installed checkout,
 run `.venv/bin/gazoken` and open `http://127.0.0.1:8765/`.
 
 - [Browser demo and local installation options](docs/publishing.md#browser-demo-and-full-local-app)
+- [Future media roadmap: other images, audio and video](docs/roadmap.md#media-expansion-direction--accepted-2026-11-05)
 - [Tool modules and contributor guide](docs/tool-development.md)
 - [Documentation / ドキュメント](docs/README.md)
 - [Prototype methods / 試作版の手法](docs/first-workbench.md)

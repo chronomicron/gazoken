@@ -390,3 +390,11 @@ fetch('/api/samples').then(response => { if (!response.ok) throw new Error(); re
   samples = items;
   for (const item of items) $('sample-choice').add(new Option(item.title, item.id));
 }).catch(() => { $('sample-description').textContent = 'Sample catalog unavailable. You can still load your own JPEG.'; });
+
+// Planned workspaces explain their status; the source/session remain JPEG-only.
+document.querySelectorAll('[data-media]').forEach(button=>button.addEventListener('click',()=>{
+  $('media-selector').open=false;
+  if(button.dataset.media==='JPEG')return;
+  $('media-notice-text').textContent=`${button.dataset.media} analysis is under development. JPEG remains the active workspace. Your source, settings and results are retained.`;
+  $('media-notice').showModal();
+}));

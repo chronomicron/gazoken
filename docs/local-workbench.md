@@ -420,3 +420,19 @@ Verification: seven indicator-state tests and ten session regression tests passe
 module syntax and whitespace checks passed. Desktop browser checks verified
 invalid-value red → correction green, real failed-reader red, planned-method amber,
 deselection gray, accessible explanations, and all twelve Phase 1 cards collapsed.
+
+
+## Media workspace menu — 2026-11-05
+
+The menu above the phase tabs identifies JPEG as current. BMP, TIFF, PNG/other
+images, MP3/audio and video are dimmed and labeled Under development. These
+entries remain keyboard-focusable to explain availability: activating one opens
+a dismissible status dialog, not another workspace. JPEG source, parameters,
+selection and run history remain unchanged. Escape or Continue with JPEG closes
+the dialog. File uploads and analysis calls still accept JPEG only. See the
+[future media direction](roadmap.md#media-expansion-direction--accepted-2026-11-05).
+
+Verification: all five planned choices opened the notice and returned to JPEG.
+The loaded source SHA-256 and identity record were preserved. The expanded menu
+and dialog were visually checked; seventeen indicator/session tests and the API
+UI-asset boundary test passed. No new media decoder or public deployment added.
