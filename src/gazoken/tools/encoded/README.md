@@ -20,3 +20,9 @@ Planned paths below are reserved names, not generated stubs or implemented metho
 | 1.10 Coefficient statistics | `coefficient_statistics.py` | Registered | jpeg_bytes, coefficients |
 | 1.11 Compression history | `compression_history.py` | Planned | jpeg_bytes, coefficients |
 | 1.12 Evidence report | `evidence_report.py` | Registered | jpeg_bytes, run_evidence |
+
+The GUI places a readiness dot below each step number, visible when collapsed:
+green = selected/ready, amber = selected/needs attention, gray = not selected,
+red = selected with invalid settings or a matching failed attempt. Tooltips explain
+why. These UI cues do not change execution order or implementation coverage; see
+[workbench indicator behavior](../../../../docs/local-workbench.md#step-indicators--2026-11-05).

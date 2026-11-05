@@ -1,3 +1,4 @@
+import {stepStatus} from './step-status.mjs';
 import {sessionRecord, readSettings, phaseReport, phaseSteps} from './session.mjs';
 const $ = id => document.getElementById(id);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -47,7 +48,7 @@ function control(p, id) {
   if (p.type === 'checkbox') return `<label class="param checkbox"><input data-step="${id}" data-param="${p.key}" id="${key}" type="checkbox" ${value ? 'checked' : ''}><span>${esc(p.label)}</span></label>`;
   let widget;
   if (p.type === 'select') widget = `<select data-step="${id}" data-param="${p.key}" id="${key}">${p.options.map(o => `<option ${value === o ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select>`;
-  else widget = `<input data-step="${id}" data-param="${p.key}" id="${key}" type="${p.type}" value="${esc(value)}" ${p.type === 'number' ? `min="${p.min}" max="${p.max}" step="${p.step}"` : 'maxlength="2000"'} placeholder="${esc(p.placeholder || '')}">`;
+  else widget = `<input data-step="${id}" data-param="${p.key}" id="${key}" type="${p.type}" value="${esc(value)}" ${p.type === 'number' ? `min="${p.min}" max="${p.max}" step="${p.step}" required` : 'maxlength="2000"'} placeholder="${esc(p.placeholder || '')}">`;
   return `<label class="param" for="${key}"><span>${esc(p.label)}</span>${widget}</label>`;
 }
 const inputLabel = kind => ({jpeg_bytes:'Original JPEG bytes',pixels:'Python pixel package',coefficients:'Stored coefficient package',sensor_reference:'Enrolled sensor reference',model_weights:'Versioned model weights',evaluated_evidence:'Evaluated specialist evidence',run_evidence:'Earlier results in this run'}[kind] || kind);
@@ -59,13 +60,22 @@ function toolBoundary(step) {
 function renderSteps() {
   const open = state.openByPhase[state.phase];
   $('steps').innerHTML = visibleSteps().map(s => `<details class="step-card ${state.selected.has(s.id) ? 'selected' : ''}" data-step="${s.id}" ${open.has(s.id) ? 'open' : ''}>
-    <summary><span class="step-number">${s.id}</span><span class="step-info"><strong>${esc(s.title)}</strong><small>${esc(s.subtitle)}</small></span><span class="step-state ${s.implementation === 'ready' ? 'ready' : ''}">${s.implementation === 'ready' ? 'PYTHON' : 'PLANNED'}</span><span class="chevron">›</span></summary>
+    <summary><span class="step-number">${s.id}<span class="step-signal" data-signal="${s.id}" role="img"></span></span><span class="step-info"><strong>${esc(s.title)}</strong><small>${esc(s.subtitle)}</small></span><span class="step-state ${s.implementation === 'ready' ? 'ready' : ''}">${s.implementation === 'ready' ? 'PYTHON' : 'PLANNED'}</span><span class="chevron">›</span></summary>
     <fieldset class="step-controls"><legend>STEP ${s.id} / PARAMETERS${s.implementation==='ready'?'':' · PROVISIONAL'}</legend><p class="step-description">${esc(s.description)}</p>${toolBoundary(s)}${s.parameters.map(p => control(p, s.id)).join('')}
     <div class="step-actions"><label><input type="checkbox" data-select="${s.id}" ${state.selected.has(s.id) ? 'checked' : ''}> Include step</label><button type="button" class="button" data-inspect="${s.id}">Inspect view ↗</button><button type="button" class="button" data-run="${s.id}" ${!state.file || state.busy ? 'disabled' : ''}>${s.implementation==='ready'?'Run step':'Record settings'}</button></div>
     ${s.implementation !== 'ready' ? `<p class="step-hint">Configuration only · Python method not connected.${s.requires ? ` Planned prerequisites: ${s.requires.join(', ')} (not executed or verified).` : ''}</p>` : ''}</fieldset></details>`).join('');
   updateSelection();
 }
+function updateStepSignals() {
+  const attempts=Object.fromEntries(state.runs.filter(r=>r.source.sha256===state.source?.sha256).flatMap(r=>r.results).map(r=>[r.id,r]));
+  for (const step of visibleSteps()) {
+    const signal=stepStatus(step,{selected:state.selected,settings:state.settings,hasSource:!!state.source,attempt:attempts[step.id],attempts,catalog:state.catalog});
+    const dot=document.querySelector(`[data-signal="${step.id}"]`);
+    if(dot){dot.dataset.status=signal.color;dot.title=signal.text;dot.setAttribute('aria-label',`Step ${step.id}: ${signal.text}`);}
+  }
+}
 function updateSelection() {
+  updateStepSignals();
   const selected=visibleSteps().filter(s=>state.selected.has(s.id));
   $('selected-count').textContent = `${selected.length} selected`;
   $('execution-plan').innerHTML=selected.length?selected.map(s=>`<li><b>${esc(s.id)} ${esc(s.title)}</b><code>${esc(s.tool?.key||'Unassigned')}</code><span>${s.implementation==='ready'?'Call registered adapter':'Record planned settings only'} · ${esc((s.tool?.inputs||[]).map(inputLabel).join(' + '))}</span></li>`).join(''):'<li>No tools selected in this phase.</li>';
@@ -318,7 +328,8 @@ function clearSession() {
 }
 $('steps').addEventListener('input',e=>{
   const el=e.target;if(!el.dataset.param)return;
-  state.settings[el.dataset.step][el.dataset.param]=el.type==='checkbox'?el.checked:el.type==='number'?Number(el.value):el.value;
+  state.settings[el.dataset.step][el.dataset.param]=el.type==='checkbox'?el.checked:el.type==='number'?(el.value===''?NaN:Number(el.value)):el.value;
+  updateStepSignals();
   if(el.dataset.step==='1.4' && state.mode==='quantization')drawQuantization();
   if(el.dataset.step===state.active)showEvidence();
 });

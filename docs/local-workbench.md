@@ -392,3 +392,31 @@ Step 1.10 added (2026-11-04): select 1.9 and 1.10 in the same run for exact
 [coefficient statistics](coefficient-statistics.md). Running 1.10 alone is blocked
 without a supplied Python coefficient package; no implicit decoder call. Current
 executable IDs: 1.1–1.7, 1.9–1.10 and 1.12. Phase 1 remaining: 1.8 and 1.11.
+
+## Step indicators — 2026-11-05
+
+A dot beneath each step number stays visible when its card is collapsed:
+
+- **Green:** selected and ready for Run selected; runtime checks still apply.
+- **Amber:** selected but needs attention: no source, unimplemented method,
+  unavailable/unselected reader, missing prerequisite, empty report plan, or
+  warnings/partial extraction/blocked inputs from the latest matching attempt.
+  Optional native reader availability is not assumed before a successful run.
+- **Gray:** not selected; excluded from Run selected. A single Run step action is
+  still available when the card is open. Deselection takes precedence over history.
+- **Red:** selected with invalid/out-of-range/empty required numeric settings, or
+  the latest attempt for the current source and those settings failed.
+
+Hover for the exact explanation; accessible labels and a visible legend accompany
+colors. Indicators update on parameter/selection changes, source load/clear,
+phase changes, settings import and execution results. Changing parameters prevents
+an old failure with different settings being shown as a current failure; a new
+successful attempt clears a matching failure. Historical run cards are unchanged.
+Coefficient consumers still need 1.9 selected for the next run; packages from
+separate GUI runs are not reused. These are scheduling/readiness cues, never
+image-authenticity scores or promises that execution will succeed.
+
+Verification: seven indicator-state tests and ten session regression tests passed;
+module syntax and whitespace checks passed. Desktop browser checks verified
+invalid-value red → correction green, real failed-reader red, planned-method amber,
+deselection gray, accessible explanations, and all twelve Phase 1 cards collapsed.

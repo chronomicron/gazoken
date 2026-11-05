@@ -62,7 +62,8 @@ Gazoken（ガゾケン）は、ソフトウェア開発と研究を両輪とす�
 **Status / 現状:** Initial workbench implemented locally / 初期ワークベンチ実装済み（ローカル）
 
 **Local research app / ローカル研究アプリ:** The Python-backed three-phase framework
-provides grouped step controls, image/byte/table views, and session exports.
+provides grouped step controls with collapsed-card readiness indicators,
+image/byte/table views, and session exports.
 Python adapters currently measure source identity,
 [JPEG file structure](docs/file-structure.md),
 [bounded metadata](docs/metadata-inventory.md), byte distribution, and
