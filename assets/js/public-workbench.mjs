@@ -14,6 +14,9 @@ const dialog = $('python-dialog');
 const selectedSteps = new Set(['1.1', '1.2', '1.3', '1.4', '1.7']);
 let stepCatalog = [];
 let sourceContext = null;
+let viewerMode = 'image';
+let viewerGeneration = 0;
+let quantizationCache = null;
 const browserStepIds = new Set(['1.1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.7', '2.1', '2.2', '3.3']);
 const pixelStepIds = new Set(['2.1', '2.2', '3.3']);
 
@@ -28,9 +31,12 @@ function canRunBrowserStep(stepId) {
 
 document.addEventListener('gazoken:source-context', ({ detail }) => {
   sourceContext = detail?.sourceContext || null;
+  quantizationCache = null;
+  if (!sourceContext) viewerMode = 'image';
   document.querySelectorAll('[data-run-browser-step]').forEach(button => {
     button.disabled = !canRunBrowserStep(button.dataset.runBrowserStep);
   });
+  renderViewerMode();
 });
 
 function node(tag, className = '', text = '') {
@@ -38,6 +44,159 @@ function node(tag, className = '', text = '') {
   if (className) element.className = className;
   if (text) element.textContent = text;
   return element;
+}
+
+function drawByteMap(bytes) {
+  const canvas = $('byte-map-canvas');
+  const width = 256;
+  const height = Math.max(1, Math.min(220, Math.ceil(bytes.length / width)));
+  const cells = width * height;
+  canvas.width = width;
+  canvas.height = height;
+  const context = canvas.getContext('2d');
+  const image = context.createImageData(width, height);
+  for (let pixel = 0; pixel < cells; pixel++) {
+    const byteIndex = bytes.length <= cells ? pixel : Math.floor(pixel * bytes.length / cells);
+    const value = bytes[byteIndex];
+    const offset = pixel * 4;
+    if (value === undefined) {
+      image.data[offset] = 20;
+      image.data[offset + 1] = 33;
+      image.data[offset + 2] = 38;
+    } else {
+      image.data[offset] = 30 + value * 0.28;
+      image.data[offset + 1] = 70 + value * 0.65;
+      image.data[offset + 2] = 64 + value * 0.3;
+    }
+    image.data[offset + 3] = 255;
+  }
+  context.putImageData(image, 0, 0);
+  $('byte-map-note').textContent = bytes.length <= cells
+    ? `${bytes.length.toLocaleString()} original bytes · one byte per colored cell; unused cells are blank.`
+    : `${bytes.length.toLocaleString()} original bytes · uniformly sampled across the file into ${cells.toLocaleString()} colored cells.`;
+}
+
+function renderQuantizationTables(result) {
+  const view = $('quantization-view');
+  view.replaceChildren();
+  const measurements = result.measurements;
+  view.append(node('p', 'viewer-quant-note', 'Exact quantization values stored in the JPEG. Each table uses its own color scale; compare the numbers, not color alone. These are not DCT coefficients or an image-quality score.'));
+  if (!measurements.tables.length) {
+    view.append(node('p', 'viewer-message', 'No complete quantization table was found. This does not establish lossless encoding.'));
+    return;
+  }
+  for (const table of measurements.tables.slice(0, 4)) {
+    const section = node('section', 'viewer-quant-table');
+    section.append(node('h3', '', `Table ${table.tableId} · definition ${table.definitionIndex + 1} · ${table.precisionBits}-bit`));
+    section.append(node('p', 'viewer-quant-meta', `Range ${table.minimum}–${table.maximum} · mean ${table.mean.toFixed(2)} · ${table.layout}`));
+    const grid = node('div', 'viewer-quant-grid');
+    for (let index = 0; index < table.values.length; index++) {
+      const row = Math.floor(index / 8);
+      const column = index % 8;
+      const value = table.values[index];
+      const range = table.maximum - table.minimum;
+      const level = range ? (value - table.minimum) / range : 0.5;
+      const cell = node('span', 'viewer-quant-cell', String(value));
+      cell.style.backgroundColor = `hsl(${132 - level * 78} 34% ${96 - level * 24}%)`;
+      cell.title = `row ${row}, column ${column}: ${value}`;
+      cell.setAttribute('aria-label', `row ${row + 1}, column ${column + 1}: ${value}`);
+      grid.append(cell);
+    }
+    section.append(grid);
+    view.append(section);
+  }
+  if (measurements.tables.length > 4) view.append(node('p', 'viewer-quant-meta', `Showing 4 of ${measurements.tables.length} final table definitions.`));
+  if (result.warnings.length) view.append(node('p', 'viewer-quant-warning', result.warnings.slice(0, 3).join(' ')));
+}
+
+async function renderViewerMode() {
+  const generation = ++viewerGeneration;
+  const hasSource = Boolean(sourceContext);
+  $('grid').disabled = viewerMode !== 'image' || !hasSource;
+  $('zoom').disabled = viewerMode !== 'image' || !hasSource;
+  document.querySelectorAll('[data-viewer-mode]').forEach(tab => {
+    const active = tab.dataset.viewerMode === viewerMode;
+    tab.classList.toggle('active', active);
+    tab.setAttribute('aria-pressed', String(active));
+  });
+  $('image-wrap').hidden = true;
+  $('byte-map-view').hidden = true;
+  $('quantization-view').hidden = true;
+  $('empty-source').hidden = hasSource;
+
+  if (!hasSource) {
+    $('view-tag').textContent = { image: 'SOURCE VIEW', bytes: 'ENCODED BYTE MAP', quantization: 'JPEG QUANTIZATION' }[viewerMode];
+    $('stage-label').textContent = 'NO SOURCE LOADED';
+    $('dimensions').textContent = '— × —';
+    $('empty-heading').textContent = viewerMode === 'image'
+      ? 'Start with an unknown.'
+      : viewerMode === 'quantization'
+        ? 'Load a JPEG to view its quantization tables.'
+        : 'Load an image to inspect its bytes.';
+    if (viewerMode === 'image') {
+      $('empty-description').innerHTML = 'Drop a file to explore its encoded evidence.<br>JPEG, PNG or WebP · up to 25 MiB and 12 megapixels';
+    } else {
+      $('empty-description').textContent = viewerMode === 'bytes'
+        ? 'The map colors represent byte values in the original encoded file.'
+        : 'Quantization tables are read from the original JPEG bytes.';
+    }
+    $('preview-caption').textContent = viewerMode === 'bytes'
+      ? 'Encoded bytes · not decoded image pixels.'
+      : viewerMode === 'quantization'
+        ? 'Exact stored table values · not DCT coefficients.'
+        : 'Display preview is separate from encoded-byte analysis.';
+    return;
+  }
+
+  $('empty-source').hidden = true;
+  if (viewerMode === 'image') {
+    $('image-wrap').hidden = false;
+    $('view-tag').textContent = 'SOURCE VIEW';
+    $('stage-label').textContent = sourceContext.filename.toUpperCase();
+    const pixels = sourceContext.record().representations.decodedPixels;
+    $('dimensions').textContent = pixels.available ? `${pixels.width} × ${pixels.height}` : '— × —';
+    $('preview-caption').textContent = 'Display preview is separate from encoded-byte analysis.';
+    return;
+  }
+
+  if (viewerMode === 'bytes') {
+    $('byte-map-view').hidden = false;
+    $('view-tag').textContent = 'ORIGINAL ENCODED BYTES';
+    $('stage-label').textContent = 'BYTE VALUE MAP';
+    $('dimensions').textContent = `${sourceContext.byteLength.toLocaleString()} bytes`;
+    $('preview-caption').textContent = 'Color represents sampled byte value; rows follow original file order.';
+    try {
+      const activeSource = sourceContext;
+      const bytes = await activeSource.readOriginalBytes();
+      if (generation !== viewerGeneration || sourceContext !== activeSource) return;
+      drawByteMap(bytes);
+    } catch (error) {
+      if (generation === viewerGeneration) $('byte-map-note').textContent = `Could not read source bytes: ${error.message}`;
+    }
+    return;
+  }
+
+  $('view-tag').textContent = 'STORED JPEG QUANTIZATION TABLES';
+  $('stage-label').textContent = 'JPEG QUANTIZATION';
+  $('dimensions').textContent = sourceContext.mediaType === 'image/jpeg' ? '8 × 8 values per table' : 'JPEG only';
+  $('preview-caption').textContent = 'Exact quantization values · not stored DCT coefficients.';
+  $('quantization-view').hidden = false;
+  if (sourceContext.mediaType !== 'image/jpeg') {
+    $('quantization-view').replaceChildren(node('p', 'viewer-message', `Quantization tables are JPEG-specific. The loaded file is ${sourceContext.mediaType}.`));
+    return;
+  }
+  $('quantization-view').replaceChildren(node('p', 'viewer-message', 'Reading stored quantization tables…'));
+  try {
+    const activeSource = sourceContext;
+    if (!quantizationCache || quantizationCache.contextId !== activeSource.contextId) {
+      const result = await runQuantizationTables(activeSource, { order: 'Natural 8 × 8', retain_history: false });
+      quantizationCache = { contextId: activeSource.contextId, result };
+    }
+    if (generation !== viewerGeneration || sourceContext !== activeSource) return;
+    renderQuantizationTables(quantizationCache.result);
+  } catch (error) {
+    if (generation === viewerGeneration) $('quantization-view').replaceChildren(node('p', 'error', `Could not read quantization tables: ${error.message}`));
+  }
 }
 
 function openPythonHelp(step = null) {
@@ -65,23 +224,8 @@ document.querySelectorAll('[data-media]').forEach(button => button.addEventListe
   $('media-notice').showModal();
 }));
 document.querySelectorAll('[data-viewer-mode]').forEach(button => button.addEventListener('click', () => {
-  const mode = button.dataset.viewerMode;
-  if (mode === 'image') {
-    document.querySelectorAll('[data-viewer-mode]').forEach(tab => {
-      const active = tab === button;
-      tab.classList.toggle('active', active);
-      tab.setAttribute('aria-pressed', String(active));
-    });
-    $('view-tag').textContent = 'SOURCE VIEW';
-    return;
-  }
-  if (mode === 'quantization') {
-    window.location.href = './jpeg.html';
-    return;
-  }
-  $('python-dialog-title').textContent = 'Open the local byte map';
-  $('python-dialog-message').textContent = 'The encoded-byte map belongs to the full Python workbench. Install the local app to view it alongside the preserved JPEG source.';
-  dialog.showModal();
+  viewerMode = button.dataset.viewerMode;
+  renderViewerMode();
 }));
 document.querySelectorAll('button[data-public-phase]').forEach(button => button.addEventListener('click', () => {
   const phase = Number(button.dataset.publicPhase);

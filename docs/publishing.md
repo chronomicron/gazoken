@@ -1,6 +1,6 @@
 # Website publishing plan
 
-Updated: 2026-11-05
+Updated: 2026-11-06
 
 ## Target and verified repository facts
 
@@ -120,7 +120,8 @@ Python parameters as read-only previews. Selected Python steps lead to setup
 guidance. The four browser-decoded pixel visualizations are grouped in a separate
 exploratory-view card at the top of the Phase 2 tool panel; they remain useful for
 illustration and comparison, without claiming validated detection. The browser
-viewer also has working grid and zoom controls. The encoded-byte JPEG inspector
+viewer has working grid and zoom controls, a color map of original encoded bytes,
+and an in-place view of JPEG quantization tables. The encoded-byte JPEG inspector
 remains a separate page and asks visitors to choose the file there again. This
 shared presentation does not make the local FastAPI API available on GitHub Pages.
 

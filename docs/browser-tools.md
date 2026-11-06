@@ -1,6 +1,6 @@
 # Browser tool inputs and modules
 
-Updated: 2026-11-05  
+Updated: 2026-11-06
 Status: browser source context v1, JPEG steps 1.1–1.7, Phase 2 steps 2.1–2.2, and Phase 3 step 3.3 implemented.
 
 ## Shared source context
@@ -91,6 +91,14 @@ or discover unsupported thumbnail formats.
 values and Shannon entropy in bits per byte; the static catalog currently offers
 whole-file scope only. The result card plots the counts as an SVG histogram.
 These are descriptive byte-stream statistics, not a tampering score.
+
+The static source viewer's **Byte map** mode reads the preserved original bytes
+and renders their values as a color map. For larger files, it uniformly samples
+the byte stream to fit the bounded display canvas; this is a visualization, not a
+pixel map or a byte-frequency result. **Quantization** mode uses the same Phase 1,
+step 1.4 JPEG adapter to show the final stored 8 × 8 quantization tables in the
+viewer. It stays on the workbench page and explains when a non-JPEG source has no
+JPEG quantization tables.
 
 `assets/js/steps/decoded-reference.mjs` implements Phase 2, step 2.1 as a
 format-neutral manifest of the decoded pixels already attached to the source
