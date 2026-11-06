@@ -25,6 +25,9 @@
 .result-body canvas{display:block;width:min(100%,700px);height:auto;background:#f4f5f1;border:1px solid var(--line);margin:0 auto 12px}
 .result-body p{font-size:12px;line-height:1.7;margin:8px 0;color:#4b5f51}
 .result-body .settings,.result-body .metric{font:10px/1.6 monospace;color:#526759}
+.quantization-matrix{border-collapse:collapse;margin:10px auto 16px;width:min(100%,460px);font:11px/1.4 ui-monospace,monospace;text-align:right;font-variant-numeric:tabular-nums}
+.quantization-matrix caption{caption-side:top;text-align:left;font:9px/1.5 sans-serif;color:var(--muted);padding:4px 0}
+.quantization-matrix td{border:1px solid #dce4d7;padding:6px 8px;color:#263c31}
 .run-panel{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:20px;margin-top:15px}
 .run-panel>p{font-size:11px;color:var(--muted);line-height:1.6;margin-top:10px}
 .public-run-entry{display:block;padding:9px 0;border-top:1px solid var(--line);font-size:12px;line-height:1.6;color:#4b5f51}

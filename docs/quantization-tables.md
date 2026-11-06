@@ -57,3 +57,15 @@ and JPEG codec environment used for the independent extraction references.
 Integration verification: 24 Python checks and 37 JavaScript checks passed. A
 local browser run of 1.4 on the bundled reference produced two tables, displayed
 Python measurements and retained its parameter/provenance record. This increment is recorded in local Git; it has not been pushed or deployed.
+
+## Static browser adapter
+
+The public static workbench now runs step 1.4 through the isolated JavaScript
+adapter [`quantization-tables.mjs`](../assets/js/formats/jpeg/steps/quantization-tables.mjs).
+It uses the shared browser `SourceContext` and reads the original JPEG bytes. The
+card displays the selected table layout as exact 8 × 8 values, retains or collapses
+table history according to the selected parameter, and shows frame and scan-time
+assignments with stable definition indexes. The low-level browser parser is
+bounded to 4,096 marker segments, 32 frame headers, 256 scan headers, 256 Huffman
+definitions, and 1,024 quantization definitions. No pixel decoding or
+quality/encoder inference is performed. See [browser tool inputs and modules](browser-tools.md).

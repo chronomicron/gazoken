@@ -18,7 +18,7 @@ will assess which methods produce useful results and understand their limitation
 The goal is a usable website supported by reusable Python, C, and C++ packages.
 
 The static browser workbench in this checkout offers JPEG Phase 1 source identity,
-file-structure, and metadata-inventory steps, plus JPEG error-level analysis, a
+file-structure, metadata-inventory, and quantization-atlas steps, plus JPEG error-level analysis, a
 noise residual, edge strength, and bit-plane inspection. These are exploratory
 views and measurements; they do not assign a tampering probability. Other catalog
 steps are run in the local Python workbench or remain under development. The
@@ -48,7 +48,7 @@ Gazoken（ガゾケン）は、ソフトウェア開発と研究を両輪とす�
 のパッケージと、それらを活用できるウェブサイトの開発を目指します。
 
 このチェックアウトの静的ブラウザ版では、JPEG の Phase 1 にあるソース識別、
-ファイル構造、メタデータの調査に加え、エラーレベル解析、ノイズ残差、
+ファイル構造、メタデータ、量子化テーブルの調査に加え、エラーレベル解析、ノイズ残差、
 エッジ強度、
 ビットプレーンを利用できます。
 これらは探索用の可視化・計測であり、改ざんの確率を判定するものではありません。

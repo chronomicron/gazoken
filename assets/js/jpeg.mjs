@@ -17,6 +17,8 @@ function distribution(values) {
 }
 export function inspectJpeg(input, options = {}) {
   const bytes=input instanceof Uint8Array?input:new Uint8Array(input);
+  const quantizationLimit=options.maxQuantizationTables ?? 256;
+  if(!Number.isInteger(quantizationLimit) || quantizationLimit<1 || quantizationLimit>1024) throw new RangeError('Quantization table limit must be an integer from 1 to 1024.');
   if(bytes.length>25*1024*1024) throw new Error('JPEG inspection is limited to 25 MiB.');
   if(bytes.length<2 || bytes[0]!==255 || bytes[1]!==216) throw new Error('Not a JPEG file: the SOI signature FF D8 is missing.');
   const report={version:JPEG_INSPECTOR_VERSION,size:bytes.length,complete:false,segments:[{marker:'SOI',code:216,offset:0,length:2,payloadOffset:2,payloadLength:0}],frames:[],quantizationTables:[],huffmanTables:[],scans:[],exif:[],applications:[],comments:[],restartIntervals:[],warnings:[],trailingBytes:0,statistics:byteStatistics(bytes)};
@@ -30,7 +32,7 @@ export function inspectJpeg(input, options = {}) {
   let offset=2,frame=null;
   try {
     while(offset<bytes.length) {
-      if(report.segments.length>=4096 || report.quantizationTables.length>=256 || report.huffmanTables.length>=256 || report.scans.length>=256) { warn('Structural inspection limit reached; remaining data was not parsed.'); break; }
+      if(report.segments.length>=4096 || report.huffmanTables.length>=256 || report.scans.length>=256) { warn('Structural inspection limit reached; remaining data was not parsed.'); break; }
       const markerStart=offset;
       if(bytes[offset]!==255) throw new Error(`Expected a JPEG marker at byte ${offset}.`);
       while(bytes[offset]===255) offset++;
@@ -59,7 +61,7 @@ export function inspectJpeg(input, options = {}) {
       if(code===0xdb) {
         let p=start;
         while(p<end) {
-          if(report.quantizationTables.length>=256) throw new Error('Quantization table limit reached.');
+          if(report.quantizationTables.length>=quantizationLimit) throw new Error('Quantization table limit reached.');
           const tableOffset=p,info=bytes[p++],precision=info>>4,id=info&15;
           if(precision>1 || id>3) throw new Error(`Invalid DQT precision or table ID at byte ${tableOffset}.`);
           need(p,64*(precision+1),end);

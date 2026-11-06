@@ -12,10 +12,11 @@ Load a file using **Choose image** or drag one onto the source area. The generat
 JPEG demo illustrates a textured field with a smoother rectangle; it is not a
 research dataset or a demonstration of detector accuracy.
 
-The static Phase 1 steps 1.1–1.3 run in JavaScript on JPEG files. Step 1.1 reports
+The static Phase 1 steps 1.1–1.4 run in JavaScript on JPEG files. Step 1.1 reports
 the original file's byte length, start-of-image signature, and SHA-256; step 1.2
 inventories JPEG markers, frame declarations, and optional scan layout; step 1.3
-lists bounded metadata blocks and classic TIFF/Exif values. They receive the
+lists bounded metadata blocks and classic TIFF/Exif values; step 1.4 extracts
+stored quantization tables and their frame/scan references. They receive the
 unchanged encoded source; the decoded pixel buffer used by Phase 2 views is a
 separate representation. See [browser tool inputs and modules](browser-tools.md).
 

@@ -314,6 +314,20 @@ Proposals remain separate until agreed. The initial handoff predates this log;
   or BMP support. See [metadata inventory](metadata-inventory.md) and
   [browser tool inputs and modules](browser-tools.md).
 
+## D022 — Browser JPEG quantization atlas — 2026-11-05
+
+- Status: implemented increment, requested by Robert after step 1.3.
+- Decision: add a dedicated JavaScript adapter for step 1.4 using the common
+  `SourceContext` original-byte representation and exact DQT parsing. Preserve
+  stable table-definition references for frame and scan assignments; expose the
+  step catalog's value-layout and history controls.
+- Rationale: make exact compressed-domain table evidence inspectable on the static
+  site without decoding pixels or duplicating the Python input boundary.
+- Consequences: the result reports stored table choices and extraction coverage
+  only. It does not estimate quality, identify an encoder, or infer prior edits.
+  See [quantization atlas](quantization-tables.md) and
+  [browser tool inputs and modules](browser-tools.md).
+
 ## Pending proposals
 
 

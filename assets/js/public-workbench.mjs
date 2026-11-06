@@ -1,13 +1,14 @@
 import { run as runSourceIdentity } from './formats/jpeg/steps/source-identity.mjs';
 import { run as runFileStructure } from './formats/jpeg/steps/file-structure.mjs';
 import { run as runMetadataInventory } from './formats/jpeg/steps/metadata-inventory.mjs';
+import { run as runQuantizationTables } from './formats/jpeg/steps/quantization-tables.mjs';
 
 const $ = (id) => document.getElementById(id);
 const dialog = $('python-dialog');
 const selectedSteps = new Set(['1.1', '1.2', '1.3', '1.4', '1.7']);
 let stepCatalog = [];
 let sourceContext = null;
-const browserStepIds = new Set(['1.1', '1.2', '1.3']);
+const browserStepIds = new Set(['1.1', '1.2', '1.3', '1.4']);
 
 document.addEventListener('gazoken:source-context', ({ detail }) => {
   sourceContext = detail?.sourceContext || null;
@@ -165,6 +166,8 @@ function renderStep(step) {
       ? 'This browser step inventories markers, frame declarations, and scan layout from the original encoded JPEG bytes.'
     : step.id === '1.3'
       ? 'This browser step reads bounded metadata from the original JPEG bytes. Metadata values are editable file claims, not authenticated provenance.'
+    : step.id === '1.4'
+      ? 'This browser step extracts exact stored quantization values, their definitions over time, and frame or scan references from the original JPEG bytes.'
     : step.implementation === 'ready'
       ? 'Method implemented in the local Python app. This static page cannot run it.'
       : 'Planned method. Local settings can be recorded; no measurement is produced.');
@@ -223,11 +226,17 @@ async function executeBrowserStep(stepId, button, controls = button?.closest('.s
   }
   try {
     const parameters = readParameters(controls);
-    const runners = { '1.1': runSourceIdentity, '1.2': runFileStructure, '1.3': runMetadataInventory };
+    const runners = {
+      '1.1': runSourceIdentity,
+      '1.2': runFileStructure,
+      '1.3': runMetadataInventory,
+      '1.4': runQuantizationTables,
+    };
     const result = await runners[stepId](sourceContext, parameters);
     if (stepId === '1.1') appendSourceIdentityResult(result);
     else if (stepId === '1.2') appendFileStructureResult(result);
-    else appendMetadataInventoryResult(result);
+    else if (stepId === '1.3') appendMetadataInventoryResult(result);
+    else appendQuantizationTablesResult(result);
     $('run-python-status').textContent = `Step ${stepId} completed in this browser.`;
     return true;
   } catch (error) {
@@ -396,6 +405,82 @@ function appendMetadataInventoryResult(result) {
   appendStepReport(card);
 }
 
+function appendQuantizationTablesResult(result) {
+  const card = node('article', 'result');
+  card.dataset.stepResult = '1.4';
+  const top = node('div', 'result-top');
+  top.append(node('h3', '', '1.4 · Quantization atlas'));
+  card.append(top);
+  const body = node('div', 'result-body');
+  const data = result.measurements;
+  addReportParagraph(body, `${data.extractionStatus.toUpperCase()} · ${data.definitionCount} table definitions · ${data.frames.length} frames · ${data.scans.length} scans · ${data.eoiReached ? 'EOI reached' : 'EOI not reached'}`, 'metric');
+  addReportParagraph(body, `Layout: ${result.parameters.order} · History ${data.historyRetained ? 'retained' : 'collapsed to final definition per table ID'} · original JPEG bytes`, 'settings');
+  const assignments = data.frames.flatMap((frame, frameIndex) => frame.components.map(component =>
+    `Frame ${frameIndex + 1} (${frame.marker}) component ${component.componentId} → table ${component.tableId}`));
+  if (assignments.length) addReportParagraph(body, assignments.join(' · '));
+  if (data.tables.length) {
+    for (const tableData of data.tables.slice(0, 16)) {
+      const details = document.createElement('details');
+      const definitionLabel = `Table ${tableData.tableId} · definition ${tableData.definitionIndex} · ${tableData.precisionBits}-bit · byte ${tableData.payloadOffset}`;
+      details.append(node('summary', '', definitionLabel));
+      addReportParagraph(details, `Range ${tableData.minimum}–${tableData.maximum} · mean ${tableData.mean.toFixed(2)} quantization step`, 'settings');
+      const matrix = document.createElement('table');
+      matrix.className = 'quantization-matrix';
+      const caption = document.createElement('caption');
+      caption.textContent = tableData.layout === 'Natural 8 × 8'
+        ? 'Natural row-major frequency positions; exact stored values'
+        : 'Stored zigzag sequence shown in rows of eight; exact stored values';
+      matrix.append(caption);
+      const tableBody = document.createElement('tbody');
+      for (let rowIndex = 0; rowIndex < 8; rowIndex++) {
+        const row = document.createElement('tr');
+        for (let columnIndex = 0; columnIndex < 8; columnIndex++) {
+          const index = rowIndex * 8 + columnIndex;
+          const cell = document.createElement('td');
+          cell.textContent = String(tableData.values[index]);
+          const range = tableData.maximum - tableData.minimum;
+          const level = range ? (tableData.values[index] - tableData.minimum) / range : 0.5;
+          cell.style.backgroundColor = `hsl(${132 - level * 78} 34% ${96 - level * 24}%)`;
+          cell.title = `${tableData.layout === 'Natural 8 × 8' ? `row ${rowIndex}, column ${columnIndex}` : `zigzag index ${index}`}: ${tableData.values[index]}`;
+          row.append(cell);
+        }
+        tableBody.append(row);
+      }
+      matrix.append(tableBody);
+      details.append(matrix);
+      body.append(details);
+    }
+    if (data.tables.length > 16) addReportParagraph(body, `First 16 of ${data.tables.length} retained table definitions shown.`, 'settings');
+  } else {
+    addReportParagraph(body, 'No complete quantization table was found. Absence does not establish lossless encoding.', 'settings');
+  }
+  if (data.scans.length) {
+    const scanDetails = document.createElement('details');
+    scanDetails.append(node('summary', '', 'Scan-time table assignments'));
+    const list = document.createElement('ul');
+    for (const scan of data.scans.slice(0, 64)) {
+      const description = scan.assignments.map(assignment =>
+        `component ${assignment.componentId} → table ${assignment.tableId ?? 'unknown'}, definition ${assignment.definitionIndex ?? 'missing'}`).join('; ');
+      list.append(node('li', '', `Byte ${scan.markerOffset}: ${description || 'no component assignments'}`));
+    }
+    scanDetails.append(list);
+    body.append(scanDetails);
+  }
+  if (!data.historyRetained) {
+    addReportParagraph(body, 'Earlier definitions may be omitted from the table display; scan references retain their original definition indexes and are not redirected to later tables.', 'step-hint');
+  }
+  if (result.warnings.length) {
+    const warningList = document.createElement('ul');
+    warningList.className = 'step-warnings';
+    for (const warning of result.warnings.slice(0, 20)) warningList.append(node('li', '', warning));
+    body.append(node('h4', '', 'Parser warnings'), warningList);
+  }
+  addReportParagraph(body, data.interpretation);
+  addReportParagraph(body, data.limits, 'settings');
+  card.append(body);
+  appendStepReport(card);
+}
+
 function appendStepReport(card) {
   $('results').querySelector('.results-empty')?.remove();
   const prior = $('results').querySelector(`[data-step-result="${card.dataset.stepResult}"]`);
@@ -408,7 +493,7 @@ function appendStepReport(card) {
 function appendBrowserStepError(stepId, error) {
   const card = node('article', 'result');
   card.dataset.stepResult = stepId;
-  const names = { '1.1': 'Source identity', '1.2': 'File structure', '1.3': 'Metadata inventory' };
+  const names = { '1.1': 'Source identity', '1.2': 'File structure', '1.3': 'Metadata inventory', '1.4': 'Quantization atlas' };
   card.append(node('h3', '', `${stepId} · ${names[stepId] || 'Browser step'}`));
   const body = node('div', 'result-body');
   addReportParagraph(body, `Step unavailable: ${error.message}`, 'error');

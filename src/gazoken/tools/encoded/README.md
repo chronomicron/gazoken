@@ -3,7 +3,7 @@
 Original bytes and compressed-domain data; later coefficient tools require a separately implemented reader.
 
 This table lists the Python adapters registered in the local workbench. The
-static browser has separate JavaScript modules for steps 1.1–1.3; see the
+static browser has separate JavaScript modules for steps 1.1–1.4; see the
 [browser tool guide](../../../../docs/browser-tools.md).
 
 Use the common [tool contract](../../../../docs/tool-development.md). Each module

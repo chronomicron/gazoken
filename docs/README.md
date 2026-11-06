@@ -14,7 +14,7 @@ Image Forensics Workbench, under グルー研究室 · Grou-lab.
 | [Entropy coding](entropy-coding.md) | Python step 1.5: stored Huffman codebooks, canonical codes and scan-time assignments. |
 | [Metadata inventory](metadata-inventory.md) | Python and static-browser step 1.3: bounded Exif, reader options, GPS/vendor controls and limitations. |
 | [JPEG file structure](file-structure.md) | Python and static-browser step 1.2: marker map, frames, scans, restart intervals and byte-boundary checks. |
-| [Quantization atlas](quantization-tables.md) | Python step 1.4: exact tables, assignments, history, output schema and checks. |
+| [Quantization atlas](quantization-tables.md) | Python and static-browser step 1.4: exact tables, assignments, history, output schema and checks. |
 | [Test fixtures](../tests/fixtures/README.md) | Synthetic inputs, known edits, masks, and regeneration instructions. |
 | [Private research workspace](https://github.com/chronomicron/gazoken-research) | Literature, papers, research data, study proposals, and unpublished results. |
 | [JPEG inspector](jpeg-inspector.md) | Raw JPEG/Exif inspection, graphical tables, byte statistics, and coverage. |
