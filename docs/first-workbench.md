@@ -12,7 +12,7 @@ Load a file using **Choose image** or drag one onto the source area. The generat
 JPEG demo illustrates a textured field with a smoother rectangle; it is not a
 research dataset or a demonstration of detector accuracy.
 
-The static Phase 1 steps 1.1–1.6 run in JavaScript on JPEG files. Step 1.1 reports
+The static Phase 1 steps 1.1–1.7 run in JavaScript on JPEG files. Step 1.1 reports
 the original file's byte length, start-of-image signature, and SHA-256; step 1.2
 inventories JPEG markers, frame declarations, and optional scan layout; step 1.3
 lists bounded metadata blocks and classic TIFF/Exif values; step 1.4 extracts
@@ -21,7 +21,9 @@ unchanged encoded source; the decoded pixel buffer used by Phase 2 views is a
 separate representation. Step 1.5 inventories stored Huffman definitions, derives
 canonical codes, and links scan selectors to active definitions; it does not decode
 entropy symbols. Step 1.6 locates bounded Exif IFD1/JFXX JPEG previews and hashes
-their byte ranges without decoding them. See [browser tool inputs and modules](browser-tools.md).
+their byte ranges without decoding them. Step 1.7 plots the exact whole-file
+byte-value histogram and reports Shannon entropy as a descriptive statistic.
+See [browser tool inputs and modules](browser-tools.md).
 
 Run selected tools, compare outputs with the source preview, and optionally save
 a result as a PNG. Result cards record method version, settings, a descriptive

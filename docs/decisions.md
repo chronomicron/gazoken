@@ -357,6 +357,20 @@ Proposals remain separate until agreed. The initial handoff predates this log;
   bounded to 256 markers. See [embedded images](embedded-images.md) and
   [browser tool inputs and modules](browser-tools.md).
 
+## D025 — Browser JPEG byte distribution — 2026-11-05
+
+- Status: implemented increment, requested by Robert after step 1.6.
+- Decision: add an isolated JavaScript adapter for step 1.7 using original
+  encoded bytes and expose the catalog's whole-file scope. Report all 256 byte
+  counts and Shannon entropy, with a browser-rendered histogram.
+- Rationale: make a small descriptive byte-stream measurement directly available
+  in the static workbench without introducing another parser or pixel operation.
+- Consequences: output is descriptive only and does not localize byte patterns,
+  identify an encoder, or estimate editing. The JavaScript result remains a
+  browser adapter record, not a Python-backed execution. See
+  [byte distribution](byte-distribution.md) and
+  [browser tool inputs and modules](browser-tools.md).
+
 ## Pending proposals
 
 

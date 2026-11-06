@@ -1,7 +1,7 @@
 # Browser tool inputs and modules
 
 Updated: 2026-11-05  
-Status: browser source context v1 and JPEG steps 1.1–1.6 implemented; later steps remain unchanged
+Status: browser source context v1 and JPEG steps 1.1–1.7 implemented; later steps remain unchanged
 
 ## Shared source context
 
@@ -86,6 +86,12 @@ the extracted bytes, and can inventory nested marker structure with its own
 256-marker limit. It does not decode preview pixels, search arbitrary byte ranges,
 or discover unsupported thumbnail formats.
 
+`assets/js/formats/jpeg/steps/byte-distribution.mjs` implements Phase 1, step
+1.7 on the original encoded bytes. It reports exact counts for all 256 byte
+values and Shannon entropy in bits per byte; the static catalog currently offers
+whole-file scope only. The result card plots the counts as an SVG histogram.
+These are descriptive byte-stream statistics, not a tampering score.
+
 `assets/js/app.mjs` creates the context after the browser has decoded the selected
 image for display and attaches that separate RGBA pixel representation with
 browser-decoder provenance. The context retains the original file independently.
@@ -95,7 +101,7 @@ The browser steps currently accept detected JPEG input only. PNG and WebP remain
 usable for existing Phase 2 browser views, but cannot run these JPEG-specific
 steps.
 The Phase 1 **Run selected** control executes selected browser-backed steps 1.1
-through 1.6 in catalog order. When other selected steps are included, it runs the
+through 1.7 in catalog order. When other selected steps are included, it runs the
 browser-backed steps and reports that the remaining selections require the local
 workbench. Selecting only local-workbench steps opens the local-workbench guidance.
 
@@ -120,7 +126,7 @@ viewer and is designed to carry their format identity. The active public media
 workspace remains JPEG. BMP signature parsing, BMP decoding, per-format tool
 registration, worker transfer rules, larger numerical types, color-management
 policy, and a stable serialized/cross-language contract are open future work.
-Steps 1.1–1.6 currently read/hash or parse the whole file on the main browser
+Steps 1.1–1.7 currently read/hash or parse the whole file on the main browser
 thread; large-file work may later move to a worker. The low-level JPEG inspector
 computes some additional byte statistics internally, although steps 1.2–1.6
 return only their declared structural, metadata, table, coding, or preview fields. The

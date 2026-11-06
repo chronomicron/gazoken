@@ -11,6 +11,7 @@ Image Forensics Workbench, under グルー研究室 · Grou-lab.
 | [Stored coefficients](stored-coefficients.md) | Python step 1.9: optional jpeglib reader, immutable coefficient package, process bounds and tests. |
 | [Evidence report](evidence-report.md) | Python step 1.12: same-run evidence assembly, source linkage, coverage and report download. |
 | [Embedded images](embedded-images.md) | Python and static-browser step 1.6: bounded Exif/JFXX JPEG preview ranges, hashes and nested structure. |
+| [Byte distribution](byte-distribution.md) | Python and static-browser step 1.7: exact whole-file byte histogram, Shannon entropy and limits. |
 | [Entropy coding](entropy-coding.md) | Python and static-browser step 1.5: stored Huffman definitions, canonical codes, scan-time assignments and limits. |
 | [Metadata inventory](metadata-inventory.md) | Python and static-browser step 1.3: bounded Exif, reader options, GPS/vendor controls and limitations. |
 | [JPEG file structure](file-structure.md) | Python and static-browser step 1.2: marker map, frames, scans, restart intervals and byte-boundary checks. |

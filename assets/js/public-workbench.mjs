@@ -4,13 +4,14 @@ import { run as runMetadataInventory } from './formats/jpeg/steps/metadata-inven
 import { run as runQuantizationTables } from './formats/jpeg/steps/quantization-tables.mjs';
 import { run as runEntropyCoding } from './formats/jpeg/steps/entropy-coding.mjs';
 import { run as runEmbeddedImages } from './formats/jpeg/steps/embedded-images.mjs';
+import { run as runByteDistribution } from './formats/jpeg/steps/byte-distribution.mjs';
 
 const $ = (id) => document.getElementById(id);
 const dialog = $('python-dialog');
 const selectedSteps = new Set(['1.1', '1.2', '1.3', '1.4', '1.7']);
 let stepCatalog = [];
 let sourceContext = null;
-const browserStepIds = new Set(['1.1', '1.2', '1.3', '1.4', '1.5', '1.6']);
+const browserStepIds = new Set(['1.1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.7']);
 
 document.addEventListener('gazoken:source-context', ({ detail }) => {
   sourceContext = detail?.sourceContext || null;
@@ -174,6 +175,8 @@ function renderStep(step) {
       ? 'This browser step reads stored Huffman definitions and scan-time table assignments from the original JPEG bytes. It does not decode entropy symbols.'
     : step.id === '1.6'
       ? 'This browser step locates declared embedded JPEG previews in Exif and JFXX blocks, verifies their bounded byte ranges, and records hashes without replacing or decoding the source.'
+    : step.id === '1.7'
+      ? 'This browser step counts each byte value in the original encoded file and reports descriptive Shannon entropy. The result is not a tampering score.'
     : step.implementation === 'ready'
       ? 'Method implemented in the local Python app. This static page cannot run it.'
       : 'Planned method. Local settings can be recorded; no measurement is produced.');
@@ -239,6 +242,7 @@ async function executeBrowserStep(stepId, button, controls = button?.closest('.s
       '1.4': runQuantizationTables,
       '1.5': runEntropyCoding,
       '1.6': runEmbeddedImages,
+      '1.7': runByteDistribution,
     };
     const result = await runners[stepId](sourceContext, parameters);
     if (stepId === '1.1') appendSourceIdentityResult(result);
@@ -246,7 +250,8 @@ async function executeBrowserStep(stepId, button, controls = button?.closest('.s
     else if (stepId === '1.3') appendMetadataInventoryResult(result);
     else if (stepId === '1.4') appendQuantizationTablesResult(result);
     else if (stepId === '1.5') appendEntropyCodingResult(result);
-    else appendEmbeddedImagesResult(result);
+    else if (stepId === '1.6') appendEmbeddedImagesResult(result);
+    else appendByteDistributionResult(result);
     $('run-python-status').textContent = `Step ${stepId} completed in this browser.`;
     return true;
   } catch (error) {
@@ -579,6 +584,75 @@ function appendEmbeddedImagesResult(result) {
   appendStepReport(card);
 }
 
+function appendByteDistributionResult(result) {
+  const card = node('article', 'result');
+  card.dataset.stepResult = '1.7';
+  const top = node('div', 'result-top');
+  top.append(node('h3', '', '1.7 · Byte distribution'));
+  card.append(top);
+  const body = node('div', 'result-body');
+  const data = result.measurements;
+  const histogram = data.histogram;
+  const maximum = Math.max(...histogram);
+  const occupiedValues = histogram.filter(count => count > 0).length;
+  const modalValue = histogram.indexOf(maximum);
+  addReportParagraph(body, `${data.count.toLocaleString()} bytes · ${occupiedValues} of 256 byte values present · Shannon entropy ${data.entropyBitsPerByte.toFixed(4)} bits/byte`, 'metric');
+  addReportParagraph(body, `Scope: whole original JPEG file · most frequent byte 0x${modalValue.toString(16).padStart(2, '0').toUpperCase()} (${maximum.toLocaleString()} occurrences)`, 'settings');
+
+  const svgNamespace = 'http://www.w3.org/2000/svg';
+  const chart = document.createElementNS(svgNamespace, 'svg');
+  chart.setAttribute('viewBox', '0 0 800 142');
+  chart.setAttribute('role', 'img');
+  chart.setAttribute('aria-label', 'Histogram of exact byte counts for values zero through 255.');
+  chart.classList.add('byte-histogram');
+  const title = document.createElementNS(svgNamespace, 'title');
+  title.textContent = 'Whole-file byte-value histogram';
+  chart.append(title);
+  const plotTop = 8;
+  const plotHeight = 104;
+  const baseline = plotTop + plotHeight;
+  for (const fraction of [0, 0.5, 1]) {
+    const y = baseline - fraction * plotHeight;
+    const line = document.createElementNS(svgNamespace, 'line');
+    line.setAttribute('x1', '0');
+    line.setAttribute('x2', '768');
+    line.setAttribute('y1', String(y));
+    line.setAttribute('y2', String(y));
+    line.setAttribute('class', 'histogram-gridline');
+    chart.append(line);
+    const scaleLabel = document.createElementNS(svgNamespace, 'text');
+    scaleLabel.setAttribute('x', '772');
+    scaleLabel.setAttribute('y', String(y + 3));
+    scaleLabel.textContent = Math.round(maximum * fraction).toLocaleString();
+    chart.append(scaleLabel);
+  }
+  histogram.forEach((count, value) => {
+    if (!count) return;
+    const barHeight = count / maximum * plotHeight;
+    const rect = document.createElementNS(svgNamespace, 'rect');
+    rect.setAttribute('x', String(value * 3));
+    rect.setAttribute('y', String(baseline - barHeight));
+    rect.setAttribute('width', '2.55');
+    rect.setAttribute('height', String(barHeight));
+    const barTitle = document.createElementNS(svgNamespace, 'title');
+    barTitle.textContent = `Byte 0x${value.toString(16).padStart(2, '0').toUpperCase()}: ${count.toLocaleString()}`;
+    rect.append(barTitle);
+    chart.append(rect);
+  });
+  for (const value of [0, 64, 128, 192, 255]) {
+    const label = document.createElementNS(svgNamespace, 'text');
+    label.setAttribute('x', String(value * 3));
+    label.setAttribute('y', '136');
+    label.textContent = `0x${value.toString(16).padStart(2, '0').toUpperCase()}`;
+    chart.append(label);
+  }
+  body.append(chart);
+  addReportParagraph(body, 'The histogram describes the complete encoded byte stream, including headers and coded image data. Byte entropy alone is not evidence of editing or image authenticity.', 'settings');
+  addReportParagraph(body, data.interpretation);
+  card.append(body);
+  appendStepReport(card);
+}
+
 function appendStepReport(card) {
   $('results').querySelector('.results-empty')?.remove();
   const prior = $('results').querySelector(`[data-step-result="${card.dataset.stepResult}"]`);
@@ -592,7 +666,7 @@ function appendStepReport(card) {
 function appendBrowserStepError(stepId, error) {
   const card = node('article', 'result');
   card.dataset.stepResult = stepId;
-  const names = { '1.1': 'Source identity', '1.2': 'File structure', '1.3': 'Metadata inventory', '1.4': 'Quantization atlas', '1.5': 'Entropy coding', '1.6': 'Embedded images' };
+  const names = { '1.1': 'Source identity', '1.2': 'File structure', '1.3': 'Metadata inventory', '1.4': 'Quantization atlas', '1.5': 'Entropy coding', '1.6': 'Embedded images', '1.7': 'Byte distribution' };
   card.append(node('h3', '', `${stepId} · ${names[stepId] || 'Browser step'}`));
   const body = node('div', 'result-body');
   addReportParagraph(body, `Step unavailable: ${error.message}`, 'error');
