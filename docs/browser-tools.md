@@ -1,7 +1,7 @@
 # Browser tool inputs and modules
 
 Updated: 2026-11-05  
-Status: browser source context v1 and JPEG step 1.1 implemented; later steps remain unchanged
+Status: browser source context v1 and JPEG steps 1.1–1.2 implemented; later steps remain unchanged
 
 ## Shared source context
 
@@ -42,6 +42,14 @@ conformance or provenance authenticity, and it does not inspect decoded pixels.
 The Phase 1.1 card's acquisition note is recorded as a user-supplied note, not as
 verified provenance.
 
+`assets/js/formats/jpeg/steps/file-structure.mjs` implements Phase 1, step 1.2 as
+an independent adapter over the existing low-level JPEG inspector. It reads the
+same original-byte representation and returns a bounded marker inventory, frame
+declarations, optional scan layout, restart intervals, and parser warnings in the
+browser tool-result shape. The step adapter applies its segment limit and projects
+only structural fields into the result; it does not use decoded pixels. Parser
+warnings and reaching EOI describe extraction coverage, not JPEG conformance.
+
 `assets/js/app.mjs` creates the context after the browser has decoded the selected
 image for display and attaches that separate RGBA pixel representation with
 browser-decoder provenance. The context retains the original file independently.
@@ -49,10 +57,10 @@ It keeps the workbench's existing pixel buffer rather than allocating a duplicat
 tools receive a detached copy only when they request that representation.
 The browser step currently accepts detected JPEG input only. PNG and WebP remain
 usable for existing Phase 2 browser views, but cannot run this JPEG-specific step.
-The Phase 1 **Run selected** control executes selected browser-backed steps; at
-present that is step 1.1. When other selected steps are included, it runs 1.1 and
-reports that the remaining selections require the local workbench. Selecting no
-browser-backed step while local steps are selected opens the local-workbench guidance.
+The Phase 1 **Run selected** control executes selected browser-backed steps 1.1
+and 1.2 in catalog order. When other selected steps are included, it runs the
+browser-backed steps and reports that the remaining selections require the local
+workbench. Selecting only local-workbench steps opens the local-workbench guidance.
 
 Example future organization:
 
@@ -75,6 +83,7 @@ viewer and is designed to carry their format identity. The active public media
 workspace remains JPEG. BMP signature parsing, BMP decoding, per-format tool
 registration, worker transfer rules, larger numerical types, color-management
 policy, and a stable serialized/cross-language contract are open future work.
-Step 1.1 currently computes the whole-file SHA-256 on the main browser thread;
-large-file hashing may later move to a worker. File-size and pixel limits remain
-those of the existing public viewer.
+Steps 1.1 and 1.2 currently read/hash the whole file on the main browser thread;
+large-file work may later move to a worker. The low-level parser computes some
+additional inspector statistics internally, although step 1.2 returns structural
+fields only. File-size and pixel limits remain those of the existing public viewer.

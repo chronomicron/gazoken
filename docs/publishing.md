@@ -101,7 +101,7 @@ Pages hosts static HTML/CSS/JavaScript; it does not execute our Python API.
 
 | Entry point | Runs where | Current capabilities |
 | --- | --- | --- |
-| `index.html` | Visitor's browser; no Python installation | Workbench-matched three-phase layout and catalog; ELA, local-mean residual, Sobel edges, bit planes; sample gallery including a known PNG bit pattern. Python-only actions explain local installation and distinguish implemented from planned methods. |
+| `index.html` | Visitor's browser; no Python installation | Workbench-matched three-phase layout and catalog; JPEG steps 1.1 source identity and 1.2 file structure; ELA, local-mean residual, Sobel edges, bit planes; sample gallery including a known PNG bit pattern. Other catalog steps explain local installation or planned status. |
 | `jpeg.html` | Visitor's browser; no Python installation | Raw JPEG segments, metadata, quantization/Huffman tables, scan structure, hex view, byte statistics; three JPEG samples. |
 | `gazoken` command | User's local Python server and browser | Three-phase module framework, original-byte identity, file structure, bounded metadata, distribution, exact quantization tables, Huffman codebook/scan inventory and bounded embedded JPEG extraction, current-run evidence assembly, parameter/result/session records; most planned adapters remain unimplemented. |
 
@@ -152,9 +152,9 @@ The tracker is a third-party request; local image decoding and inspection remain
 in the visitor's browser, and image bytes are not sent to Statcounter. The local
 Python workbench does not include this tracker.
 
-The static workbench now has a browser-specific shared `SourceContext` and an
-isolated JavaScript module for JPEG step 1.1 (source identity). The wrapper retains
-the original encoded file and records an optional decoded-pixel representation
-separately, so later format-specific steps can choose the representation they
-require. See [browser tool inputs and modules](browser-tools.md). This does not
-add BMP support or change the Python adapter contract.
+The static workbench now has a browser-specific shared `SourceContext` and
+isolated JavaScript adapters for JPEG steps 1.1 (source identity) and 1.2 (file
+structure). The wrapper retains the original encoded file and records an optional
+decoded-pixel representation separately, so later format-specific steps can
+choose the representation they require. See [browser tool inputs and modules](browser-tools.md).
+This does not add BMP support or change the Python adapter contract.

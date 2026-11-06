@@ -286,6 +286,20 @@ Proposals remain separate until agreed. The initial handoff predates this log;
   a cross-language schema and adds no BMP implementation. Future BMP and other
   format adapters remain open. See [browser tool inputs and modules](browser-tools.md).
 
+## D020 — Browser JPEG file-structure step — 2026-11-05
+
+- Status: implemented increment, requested by Robert after the browser source
+  context and step 1.1 were in place.
+- Decision: add a dedicated JavaScript adapter for JPEG step 1.2 using the shared
+  `SourceContext` original-byte input and the existing low-level JPEG inspector.
+  Add it to the browser-supported Phase 1 selection runner alongside step 1.1.
+- Rationale: let visitors inspect marker, frame, scan, and restart structure in
+  the static browser workbench while preserving one adapter module per step.
+- Consequences: step 1.2 produces a structural inventory only. It does not claim
+  JPEG conformance or editing history, and it does not add BMP support. The
+  existing low-level inspector computes additional statistics internally, while
+  the step result exposes structural fields. See [browser tool inputs and modules](browser-tools.md).
+
 ## Pending proposals
 
 

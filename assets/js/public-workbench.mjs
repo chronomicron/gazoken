@@ -1,10 +1,12 @@
 import { run as runSourceIdentity } from './formats/jpeg/steps/source-identity.mjs';
+import { run as runFileStructure } from './formats/jpeg/steps/file-structure.mjs';
 
 const $ = (id) => document.getElementById(id);
 const dialog = $('python-dialog');
 const selectedSteps = new Set(['1.1', '1.2', '1.3', '1.4', '1.7']);
 let stepCatalog = [];
 let sourceContext = null;
+const browserStepIds = new Set(['1.1', '1.2']);
 
 document.addEventListener('gazoken:source-context', ({ detail }) => {
   sourceContext = detail?.sourceContext || null;
@@ -151,12 +153,14 @@ function renderStep(step) {
   details.append(include);
 
   const controls = node('fieldset', 'step-controls');
-  const browserStep = step.id === '1.1';
+  const browserStep = browserStepIds.has(step.id);
   controls.disabled = !browserStep;
   const legend = node('legend', '', 'STEP ' + step.id + ' / PARAMETERS');
   const description = node('p', 'step-description', step.description || 'See the local workbench for this step.');
-  const note = node('p', 'step-hint', browserStep
+  const note = node('p', 'step-hint', step.id === '1.1'
     ? 'This browser step reads the original JPEG file bytes. Decoded preview pixels are a separate representation.'
+    : step.id === '1.2'
+      ? 'This browser step inventories markers, frame declarations, and scan layout from the original encoded JPEG bytes.'
     : step.implementation === 'ready'
       ? 'Method implemented in the local Python app. This static page cannot run it.'
       : 'Planned method. Local settings can be recorded; no measurement is produced.');
@@ -175,9 +179,9 @@ function renderStep(step) {
   if (browserStep) {
     use.dataset.runBrowserStep = step.id;
     use.disabled = !sourceContext || sourceContext.mediaType !== 'image/jpeg';
-    use.title = 'Runs source identity on the unchanged encoded JPEG file.';
+    use.title = `Runs step ${step.id} on the original encoded JPEG file.`;
     use.addEventListener('click', async () => {
-      await executeSourceIdentity(use, controls);
+      await executeBrowserStep(step.id, use, controls);
     });
   } else {
     use.addEventListener('click', () => openPythonHelp(step));
@@ -194,9 +198,19 @@ function renderStep(step) {
   return details;
 }
 
-async function executeSourceIdentity(button, controls = button?.closest('.step-card')?.querySelector('.step-controls')) {
+function readParameters(controls) {
+  const parameters = {};
+  for (const control of controls?.querySelectorAll('[data-step-parameter]') || []) {
+    parameters[control.dataset.stepParameter] = control.type === 'checkbox'
+      ? control.checked
+      : control.type === 'number' ? Number(control.value) : control.value;
+  }
+  return parameters;
+}
+
+async function executeBrowserStep(stepId, button, controls = button?.closest('.step-card')?.querySelector('.step-controls')) {
   if (!sourceContext || sourceContext.mediaType !== 'image/jpeg') {
-    $('run-python-status').textContent = 'Load a JPEG image to run step 1.1 in the browser.';
+    $('run-python-status').textContent = `Load a JPEG image to run step ${stepId} in the browser.`;
     return false;
   }
   if (button) {
@@ -204,14 +218,17 @@ async function executeSourceIdentity(button, controls = button?.closest('.step-c
     button.textContent = 'Reading original file…';
   }
   try {
-    const noteInput = controls?.querySelector('[data-step-parameter="note"]');
-    const result = await runSourceIdentity(sourceContext, { note: noteInput?.value || '' });
-    appendSourceIdentityResult(result);
-    $('run-python-status').textContent = 'Step 1.1 completed in this browser.';
+    const parameters = readParameters(controls);
+    const result = stepId === '1.1'
+      ? await runSourceIdentity(sourceContext, parameters)
+      : await runFileStructure(sourceContext, parameters);
+    if (stepId === '1.1') appendSourceIdentityResult(result);
+    else appendFileStructureResult(result);
+    $('run-python-status').textContent = `Step ${stepId} completed in this browser.`;
     return true;
   } catch (error) {
-    appendSourceIdentityError(error);
-    $('run-python-status').textContent = `Step 1.1 failed: ${error.message}`;
+    appendBrowserStepError(stepId, error);
+    $('run-python-status').textContent = `Step ${stepId} failed: ${error.message}`;
     return false;
   } finally {
     if (button) {
@@ -228,6 +245,7 @@ function addReportParagraph(parent, text, className = '') {
 
 function appendSourceIdentityResult(result) {
   const card = node('article', 'result');
+  card.dataset.stepResult = '1.1';
   const top = node('div', 'result-top');
   top.append(node('h3', '', '1.1 · Source identity'));
   card.append(top);
@@ -240,25 +258,96 @@ function appendSourceIdentityResult(result) {
   if (result.parameters.note) addReportParagraph(body, `Acquisition note: ${result.parameters.note}`);
   addReportParagraph(body, `Input: ${result.inputs.source.representations.original.kind} · ${result.inputs.source.mediaType}; decoded pixels were not used.`, 'settings');
   card.append(body);
-  $('results').replaceChildren(card);
-  $('result-count').textContent = 'Step 1.1 complete';
+  appendStepReport(card);
 }
 
-function appendSourceIdentityError(error) {
+function appendFileStructureResult(result) {
   const card = node('article', 'result');
-  card.append(node('h3', '', '1.1 · Source identity'));
+  card.dataset.stepResult = '1.2';
+  const top = node('div', 'result-top');
+  top.append(node('h3', '', '1.2 · File structure'));
+  card.append(top);
+  const body = node('div', 'result-body');
+  const data = result.measurements;
+  addReportParagraph(body, `${data.extractionStatus.toUpperCase()} · ${data.segmentCount} segments · ${data.frames.length} frames · ${data.scanCount} scans · ${data.eoiReached ? 'EOI reached' : 'EOI not reached'}`, 'metric');
+  addReportParagraph(body, `${data.fileBytes.toLocaleString()} source bytes${data.trailingBytes ? ` · ${data.trailingBytes.toLocaleString()} bytes after EOI` : ''}`, 'settings');
+  for (const frame of data.frames.slice(0, 8)) {
+    addReportParagraph(body, `${frame.marker} at byte ${frame.markerOffset}: ${frame.width} × ${frame.height}, ${frame.samplePrecisionBits}-bit, ${frame.components.length} components (declared dimensions; no pixel decode).`);
+  }
+  if (data.frames.length > 8) addReportParagraph(body, `${data.frames.length - 8} additional frame declarations are included in the full record.`, 'settings');
+  if (data.scans.length) {
+    const scanDetails = document.createElement('details');
+    const scanSummary = node('summary', '', 'Scan layout');
+    const scanList = document.createElement('ol');
+    for (const scan of data.scans.slice(0, 64)) {
+      const item = document.createElement('li');
+      item.textContent = `Byte ${scan.markerOffset} · ${scan.encodedDataBytes.toLocaleString()} encoded bytes · ${scan.components.length} components · ${scan.restartMarkerCount} restart markers · ${scan.stuffedByteCount} stuffed bytes`;
+      scanList.append(item);
+    }
+    scanDetails.append(scanSummary, scanList);
+    body.append(scanDetails);
+  }
+  const tableDetails = document.createElement('details');
+  const tableSummary = node('summary', '', `Marker inventory (${data.segmentCount})`);
+  const table = document.createElement('table');
+  const head = document.createElement('thead');
+  const header = document.createElement('tr');
+  for (const title of ['Marker', 'Code', 'Offset', 'Bytes', 'Payload']) {
+    const cell = document.createElement('th');
+    cell.scope = 'col';
+    cell.textContent = title;
+    header.append(cell);
+  }
+  head.append(header);
+  const rows = document.createElement('tbody');
+  for (const segment of data.segments.slice(0, 128)) {
+    const row = document.createElement('tr');
+    for (const value of [segment.marker, segment.code, segment.offset, segment.byteLength, segment.payloadLength]) {
+      const cell = document.createElement('td');
+      cell.textContent = String(value);
+      row.append(cell);
+    }
+    rows.append(row);
+  }
+  table.append(head, rows);
+  tableDetails.append(tableSummary, table);
+  body.append(tableDetails);
+  if (data.segmentCount > 128) addReportParagraph(body, `First 128 of ${data.segmentCount} marker records shown here.`, 'settings');
+  if (result.warnings.length) {
+    const warningList = document.createElement('ul');
+    warningList.className = 'step-warnings';
+    for (const warning of result.warnings.slice(0, 20)) warningList.append(node('li', '', warning));
+    body.append(node('h4', '', 'Parser warnings'), warningList);
+  }
+  addReportParagraph(body, data.interpretation);
+  card.append(body);
+  appendStepReport(card);
+}
+
+function appendStepReport(card) {
+  $('results').querySelector('.results-empty')?.remove();
+  const prior = $('results').querySelector(`[data-step-result="${card.dataset.stepResult}"]`);
+  prior?.remove();
+  $('results').append(card);
+  const reportCount = $('results').querySelectorAll('[data-step-result]').length;
+  $('result-count').textContent = `${reportCount} step report${reportCount === 1 ? '' : 's'}`;
+}
+
+function appendBrowserStepError(stepId, error) {
+  const card = node('article', 'result');
+  card.dataset.stepResult = stepId;
+  card.append(node('h3', '', `${stepId} · ${stepId === '1.1' ? 'Source identity' : 'File structure'}`));
   const body = node('div', 'result-body');
   addReportParagraph(body, `Step unavailable: ${error.message}`, 'error');
   card.append(body);
-  $('results').replaceChildren(card);
-  $('result-count').textContent = 'Step 1.1 unavailable';
+  appendStepReport(card);
 }
 
 function updateSignal(stepId, signal, implementation) {
   const status = !selectedSteps.has(stepId) ? 'gray' : implementation === 'ready' ? 'green' : 'amber';
   signal.dataset.status = status;
   signal.setAttribute('aria-label', status === 'green'
-    ? stepId === '1.1' ? 'Selected; can run in this browser' : 'Selected; available in the local workbench'
+    ? browserStepIds.has(stepId) ? 'Selected; can run in this browser' : 'Selected; available in the local workbench'
     : status === 'amber' ? 'Selected; method still planned' : 'Not selected');
 }
 
@@ -267,7 +356,7 @@ function updateSelection() {
   const steps = stepCatalog.filter(step => step.id.startsWith(phase));
   const selected = steps.filter(step => selectedSteps.has(step.id));
   $('selected-count').textContent = `${selected.length} selected`;
-  const browserCount = selected.filter(step => step.id === '1.1').length;
+  const browserCount = selected.filter(step => browserStepIds.has(step.id)).length;
   const localCount = selected.length - browserCount;
   $('ready-count').textContent = selected.length === 0
     ? 'No selected steps'
@@ -330,21 +419,25 @@ $('run-python').addEventListener('click', () => {
     $('run-python-status').textContent = 'Select one or more steps first.';
     return;
   }
-  const browserStep = selected.find(step => step.id === '1.1');
-  if (!browserStep) {
+  const browserSteps = selected.filter(step => browserStepIds.has(step.id));
+  if (!browserSteps.length) {
     $('run-python-status').textContent = 'These selected steps need the local Python workbench.';
     openPythonHelp();
     return;
   }
-  const button = document.querySelector('[data-run-browser-step="1.1"]');
-  const controls = button?.closest('.step-card')?.querySelector('.step-controls');
-  executeSourceIdentity(button, controls).then((completed) => {
-    if (!completed) return;
-    const localCount = selected.length - 1;
+  (async () => {
+    let completed = 0;
+    for (const step of browserSteps) {
+      const button = document.querySelector(`[data-run-browser-step="${step.id}"]`);
+      const controls = button?.closest('.step-card')?.querySelector('.step-controls');
+      if (!await executeBrowserStep(step.id, button, controls)) return;
+      completed++;
+    }
+    const localCount = selected.length - completed;
     $('run-python-status').textContent = localCount
-      ? `Step 1.1 completed here. ${localCount} other selected step${localCount === 1 ? ' needs' : 's need'} the local Python workbench.`
-      : 'Step 1.1 completed in this browser.';
-  });
+      ? `${completed} browser step${completed === 1 ? '' : 's'} completed. ${localCount} other selected step${localCount === 1 ? ' needs' : 's need'} the local Python workbench.`
+      : `${completed} browser step${completed === 1 ? '' : 's'} completed.`;
+  })();
 });
 
 loadCatalog();

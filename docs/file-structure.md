@@ -82,3 +82,14 @@ JavaScript tests passed; module syntax and Git whitespace checks passed. Browser
 verification ran 1.2 through the GUI on the reference JPEG: 11 segments, one scan,
 zero trailing bytes, and a stored Python result with executed parameters. This
 increment is recorded in local Git; it has not been pushed or deployed.
+
+## Static browser adapter
+
+The public workbench also exposes step 1.2 through the isolated JavaScript adapter
+[`file-structure.mjs`](../assets/js/formats/jpeg/steps/file-structure.mjs). It
+accepts the shared browser `SourceContext`, reads its original encoded bytes, and
+projects the existing browser JPEG inspector's parse into a step result. It does
+not decode pixels. The browser result limits displayed marker rows in the UI;
+the structured result retains up to the selected segment limit. See
+[browser tool inputs and modules](browser-tools.md) for the browser contract and
+current limits. This does not change the Python implementation described above.
