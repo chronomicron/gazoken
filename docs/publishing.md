@@ -117,10 +117,12 @@ the local Python interface and mirrors its rail, media selector, phase navigatio
 source viewer, step selection controls, execution plan, and run bar. It opens in
 Phase 1, reads the shared step catalog from `src/gazoken/web/steps.json`, and shows
 Python parameters as read-only previews. Selected Python steps lead to setup
-guidance; the four browser image views remain runnable in Phase 2. The browser
-viewer also has working grid and zoom controls. The Phase 1 JPEG inspector remains
-a separate page and asks visitors to choose the file there again. This shared
-presentation does not make the local FastAPI API available on GitHub Pages.
+guidance. The four browser-decoded pixel visualizations are grouped in a separate
+exploratory-view card at the top of the Phase 2 tool panel; they remain useful for
+illustration and comparison, without claiming validated detection. The browser
+viewer also has working grid and zoom controls. The encoded-byte JPEG inspector
+remains a separate page and asks visitors to choose the file there again. This
+shared presentation does not make the local FastAPI API available on GitHub Pages.
 
 For the full app today, users can clone the repository **or download its source
 ZIP**, install Python 3.11+, create a virtual environment, install the checkout
