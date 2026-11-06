@@ -343,6 +343,20 @@ Proposals remain separate until agreed. The initial handoff predates this log;
   1,024-definition cap and retains the underlying structural parser limits. See
   [entropy coding](entropy-coding.md) and [browser tool inputs and modules](browser-tools.md).
 
+## D024 — Browser JPEG embedded-image inventory — 2026-11-05
+
+- Status: implemented increment, requested by Robert after step 1.5.
+- Decision: add an isolated JavaScript adapter for step 1.6 using original JPEG
+  bytes, the bounded TIFF/Exif reader, and the file-structure adapter. Recognize
+  only declared Exif IFD1 and JFXX JPEG ranges; validate container boundaries and
+  hash extracted ranges; optionally inspect nested JPEG structure.
+- Rationale: expose a bounded source-inspection tool in the static workbench while
+  preserving the original bytes and the per-step module boundary.
+- Consequences: no arbitrary byte-pattern discovery, pixel decoding, recursive
+  extraction, or unsupported thumbnail decoding is added. Nested structure is
+  bounded to 256 markers. See [embedded images](embedded-images.md) and
+  [browser tool inputs and modules](browser-tools.md).
+
 ## Pending proposals
 
 

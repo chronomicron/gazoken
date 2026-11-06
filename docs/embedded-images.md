@@ -77,3 +77,14 @@ recorded a valid empty preview inventory. Positive extraction cases and exact
 byte identities were verified using constructed Exif and JFXX containers in the
 adapter tests. Phase 1 and project READMEs updated. Committed locally, not pushed
 or deployed.
+
+## Static browser adapter
+
+On 2026-11-05 the public workbench gained an isolated JavaScript adapter at
+`assets/js/formats/jpeg/steps/embedded-images.mjs`. It reads the original JPEG,
+reuses the bounded TIFF/Exif parser, extracts only declared Exif IFD1 or JFXX JPEG
+ranges, and records source and preview SHA-256 values. Optional nested structure
+uses the file-structure adapter with a 256-marker cap. The browser report shows
+range descriptors and nested summary; it does not decode or download preview
+pixels. JavaScript syntax and whitespace checks were run; browser interaction has
+not yet been verified for this increment.

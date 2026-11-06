@@ -3,13 +3,14 @@ import { run as runFileStructure } from './formats/jpeg/steps/file-structure.mjs
 import { run as runMetadataInventory } from './formats/jpeg/steps/metadata-inventory.mjs';
 import { run as runQuantizationTables } from './formats/jpeg/steps/quantization-tables.mjs';
 import { run as runEntropyCoding } from './formats/jpeg/steps/entropy-coding.mjs';
+import { run as runEmbeddedImages } from './formats/jpeg/steps/embedded-images.mjs';
 
 const $ = (id) => document.getElementById(id);
 const dialog = $('python-dialog');
 const selectedSteps = new Set(['1.1', '1.2', '1.3', '1.4', '1.7']);
 let stepCatalog = [];
 let sourceContext = null;
-const browserStepIds = new Set(['1.1', '1.2', '1.3', '1.4', '1.5']);
+const browserStepIds = new Set(['1.1', '1.2', '1.3', '1.4', '1.5', '1.6']);
 
 document.addEventListener('gazoken:source-context', ({ detail }) => {
   sourceContext = detail?.sourceContext || null;
@@ -171,6 +172,8 @@ function renderStep(step) {
       ? 'This browser step extracts exact stored quantization values, their definitions over time, and frame or scan references from the original JPEG bytes.'
     : step.id === '1.5'
       ? 'This browser step reads stored Huffman definitions and scan-time table assignments from the original JPEG bytes. It does not decode entropy symbols.'
+    : step.id === '1.6'
+      ? 'This browser step locates declared embedded JPEG previews in Exif and JFXX blocks, verifies their bounded byte ranges, and records hashes without replacing or decoding the source.'
     : step.implementation === 'ready'
       ? 'Method implemented in the local Python app. This static page cannot run it.'
       : 'Planned method. Local settings can be recorded; no measurement is produced.');
@@ -197,7 +200,7 @@ function renderStep(step) {
     use.addEventListener('click', () => openPythonHelp(step));
   }
   actions.append(use);
-  if (step.id.startsWith('1.') && ['1.2','1.3','1.4','1.5','1.7'].includes(step.id)) {
+  if (step.id.startsWith('1.') && ['1.2','1.3','1.4','1.5','1.6','1.7'].includes(step.id)) {
     const inspector = node('a', 'text-link', 'View browser inspector ↗');
     inspector.href = './jpeg.html';
     inspector.title = 'Choose this JPEG again in the separate browser inspector.';
@@ -235,13 +238,15 @@ async function executeBrowserStep(stepId, button, controls = button?.closest('.s
       '1.3': runMetadataInventory,
       '1.4': runQuantizationTables,
       '1.5': runEntropyCoding,
+      '1.6': runEmbeddedImages,
     };
     const result = await runners[stepId](sourceContext, parameters);
     if (stepId === '1.1') appendSourceIdentityResult(result);
     else if (stepId === '1.2') appendFileStructureResult(result);
     else if (stepId === '1.3') appendMetadataInventoryResult(result);
     else if (stepId === '1.4') appendQuantizationTablesResult(result);
-    else appendEntropyCodingResult(result);
+    else if (stepId === '1.5') appendEntropyCodingResult(result);
+    else appendEmbeddedImagesResult(result);
     $('run-python-status').textContent = `Step ${stepId} completed in this browser.`;
     return true;
   } catch (error) {
@@ -534,6 +539,46 @@ function appendEntropyCodingResult(result) {
   appendStepReport(card);
 }
 
+function appendEmbeddedImagesResult(result) {
+  const card = node('article', 'result');
+  card.dataset.stepResult = '1.6';
+  const top = node('div', 'result-top');
+  top.append(node('h3', '', '1.6 · Embedded images'));
+  card.append(top);
+  const body = node('div', 'result-body');
+  const data = result.measurements;
+  addReportParagraph(body, `${data.extractionStatus.toUpperCase()} · ${data.previewCount} declared JPEG preview${data.previewCount === 1 ? '' : 's'} · ${data.eoiReached ? 'EOI reached' : 'EOI not reached'}`, 'metric');
+  addReportParagraph(body, `Preview limit ${result.parameters.preview_limit} · nested structure ${result.parameters.nested_structure ? 'included' : 'omitted'} · original JPEG bytes`, 'settings');
+  if (data.previews.length) {
+    for (const preview of data.previews) {
+      const detail = document.createElement('details');
+      detail.append(node('summary', '', `${preview.kind} · ${preview.byteCount.toLocaleString()} bytes · source byte ${preview.offset}`));
+      addReportParagraph(detail, `Container marker at byte ${preview.containerMarkerOffset} · MIME ${preview.mime}`);
+      addReportParagraph(detail, `Preview SHA-256: ${preview.sha256}`, 'metric');
+      addReportParagraph(detail, `Source SHA-256: ${preview.sourceSha256}`, 'settings');
+      if (preview.structure) {
+        const structure = preview.structure;
+        addReportParagraph(detail, `Nested structure: ${structure.segmentCount} markers · ${structure.frames.length} frames · ${structure.scanCount} scans · ${structure.eoiReached ? 'EOI reached' : 'EOI not reached'}`, 'settings');
+        for (const warning of preview.warnings || []) addReportParagraph(detail, warning, 'warning');
+      } else if (data.nestedStructureRequested) {
+        addReportParagraph(detail, 'Nested JPEG structure is unavailable.', 'settings');
+      }
+      body.append(detail);
+    }
+  } else {
+    addReportParagraph(body, 'No supported Exif IFD1 or JFXX JPEG preview was found. Empty inventory does not establish that the file contains no other embedded image types.', 'settings');
+  }
+  if (result.warnings.length) {
+    const list = document.createElement('ul');
+    list.className = 'step-warnings';
+    for (const warning of result.warnings.slice(0, 20)) list.append(node('li', '', warning));
+    body.append(node('h4', '', 'Parser warnings'), list);
+  }
+  addReportParagraph(body, data.interpretation);
+  card.append(body);
+  appendStepReport(card);
+}
+
 function appendStepReport(card) {
   $('results').querySelector('.results-empty')?.remove();
   const prior = $('results').querySelector(`[data-step-result="${card.dataset.stepResult}"]`);
@@ -547,7 +592,7 @@ function appendStepReport(card) {
 function appendBrowserStepError(stepId, error) {
   const card = node('article', 'result');
   card.dataset.stepResult = stepId;
-  const names = { '1.1': 'Source identity', '1.2': 'File structure', '1.3': 'Metadata inventory', '1.4': 'Quantization atlas', '1.5': 'Entropy coding' };
+  const names = { '1.1': 'Source identity', '1.2': 'File structure', '1.3': 'Metadata inventory', '1.4': 'Quantization atlas', '1.5': 'Entropy coding', '1.6': 'Embedded images' };
   card.append(node('h3', '', `${stepId} · ${names[stepId] || 'Browser step'}`));
   const body = node('div', 'result-body');
   addReportParagraph(body, `Step unavailable: ${error.message}`, 'error');
