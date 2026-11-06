@@ -416,6 +416,17 @@ Proposals remain separate until agreed. The initial handoff predates this log;
   [color relationships](color-relationships.md) and
   [browser tool inputs and modules](browser-tools.md).
 
+## D029 — Public romaji styling — 2026-11-05
+
+- Status: accepted at Robert's request.
+- Decision: style the project name as **GAZŌKEN** in website and project identity
+  copy, reflecting its association with 画像 (*gazō*, image). Keep repository,
+  package, CLI, and URL identifiers in ASCII as `gazoken`.
+- Rationale: make the long vowel in the intended *gazō* association visible in
+  the project's romaji brand.
+- Consequences: the original archived handoff and machine-facing identifiers
+  remain unchanged; visible browser workbench labels use the macron form.
+
 ## Pending proposals
 
 

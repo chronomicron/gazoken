@@ -1,4 +1,4 @@
-# ガゾケン · GAZOKEN
+# ガゾケン · GAZŌKEN
 
 **Image Forensics Workbench · 画像フォレンジック・ワークベンチ**
 
@@ -6,7 +6,7 @@
 
 ## English
 
-Gazoken is an image forensics project combining software development and research.
+GAZŌKEN is an image forensics project combining software development and research.
 We aim to build a workbench for investigating image artefacts, processing traces,
 and signs of editing or manipulation, with tools that make the evidence inspectable.
 
@@ -34,12 +34,12 @@ statistics without rendering pixels. Images stay on your device.
 Building on those evaluations, we will explore improvements to existing methods
 and develop ideas of our own. We aim to conduct reproducible experiments and
 publish our findings in journals or conferences, with research material in English
-and Japanese. Gazoken will present evidence and its limitations to support informed
+and Japanese. GAZŌKEN will present evidence and its limitations to support informed
 judgments about an image.
 
 ## 日本語
 
-Gazoken（ガゾケン）は、ソフトウェア開発と研究を両輪とする画像フォレンジックの
+GAZŌKEN（ガゾケン）は、ソフトウェア開発と研究を両輪とする画像フォレンジックの
 プロジェクトです。画像のアーティファクト、処理の痕跡、編集・改ざんの兆候を調べ、
 その根拠を確認できるワークベンチの構築を目指します。
 

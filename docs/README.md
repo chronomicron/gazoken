@@ -1,6 +1,6 @@
-# Gazoken documentation
+# GAZŌKEN documentation
 
-This directory is the evolving record for ガゾケン · GAZOKEN,
+This directory is the evolving record for ガゾケン · GAZŌKEN,
 Image Forensics Workbench, under グルー研究室 · Grou-lab.
 
 | Document | Purpose |

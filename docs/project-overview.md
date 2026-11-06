@@ -4,11 +4,12 @@ Updated: 2026-11-05
 
 ## Purpose and identity
 
-**ガゾケン · GAZOKEN — Image Forensics Workbench**, developed under
+**ガゾケン · GAZŌKEN — Image Forensics Workbench**, developed under
 **グルー研究室 · Grou-lab**, is a suite of tools for image investigation.
-Gazoken is a coined name associated with 画像 (gazō, image) and 研究
-(kenkyū, research), with a secondary phonetic association with 検証
-(kenshō, verification). Name availability has not been checked.
+**GAZŌKEN** is the stylized romaji brand: ガゾケン alone romanizes as *Gazoken*,
+while the macron highlights the association with 画像 (*gazō*, image) and 研究
+(*kenkyū*, research). There is also a secondary phonetic association with 検証
+(*kenshō*, verification). Name availability has not been checked.
 
 The working question is: given a file of unknown provenance, what can we learn
 from its contents, structure, and processing traces? Camera origin, editing,
