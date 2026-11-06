@@ -385,6 +385,22 @@ Proposals remain separate until agreed. The initial handoff predates this log;
   proposed for the local framework. See [decoded reference](decoded-reference.md)
   and [browser tool inputs and modules](browser-tools.md).
 
+## D027 — Browser spatial measurements — 2026-11-05
+
+- Status: implemented increment, requested by Robert after step 2.1.
+- Decision: add a separate JavaScript adapter for Phase 2, step 2.2 over the
+  detached browser-decoded RGBA package. Report derived-luminance or RGB
+  histograms, global luminance moments, and a regular sample of local variation,
+  gradients, and optional exact endpoint clipping. Run pixel loops in a worker.
+- Rationale: expose bounded descriptive spatial measurements using the browser
+  pixel representation without presenting the display decode as a canonical
+  Python reference.
+- Consequences: cap retained windows at 4,096, report sample coverage, and omit
+  low-texture classification because no eligibility threshold is defined. Native
+  JPEG component planes remain unavailable. See
+  [spatial measurements](spatial-measurements.md) and
+  [browser tool inputs and modules](browser-tools.md).
+
 ## Pending proposals
 
 

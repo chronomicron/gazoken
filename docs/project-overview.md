@@ -61,7 +61,10 @@ source-bound quantized DCT packages without reconstructing pixels.
 [Coefficient statistics](coefficient-statistics.md) now describes their per-frequency
 histograms, moments and zero fractions without inferring compression history.
 A [current-run evidence report](evidence-report.md) assembles Phase 1 outputs
-without adding a forensic verdict. All Phase 2 and Phase 3 analyses remain configuration-only.
+without adding a forensic verdict. The local Python Phase 2 and Phase 3 analyses
+remain configuration-only. The static site provides a browser-decoded reference
+manifest and descriptive Phase 2 spatial summaries, with coverage limits; Phase 3
+has no browser measurements yet.
 No calibrated detector, scientific benchmark, C/C++ package, or paper is
 implemented yet.
 

@@ -6,14 +6,15 @@ import { run as runEntropyCoding } from './formats/jpeg/steps/entropy-coding.mjs
 import { run as runEmbeddedImages } from './formats/jpeg/steps/embedded-images.mjs';
 import { run as runByteDistribution } from './formats/jpeg/steps/byte-distribution.mjs';
 import { run as runDecodedReference } from './steps/decoded-reference.mjs';
+import { run as runSpatialMeasurements } from './steps/spatial-measurements.mjs';
 
 const $ = (id) => document.getElementById(id);
 const dialog = $('python-dialog');
 const selectedSteps = new Set(['1.1', '1.2', '1.3', '1.4', '1.7']);
 let stepCatalog = [];
 let sourceContext = null;
-const browserStepIds = new Set(['1.1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.7', '2.1']);
-const pixelStepIds = new Set(['2.1']);
+const browserStepIds = new Set(['1.1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.7', '2.1', '2.2']);
+const pixelStepIds = new Set(['2.1', '2.2']);
 
 function canRunBrowserStep(stepId) {
   if (!sourceContext || !browserStepIds.has(stepId)) return false;
@@ -150,6 +151,7 @@ function renderStep(step) {
   const info = node('span', 'step-info');
   info.append(node('strong', '', step.title));
   info.append(node('small', '', step.subtitle || step.group || 'Investigation step'));
+  const browserStep = browserStepIds.has(step.id);
   const state = browserStep && step.implementation !== 'ready'
     ? node('span', 'step-state ready', 'BROWSER')
     : step.implementation === 'ready' ? null : node('span', 'step-state', 'PLANNED');
@@ -172,7 +174,6 @@ function renderStep(step) {
   details.append(include);
 
   const controls = node('fieldset', 'step-controls');
-  const browserStep = browserStepIds.has(step.id);
   controls.disabled = !browserStep;
   const legend = node('legend', '', 'STEP ' + step.id + ' / PARAMETERS');
   const description = node('p', 'step-description', step.description || 'See the local workbench for this step.');
@@ -192,13 +193,15 @@ function renderStep(step) {
       ? 'This browser step counts each byte value in the original encoded file and reports descriptive Shannon entropy. The result is not a tampering score.'
     : step.id === '2.1'
       ? 'This browser step records dimensions, pixel layout, source linkage, and decoder provenance for the current browser-decoded image. Python decoder controls do not apply here.'
+    : step.id === '2.2'
+      ? 'This browser step summarizes decoded RGB/luminance histograms and sampled local variation, gradient, and exact-endpoint clipping. It does not apply a low-texture threshold or make an editing finding.'
     : step.implementation === 'ready'
       ? 'Method implemented in the local Python app. This static page cannot run it.'
       : 'Planned method. Local settings can be recorded; no measurement is produced.');
   controls.append(legend, description);
   if (step.parameters?.length && step.id !== '2.1') {
     const grid = node('div', 'parameter-preview');
-    for (const parameter of step.parameters || []) addParameter(grid, parameter, browserStep);
+    for (const parameter of browserParameterDefinitions(step)) addParameter(grid, parameter, browserStep);
     controls.append(grid);
   }
   const inputText = browserStep
@@ -216,7 +219,9 @@ function renderStep(step) {
   if (browserStep) {
     use.dataset.runBrowserStep = step.id;
     use.disabled = !canRunBrowserStep(step.id);
-    use.title = `Runs step ${step.id} on the original encoded JPEG file.`;
+    use.title = pixelStepIds.has(step.id)
+      ? `Runs step ${step.id} on the current browser-decoded pixel package.`
+      : `Runs step ${step.id} on the original encoded JPEG file.`;
     use.addEventListener('click', async () => {
       await executeBrowserStep(step.id, use, controls);
     });
@@ -245,6 +250,13 @@ function readParameters(controls) {
   return parameters;
 }
 
+function browserParameterDefinitions(step) {
+  if (step.id === '2.2') return step.parameters.map(parameter => parameter.key === 'channel'
+    ? { ...parameter, options: ['Derived RGB luminance', 'Separate RGB channels'], default: 'Derived RGB luminance' }
+    : parameter);
+  return step.parameters || [];
+}
+
 async function executeBrowserStep(stepId, button, controls = button?.closest('.step-card')?.querySelector('.step-controls')) {
   if (!canRunBrowserStep(stepId)) {
     $('run-python-status').textContent = pixelStepIds.has(stepId)
@@ -254,7 +266,7 @@ async function executeBrowserStep(stepId, button, controls = button?.closest('.s
   }
   if (button) {
     button.disabled = true;
-    button.textContent = 'Reading original file…';
+    button.textContent = pixelStepIds.has(stepId) ? 'Reading pixel package…' : 'Reading original file…';
   }
   try {
     const parameters = readParameters(controls);
@@ -267,6 +279,7 @@ async function executeBrowserStep(stepId, button, controls = button?.closest('.s
       '1.6': runEmbeddedImages,
       '1.7': runByteDistribution,
       '2.1': runDecodedReference,
+      '2.2': runSpatialMeasurements,
     };
     const result = await runners[stepId](sourceContext, parameters);
     if (stepId === '1.1') appendSourceIdentityResult(result);
@@ -277,7 +290,10 @@ async function executeBrowserStep(stepId, button, controls = button?.closest('.s
     else if (stepId === '1.6') appendEmbeddedImagesResult(result);
     else if (stepId === '1.7') appendByteDistributionResult(result);
     else if (stepId === '2.1') appendDecodedReferenceResult(result);
-    $('run-python-status').textContent = `Step ${stepId} completed in this browser.`;
+    else if (stepId === '2.2') appendSpatialMeasurementsResult(result);
+    $('run-python-status').textContent = result.status === 'partial'
+      ? `Step ${stepId} ran in this browser with partial coverage.`
+      : `Step ${stepId} completed in this browser.`;
     return true;
   } catch (error) {
     appendBrowserStepError(stepId, error);
@@ -697,6 +713,105 @@ function appendDecodedReferenceResult(result) {
   appendStepReport(card);
 }
 
+function appendChannelHistogram(parent, histograms, heading) {
+  addReportParagraph(parent, heading, 'settings');
+  const namespace = 'http://www.w3.org/2000/svg';
+  const chart = document.createElementNS(namespace, 'svg');
+  chart.setAttribute('viewBox', '0 0 800 128');
+  chart.setAttribute('role', 'img');
+  chart.setAttribute('aria-label', heading);
+  chart.classList.add('channel-histogram');
+  const title = document.createElementNS(namespace, 'title');
+  title.textContent = heading;
+  chart.append(title);
+  const entries = Object.entries(histograms || {});
+  const maximum = Math.max(1, ...entries.flatMap(([, values]) => values));
+  for (const fraction of [0, 0.5, 1]) {
+    const line = document.createElementNS(namespace, 'line');
+    const y = 104 - fraction * 92;
+    line.setAttribute('x1', '0');
+    line.setAttribute('x2', '768');
+    line.setAttribute('y1', String(y));
+    line.setAttribute('y2', String(y));
+    line.setAttribute('class', 'histogram-gridline');
+    chart.append(line);
+  }
+  const colors = { R: '#c94a4a', G: '#2a8a60', B: '#3978bd', Y: '#415a62' };
+  for (const [name, values] of entries) {
+    const path = document.createElementNS(namespace, 'path');
+    const points = values.map((count, value) => `${value * 3},${104 - count / maximum * 92}`).join(' ');
+    path.setAttribute('d', `M${points.replaceAll(' ', ' L')}`);
+    path.setAttribute('class', 'histogram-series');
+    path.setAttribute('stroke', colors[name] || '#415a62');
+    path.setAttribute('fill', 'none');
+    const seriesTitle = document.createElementNS(namespace, 'title');
+    seriesTitle.textContent = `${name} histogram; ${values.length} bins, ${values.reduce((sum, count) => sum + count, 0).toLocaleString()} pixels`;
+    path.append(seriesTitle);
+    chart.append(path);
+  }
+  for (const value of [0, 64, 128, 192, 255]) {
+    const label = document.createElementNS(namespace, 'text');
+    label.setAttribute('x', String(value * 3));
+    label.setAttribute('y', '123');
+    label.textContent = String(value);
+    chart.append(label);
+  }
+  parent.append(chart);
+  const legend = node('div', 'channel-legend');
+  for (const [name] of entries) {
+    const item = node('span', 'channel-legend-item');
+    const swatch = node('i', 'channel-swatch');
+    swatch.style.backgroundColor = colors[name] || '#415a62';
+    item.append(swatch, node('span', '', name === 'Y' ? 'Derived luminance' : name));
+    legend.append(item);
+  }
+  parent.append(legend);
+}
+
+function appendSpatialMeasurementsResult(result) {
+  const card = node('article', 'result');
+  card.dataset.stepResult = '2.2';
+  const top = node('div', 'result-top');
+  top.append(node('h3', '', '2.2 · Spatial measurements'));
+  card.append(top);
+  const body = node('div', 'result-body');
+  const data = result.measurements;
+  addReportParagraph(body, `${result.status.toUpperCase()} · ${data.pixelCount.toLocaleString()} decoded pixels · ${data.sampledWindowCount.toLocaleString()} local windows`, 'metric');
+  addReportParagraph(body, `Mean derived luminance ${data.globalMeanLuma.toFixed(2)} · global standard deviation ${data.globalLumaStandardDeviation.toFixed(2)}${data.endpointClippedFraction === undefined ? '' : ` · RGB endpoint-clipped fraction ${(data.endpointClippedFraction * 100).toFixed(2)}%`}`, 'settings');
+  appendChannelHistogram(body, data.histograms, `Decoded pixel histogram · ${result.parameters.channel}`);
+  const map = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  map.setAttribute('viewBox', `0 0 ${Math.max(1, data.sampledWindowColumns)} ${Math.max(1, data.sampledWindowRows)}`);
+  map.setAttribute('role', 'img');
+  map.setAttribute('aria-label', 'Sampled local standard deviation map; color shows relative window variation, not an edit score.');
+  map.classList.add('spatial-window-map');
+  const maxDeviation = Math.max(1e-9, ...data.windows.map(window => window.lumaStandardDeviation));
+  for (const window of data.windows) {
+    const rectangle = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rectangle.setAttribute('x', String(window.gridColumn));
+    rectangle.setAttribute('y', String(window.gridRow));
+    rectangle.setAttribute('width', '1');
+    rectangle.setAttribute('height', '1');
+    const level = window.lumaStandardDeviation / maxDeviation;
+    rectangle.setAttribute('fill', `hsl(${215 - level * 165} 72% 54%)`);
+    const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+    title.textContent = `Source ${window.x},${window.y} · ${window.width}×${window.height} · luma SD ${window.lumaStandardDeviation.toFixed(2)} · mean gradient ${window.meanGradientMagnitude.toFixed(2)}${window.endpointClippedFraction === undefined ? '' : ` · endpoint clipping ${(window.endpointClippedFraction * 100).toFixed(1)}%`}`;
+    rectangle.append(title);
+    map.append(rectangle);
+  }
+  addReportParagraph(body, 'Sampled local variation map · color is scaled to this image and does not classify edits.', 'settings');
+  body.append(map);
+  addReportParagraph(body, `${(data.sampledPixelCoverage * 100).toFixed(1)}% of source pixels represented by the sampled windows · window size ${data.windowSize}px · row/column sampling steps ${data.rowSamplingStep}/${data.columnSamplingStep}.`, 'settings');
+  if (result.warnings.length) {
+    const list = document.createElement('ul');
+    list.className = 'step-warnings';
+    for (const warning of result.warnings) list.append(node('li', '', warning));
+    body.append(node('h4', '', 'Coverage notes'), list);
+  }
+  addReportParagraph(body, data.interpretation);
+  card.append(body);
+  appendStepReport(card);
+}
+
 function appendStepReport(card) {
   $('results').querySelector('.results-empty')?.remove();
   const prior = $('results').querySelector(`[data-step-result="${card.dataset.stepResult}"]`);
@@ -710,7 +825,7 @@ function appendStepReport(card) {
 function appendBrowserStepError(stepId, error) {
   const card = node('article', 'result');
   card.dataset.stepResult = stepId;
-  const names = { '1.1': 'Source identity', '1.2': 'File structure', '1.3': 'Metadata inventory', '1.4': 'Quantization atlas', '1.5': 'Entropy coding', '1.6': 'Embedded images', '1.7': 'Byte distribution', '2.1': 'Decoded reference' };
+  const names = { '1.1': 'Source identity', '1.2': 'File structure', '1.3': 'Metadata inventory', '1.4': 'Quantization atlas', '1.5': 'Entropy coding', '1.6': 'Embedded images', '1.7': 'Byte distribution', '2.1': 'Decoded reference', '2.2': 'Spatial measurements' };
   card.append(node('h3', '', `${stepId} · ${names[stepId] || 'Browser step'}`));
   const body = node('div', 'result-body');
   addReportParagraph(body, `Step unavailable: ${error.message}`, 'error');

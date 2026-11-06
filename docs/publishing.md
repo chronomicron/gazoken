@@ -101,7 +101,7 @@ Pages hosts static HTML/CSS/JavaScript; it does not execute our Python API.
 
 | Entry point | Runs where | Current capabilities |
 | --- | --- | --- |
-| `index.html` | Visitor's browser; no Python installation | Workbench-matched three-phase layout and catalog; JPEG steps 1.1–1.7 and decoded-reference manifest 2.1; ELA, local-mean residual, Sobel edges, bit planes; sample gallery including a known PNG bit pattern. Other catalog steps explain local installation or planned status. |
+| `index.html` | Visitor's browser; no Python installation | Workbench-matched three-phase layout and catalog; JPEG steps 1.1–1.7 and decoded-image steps 2.1–2.2; ELA, local-mean residual, Sobel edges, bit planes; sample gallery including a known PNG bit pattern. Other catalog steps explain local installation or planned status. |
 | `jpeg.html` | Visitor's browser; no Python installation | Raw JPEG segments, metadata, quantization/Huffman tables, scan structure, hex view, byte statistics; three JPEG samples. |
 | `gazoken` command | User's local Python server and browser | Three-phase module framework, original-byte identity, file structure, bounded metadata, distribution, exact quantization tables, Huffman codebook/scan inventory and bounded embedded JPEG extraction, current-run evidence assembly, parameter/result/session records; most planned adapters remain unimplemented. |
 
@@ -154,9 +154,9 @@ Python workbench does not include this tracker.
 
 The static workbench now has a browser-specific shared `SourceContext` and
 isolated JavaScript adapters for JPEG steps 1.1–1.7 (source identity, file
-structure, metadata inventory, quantization tables, Huffman entropy coding, and
-embedded JPEG previews, and byte distribution), plus the browser-decoded pixel
-reference manifest for step 2.1. The wrapper retains the original encoded file and records an optional
+structure, metadata inventory, quantization tables, Huffman entropy coding,
+embedded JPEG previews, and byte distribution), plus browser-decoded steps
+2.1–2.2. The wrapper retains the original encoded file and records an optional
 decoded-pixel representation separately, so later format-specific steps can
 choose the representation they require. See [browser tool inputs and modules](browser-tools.md).
 This does not add BMP support or change the Python adapter contract.

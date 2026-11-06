@@ -20,8 +20,8 @@ The goal is a usable website supported by reusable Python, C, and C++ packages.
 The static browser workbench in this checkout offers JPEG Phase 1 source identity,
 file-structure, metadata-inventory, quantization-atlas, entropy-coding,
 embedded-image, and byte-distribution steps, plus a browser-decoded pixel reference
-manifest for Phase 2. It also has JPEG error-level analysis, a noise residual, edge
-strength, and bit-plane inspection. These are exploratory views and measurements;
+manifest and basic spatial measurements for Phase 2. It also has JPEG error-level
+analysis, a noise residual, edge strength, and bit-plane inspection. These are exploratory views and measurements;
 they do not assign a tampering probability. Other catalog steps are run in the
 local Python workbench or remain under development. The separate read-only JPEG
 inspector displays raw-file structures, EXIF, quantization tables, and encoded-byte

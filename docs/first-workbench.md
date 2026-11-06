@@ -25,7 +25,9 @@ their byte ranges without decoding them. Step 1.7 plots the exact whole-file
 byte-value histogram and reports Shannon entropy as a descriptive statistic.
 Phase 2 step 2.1 records a manifest for the already-decoded browser pixel package,
 including decoder, color, orientation, and coordinate provenance. It is not the
-reproducible Python reference decode. See [browser tool inputs and modules](browser-tools.md).
+reproducible Python reference decode. Step 2.2 adds descriptive channel
+histograms and sampled local variation, gradient, and clipping summaries; it
+does not classify low-texture regions. See [browser tool inputs and modules](browser-tools.md).
 
 Run selected tools, compare outputs with the source preview, and optionally save
 a result as a PNG. Result cards record method version, settings, a descriptive
