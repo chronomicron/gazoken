@@ -15,6 +15,7 @@ const selectedSteps = new Set(['1.1', '1.2', '1.3', '1.4', '1.7']);
 let stepCatalog = [];
 let sourceContext = null;
 let viewerMode = 'image';
+let quantizationMapStyle = 'mesh';
 let viewerGeneration = 0;
 let quantizationCache = null;
 const browserStepIds = new Set(['1.1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.7', '2.1', '2.2', '3.3']);
@@ -109,6 +110,219 @@ function renderQuantizationTables(result) {
   if (result.warnings.length) view.append(node('p', 'viewer-quant-warning', result.warnings.slice(0, 3).join(' ')));
 }
 
+function drawQuantizationSurface(canvas, table, style) {
+  const bounds = canvas.getBoundingClientRect();
+  const width = Math.max(1, Math.floor(bounds.width));
+  const height = Math.max(1, Math.floor(bounds.height));
+  const scale = window.devicePixelRatio || 1;
+  canvas.width = Math.round(width * scale);
+  canvas.height = Math.round(height * scale);
+  const context = canvas.getContext('2d');
+  context.scale(scale, scale);
+  context.clearRect(0, 0, width, height);
+
+  const size = 8;
+  const tileX = Math.min(56, (width - 64) / size);
+  const tileY = tileX * 0.5;
+  const heightScale = Math.min(98, tileX * 1.75);
+  const heightReference = Math.max(1, table.maximum);
+  const centerX = width / 2;
+  const baseY = 28 + heightScale;
+  const point = (row, column, value) => ({
+    x: centerX + (column - row) * tileX / 2,
+    y: baseY + (row + column) * tileY / 2 - value / heightReference * heightScale,
+  });
+  const valueAt = (row, column) => table.values[row * size + column];
+  const samplePoint = (row, column, value = valueAt(row, column)) => point(row, column, value);
+  const colorFor = value => {
+    const range = table.maximum - table.minimum;
+    const level = range ? (value - table.minimum) / range : 0.5;
+    return `hsl(${132 - level * 78} 42% ${78 - level * 22}%)`;
+  };
+  const drawFace = (points, fill, stroke = '#233c32') => {
+    context.beginPath();
+    context.moveTo(points[0].x, points[0].y);
+    for (let index = 1; index < points.length; index++) context.lineTo(points[index].x, points[index].y);
+    context.closePath();
+    context.fillStyle = fill;
+    context.fill();
+    context.strokeStyle = stroke;
+    context.lineWidth = 0.7;
+    context.stroke();
+  };
+
+  if (style === 'stems') {
+    // Draw the projected zero-height grid, then one vertical stem per table value.
+    context.strokeStyle = '#53665e';
+    context.lineWidth = 0.65;
+    for (let row = 0; row < size; row++) {
+      context.beginPath();
+      for (let column = 0; column < size; column++) {
+        const p = point(row, column, 0);
+        if (column === 0) context.moveTo(p.x, p.y);
+        else context.lineTo(p.x, p.y);
+      }
+      context.stroke();
+    }
+    for (let column = 0; column < size; column++) {
+      context.beginPath();
+      for (let row = 0; row < size; row++) {
+        const p = point(row, column, 0);
+        if (row === 0) context.moveTo(p.x, p.y);
+        else context.lineTo(p.x, p.y);
+      }
+      context.stroke();
+    }
+    for (let diagonal = 0; diagonal <= (size - 1) * 2; diagonal++) {
+      for (let row = Math.max(0, diagonal - size + 1); row <= Math.min(size - 1, diagonal); row++) {
+        const column = diagonal - row;
+        const value = valueAt(row, column);
+        const base = point(row, column, 0);
+        const top = samplePoint(row, column, value);
+        context.beginPath();
+        context.moveTo(base.x, base.y);
+        context.lineTo(top.x, top.y);
+        context.strokeStyle = colorFor(value);
+        context.lineWidth = 1.8;
+        context.stroke();
+        context.beginPath();
+        context.arc(top.x, top.y, 2.2, 0, Math.PI * 2);
+        context.fillStyle = colorFor(value);
+        context.fill();
+        context.fillStyle = '#e6eee8';
+        context.font = `${Math.max(7, Math.min(8, tileX * 0.14))}px monospace`;
+        context.textAlign = (row + column) % 2 ? 'left' : 'right';
+        context.textBaseline = 'bottom';
+        context.fillText(String(value), top.x + ((row + column) % 2 ? 4 : -4), top.y - 3);
+      }
+    }
+    context.fillStyle = '#afc3b7';
+    context.font = '9px monospace';
+    context.textAlign = 'left';
+    context.textBaseline = 'middle';
+    context.fillText('COLUMN →', centerX + tileX * 3.4, baseY + tileX * 1.9 + 10);
+    context.save();
+    context.translate(centerX - tileX * 3.7, baseY + tileX * 1.8 + 5);
+    context.rotate(-Math.PI / 4);
+    context.fillText('ROW', 0, 0);
+    context.restore();
+    return;
+  }
+
+  // Build a continuous height mesh whose 8 × 8 vertices are the actual table values.
+  for (let row = 0; row < size - 1; row++) for (let column = 0; column < size - 1; column++) {
+    const values = [valueAt(row, column), valueAt(row, column + 1), valueAt(row + 1, column + 1), valueAt(row + 1, column)];
+    drawFace([
+      samplePoint(row, column), samplePoint(row, column + 1),
+      samplePoint(row + 1, column + 1), samplePoint(row + 1, column),
+    ], colorFor(values.reduce((sum, value) => sum + value, 0) / values.length), '#365447');
+  }
+  context.strokeStyle = '#18382b';
+  context.lineWidth = 1;
+  for (let row = 0; row < size; row++) {
+    context.beginPath();
+    for (let column = 0; column < size; column++) {
+      const p = samplePoint(row, column);
+      if (column === 0) context.moveTo(p.x, p.y);
+      else context.lineTo(p.x, p.y);
+    }
+    context.stroke();
+  }
+  for (let column = 0; column < size; column++) {
+    context.beginPath();
+    for (let row = 0; row < size; row++) {
+      const p = samplePoint(row, column);
+      if (row === 0) context.moveTo(p.x, p.y);
+      else context.lineTo(p.x, p.y);
+    }
+    context.stroke();
+  }
+  if (style === 'combined') {
+    // Overlay bright stems from the base plane to every mesh sample.
+    for (let row = 0; row < size; row++) for (let column = 0; column < size; column++) {
+      const value = valueAt(row, column);
+      const base = point(row, column, 0);
+      const top = samplePoint(row, column, value);
+      context.beginPath();
+      context.moveTo(base.x, base.y);
+      context.lineTo(top.x, top.y);
+      context.strokeStyle = '#14271d';
+      context.lineWidth = 3.6;
+      context.stroke();
+      context.strokeStyle = '#fff0a8';
+      context.lineWidth = 1.5;
+      context.stroke();
+      context.beginPath();
+      context.arc(top.x, top.y, 2.4, 0, Math.PI * 2);
+      context.fillStyle = '#fff0a8';
+      context.fill();
+    }
+  }
+  for (let row = 0; row < size; row++) for (let column = 0; column < size; column++) {
+    const value = valueAt(row, column);
+    const p = samplePoint(row, column);
+    context.fillStyle = style === 'combined' ? '#f5f2db' : '#12271d';
+    context.font = `${Math.max(7, Math.min(9, tileX * 0.18))}px monospace`;
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    if (style === 'combined') {
+      context.lineWidth = 2.5;
+      context.strokeStyle = '#17271f';
+      context.strokeText(String(value), p.x, p.y);
+    }
+    context.fillText(String(value), p.x, p.y);
+  }
+
+  context.fillStyle = '#afc3b7';
+  context.font = '9px monospace';
+  context.textAlign = 'left';
+  context.textBaseline = 'middle';
+  context.fillText('COLUMN →', centerX + tileX * 3.4, baseY + tileX * 1.9 + 10);
+  context.save();
+  context.translate(centerX - tileX * 3.7, baseY + tileX * 1.8 + 5);
+  context.rotate(-Math.PI / 4);
+  context.fillText('ROW', 0, 0);
+  context.restore();
+}
+
+function renderQuantizationMaps(result) {
+  const view = $('quantization-map-view');
+  view.replaceChildren();
+  const measurements = result.measurements;
+  view.append(node('p', 'viewer-quant-note', 'Each table value is a height sample. Surface connects the 8 × 8 samples; Stems draws one perpendicular line per value; Combined overlays stems on the mesh. Heights are proportional to values and normalized to each table maximum.'));
+  if (!measurements.tables.length) {
+    view.append(node('p', 'viewer-message', 'No complete quantization table was found. This does not establish lossless encoding.'));
+    return;
+  }
+  const controls = node('div', 'quantization-map-controls');
+  for (const [style, label] of [['mesh', 'Surface mesh'], ['stems', 'Stems'], ['combined', 'Combined']]) {
+    const button = node('button', '', label);
+    button.type = 'button';
+    button.setAttribute('aria-pressed', String(quantizationMapStyle === style));
+    if (quantizationMapStyle === style) button.classList.add('active');
+    button.addEventListener('click', () => {
+      quantizationMapStyle = style;
+      renderQuantizationMaps(result);
+    });
+    controls.append(button);
+  }
+  view.append(controls);
+  for (const table of measurements.tables.slice(0, 4)) {
+    const section = node('section', 'viewer-quant-map-table');
+    section.append(node('h3', '', `Table ${table.tableId} · definition ${table.definitionIndex + 1} · ${table.precisionBits}-bit`));
+    section.append(node('p', 'viewer-quant-meta', `Stored range ${table.minimum}–${table.maximum} · height scaled to table maximum · natural frequency order`));
+    const canvas = node('canvas', 'quantization-surface-map');
+    canvas.setAttribute('role', 'img');
+    const styleLabel = { mesh: 'Isometric surface mesh', stems: 'Stem plot', combined: 'Combined mesh and stem plot' }[quantizationMapStyle];
+    canvas.setAttribute('aria-label', `${styleLabel} of quantization table ${table.tableId}; each mark shows one table value.`);
+    section.append(canvas);
+    view.append(section);
+    drawQuantizationSurface(canvas, table, quantizationMapStyle);
+  }
+  if (measurements.tables.length > 4) view.append(node('p', 'viewer-quant-meta', `Showing 4 of ${measurements.tables.length} final table definitions.`));
+  if (result.warnings.length) view.append(node('p', 'viewer-quant-warning', result.warnings.slice(0, 3).join(' ')));
+}
+
 async function renderViewerMode() {
   const generation = ++viewerGeneration;
   const hasSource = Boolean(sourceContext);
@@ -122,15 +336,16 @@ async function renderViewerMode() {
   $('image-wrap').hidden = true;
   $('byte-map-view').hidden = true;
   $('quantization-view').hidden = true;
+  $('quantization-map-view').hidden = true;
   $('empty-source').hidden = hasSource;
 
   if (!hasSource) {
-    $('view-tag').textContent = { image: 'SOURCE VIEW', bytes: 'ENCODED BYTE MAP', quantization: 'JPEG QUANTIZATION' }[viewerMode];
+    $('view-tag').textContent = { image: 'SOURCE VIEW', bytes: 'ENCODED BYTE MAP', quantization: 'JPEG QUANTIZATION', 'quantization-map': 'ISOMETRIC JPEG QUANTIZATION' }[viewerMode];
     $('stage-label').textContent = 'NO SOURCE LOADED';
     $('dimensions').textContent = '— × —';
     $('empty-heading').textContent = viewerMode === 'image'
       ? 'Start with an unknown.'
-      : viewerMode === 'quantization'
+      : ['quantization', 'quantization-map'].includes(viewerMode)
         ? 'Load a JPEG to view its quantization tables.'
         : 'Load an image to inspect its bytes.';
     if (viewerMode === 'image') {
@@ -142,7 +357,7 @@ async function renderViewerMode() {
     }
     $('preview-caption').textContent = viewerMode === 'bytes'
       ? 'Encoded bytes · not decoded image pixels.'
-      : viewerMode === 'quantization'
+      : ['quantization', 'quantization-map'].includes(viewerMode)
         ? 'Exact stored table values · not DCT coefficients.'
         : 'Display preview is separate from encoded-byte analysis.';
     return;
@@ -176,16 +391,19 @@ async function renderViewerMode() {
     return;
   }
 
-  $('view-tag').textContent = 'STORED JPEG QUANTIZATION TABLES';
+  const quantizationMode = ['quantization', 'quantization-map'].includes(viewerMode);
+  if (!quantizationMode) return;
+  const quantizationView = viewerMode === 'quantization' ? $('quantization-view') : $('quantization-map-view');
+  quantizationView.hidden = false;
+  $('view-tag').textContent = viewerMode === 'quantization-map' ? 'ISOMETRIC JPEG QUANTIZATION' : 'STORED JPEG QUANTIZATION TABLES';
   $('stage-label').textContent = 'JPEG QUANTIZATION';
   $('dimensions').textContent = sourceContext.mediaType === 'image/jpeg' ? '8 × 8 values per table' : 'JPEG only';
   $('preview-caption').textContent = 'Exact quantization values · not stored DCT coefficients.';
-  $('quantization-view').hidden = false;
   if (sourceContext.mediaType !== 'image/jpeg') {
-    $('quantization-view').replaceChildren(node('p', 'viewer-message', `Quantization tables are JPEG-specific. The loaded file is ${sourceContext.mediaType}.`));
+    quantizationView.replaceChildren(node('p', 'viewer-message', `Quantization tables are JPEG-specific. The loaded file is ${sourceContext.mediaType}.`));
     return;
   }
-  $('quantization-view').replaceChildren(node('p', 'viewer-message', 'Reading stored quantization tables…'));
+  quantizationView.replaceChildren(node('p', 'viewer-message', 'Reading stored quantization tables…'));
   try {
     const activeSource = sourceContext;
     if (!quantizationCache || quantizationCache.contextId !== activeSource.contextId) {
@@ -193,9 +411,10 @@ async function renderViewerMode() {
       quantizationCache = { contextId: activeSource.contextId, result };
     }
     if (generation !== viewerGeneration || sourceContext !== activeSource) return;
-    renderQuantizationTables(quantizationCache.result);
+    if (viewerMode === 'quantization-map') renderQuantizationMaps(quantizationCache.result);
+    else renderQuantizationTables(quantizationCache.result);
   } catch (error) {
-    if (generation === viewerGeneration) $('quantization-view').replaceChildren(node('p', 'error', `Could not read quantization tables: ${error.message}`));
+    if (generation === viewerGeneration) quantizationView.replaceChildren(node('p', 'error', `Could not read quantization tables: ${error.message}`));
   }
 }
 

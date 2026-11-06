@@ -100,6 +100,14 @@ step 1.4 JPEG adapter to show the final stored 8 × 8 quantization tables in the
 viewer. It stays on the workbench page and explains when a non-JPEG source has no
 JPEG quantization tables.
 
+The experimental **Quantization map** viewer offers three Canvas 2D projections
+of those same final tables: a connected isometric mesh with one vertex per
+stored value, a stem plot with one perpendicular line per value, and a combined
+view that overlays stems on the mesh. Heights are proportional to each table's
+values and normalized to that table's maximum; labels preserve the exact stored
+values. It shows up to four tables and is a static projection, not an interactive
+3D model or a forensic score.
+
 `assets/js/steps/decoded-reference.mjs` implements Phase 2, step 2.1 as a
 format-neutral manifest of the decoded pixels already attached to the source
 context. It records dimensions, channel layout, coordinate mapping, source hash,

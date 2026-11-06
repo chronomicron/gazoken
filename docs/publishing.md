@@ -121,9 +121,11 @@ guidance. The four browser-decoded pixel visualizations are grouped in a separat
 exploratory-view card at the top of the Phase 2 tool panel; they remain useful for
 illustration and comparison, without claiming validated detection. The browser
 viewer has working grid and zoom controls, a color map of original encoded bytes,
-and an in-place view of JPEG quantization tables. The encoded-byte JPEG inspector
-remains a separate page and asks visitors to choose the file there again. This
-shared presentation does not make the local FastAPI API available on GitHub Pages.
+an in-place view of JPEG quantization tables, and an experimental isometric
+quantization map with connected-mesh, stem, and combined views. The encoded-byte
+JPEG inspector remains a separate page and asks visitors to choose the file
+there again. This shared presentation does not make the local FastAPI API
+available on GitHub Pages.
 
 For the full app today, users can clone the repository **or download its source
 ZIP**, install Python 3.11+, create a virtual environment, install the checkout

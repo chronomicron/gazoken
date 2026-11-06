@@ -46,7 +46,7 @@
         <section class="evidence" aria-label="Image and results">
           <div class="panel-title"><div><p class="eyebrow">SOURCE &amp; EVIDENCE</p><h2 id="source-title">Your image, under examination</h2></div><div><button id="choose" class="button subtle" type="button">＋ Load image</button><button id="clear" class="button subtle" type="button" disabled>Clear</button></div></div>
           <section class="dropzone" id="drop-zone" aria-label="Image source area">
-            <div class="viewer-toolbar"><div class="mode-tabs" role="group" aria-label="Viewer mode"><button type="button" data-viewer-mode="image" class="active" aria-pressed="true">Image</button><button type="button" data-viewer-mode="bytes" aria-pressed="false">Byte map</button><button type="button" data-viewer-mode="quantization" aria-pressed="false">Quantization</button></div><span class="view-tag" id="view-tag">SOURCE VIEW</span></div>
+            <div class="viewer-toolbar"><div class="mode-tabs" role="group" aria-label="Viewer mode"><button type="button" data-viewer-mode="image" class="active" aria-pressed="true">Image</button><button type="button" data-viewer-mode="bytes" aria-pressed="false">Byte map</button><button type="button" data-viewer-mode="quantization" aria-pressed="false">Quantization</button><button type="button" data-viewer-mode="quantization-map" aria-pressed="false">Quantization map</button></div><span class="view-tag" id="view-tag">SOURCE VIEW</span></div>
             <div class="sample-picker" id="sample-gallery"></div>
             <div class="stage">
               <div class="empty-state" id="empty-source">
@@ -56,6 +56,7 @@
               <div class="image-wrap" id="image-wrap" hidden><canvas id="original" aria-label="Browser-decoded source image"></canvas><canvas id="overlay" aria-label="Optional pixel coordinate reference grid"></canvas></div>
               <div class="byte-map-view" id="byte-map-view" hidden><canvas id="byte-map-canvas" aria-label="Color map of sampled original file bytes"></canvas><p id="byte-map-note"></p></div>
               <div class="quantization-view" id="quantization-view" hidden></div>
+              <div class="quantization-map-view" id="quantization-map-view" hidden></div>
               <div class="stage-coordinates"><span id="stage-label">NO SOURCE LOADED</span><span id="dimensions">— × —</span></div>
             </div>
             <input id="file" type="file" accept="image/jpeg,image/png,image/webp" hidden>
