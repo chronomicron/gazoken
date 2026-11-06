@@ -7,14 +7,15 @@ import { run as runEmbeddedImages } from './formats/jpeg/steps/embedded-images.m
 import { run as runByteDistribution } from './formats/jpeg/steps/byte-distribution.mjs';
 import { run as runDecodedReference } from './steps/decoded-reference.mjs';
 import { run as runSpatialMeasurements } from './steps/spatial-measurements.mjs';
+import { run as runColorRelationships } from './steps/color-relationships.mjs';
 
 const $ = (id) => document.getElementById(id);
 const dialog = $('python-dialog');
 const selectedSteps = new Set(['1.1', '1.2', '1.3', '1.4', '1.7']);
 let stepCatalog = [];
 let sourceContext = null;
-const browserStepIds = new Set(['1.1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.7', '2.1', '2.2']);
-const pixelStepIds = new Set(['2.1', '2.2']);
+const browserStepIds = new Set(['1.1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.7', '2.1', '2.2', '3.3']);
+const pixelStepIds = new Set(['2.1', '2.2', '3.3']);
 
 function canRunBrowserStep(stepId) {
   if (!sourceContext || !browserStepIds.has(stepId)) return false;
@@ -195,6 +196,8 @@ function renderStep(step) {
       ? 'This browser step records dimensions, pixel layout, source linkage, and decoder provenance for the current browser-decoded image. Python decoder controls do not apply here.'
     : step.id === '2.2'
       ? 'This browser step summarizes decoded RGB/luminance histograms and sampled local variation, gradient, and exact-endpoint clipping. It does not apply a low-texture threshold or make an editing finding.'
+    : step.id === '3.3'
+      ? 'This browser step compares whole-image RGB channel distributions, per-channel moments, pairwise correlations, and a low-saturation count. It is descriptive only; no forensic color test is implemented.'
     : step.implementation === 'ready'
       ? 'Method implemented in the local Python app. This static page cannot run it.'
       : 'Planned method. Local settings can be recorded; no measurement is produced.');
@@ -254,6 +257,13 @@ function browserParameterDefinitions(step) {
   if (step.id === '2.2') return step.parameters.map(parameter => parameter.key === 'channel'
     ? { ...parameter, options: ['Derived RGB luminance', 'Separate RGB channels'], default: 'Derived RGB luminance' }
     : parameter);
+  if (step.id === '3.3') return [
+    { key: 'representation', label: 'Browser comparison', type: 'select', options: ['RGB channels and pairwise correlations'], default: 'RGB channels and pairwise correlations' },
+    { key: 'method', label: 'Measurement', type: 'select', options: ['Descriptive whole-image summary'], default: 'Descriptive whole-image summary' },
+    step.parameters.find(parameter => parameter.key === 'saturation_floor'),
+    { key: 'region', label: 'Spatial scope', type: 'select', options: ['Whole image'], default: 'Whole image' },
+    step.parameters.find(parameter => parameter.key === 'include_channels'),
+  ].filter(Boolean);
   return step.parameters || [];
 }
 
@@ -280,6 +290,7 @@ async function executeBrowserStep(stepId, button, controls = button?.closest('.s
       '1.7': runByteDistribution,
       '2.1': runDecodedReference,
       '2.2': runSpatialMeasurements,
+      '3.3': runColorRelationships,
     };
     const result = await runners[stepId](sourceContext, parameters);
     if (stepId === '1.1') appendSourceIdentityResult(result);
@@ -291,6 +302,7 @@ async function executeBrowserStep(stepId, button, controls = button?.closest('.s
     else if (stepId === '1.7') appendByteDistributionResult(result);
     else if (stepId === '2.1') appendDecodedReferenceResult(result);
     else if (stepId === '2.2') appendSpatialMeasurementsResult(result);
+    else if (stepId === '3.3') appendColorRelationshipsResult(result);
     $('run-python-status').textContent = result.status === 'partial'
       ? `Step ${stepId} ran in this browser with partial coverage.`
       : `Step ${stepId} completed in this browser.`;
@@ -812,6 +824,35 @@ function appendSpatialMeasurementsResult(result) {
   appendStepReport(card);
 }
 
+function appendColorRelationshipsResult(result) {
+  const card = node('article', 'result');
+  card.dataset.stepResult = '3.3';
+  const top = node('div', 'result-top');
+  top.append(node('h3', '', '3.3 · RGB channel relationships'));
+  card.append(top);
+  const body = node('div', 'result-body');
+  const data = result.measurements;
+  addReportParagraph(body, `${result.status.toUpperCase()} · ${data.pixelCount.toLocaleString()} decoded pixels · whole-image scope`, 'metric');
+  if (data.histograms) appendChannelHistogram(body, data.histograms, 'Overlaid decoded RGB channel histograms · exact browser-decoded pixel counts');
+  else addReportParagraph(body, 'Channel histograms were omitted by the selected setting.', 'settings');
+  for (const channel of ['R', 'G', 'B']) {
+    const statistics = data.channels[channel];
+    addReportParagraph(body, `${channel}: mean ${statistics.mean.toFixed(2)} · population standard deviation ${statistics.standardDeviation.toFixed(2)}`, 'settings');
+  }
+  const correlations = data.pairwisePearsonCorrelation;
+  addReportParagraph(body, `Pairwise Pearson correlations: R–G ${correlations['R-G'] === null ? 'undefined (constant channel)' : correlations['R-G'].toFixed(4)} · R–B ${correlations['R-B'] === null ? 'undefined (constant channel)' : correlations['R-B'].toFixed(4)} · G–B ${correlations['G-B'] === null ? 'undefined (constant channel)' : correlations['G-B'].toFixed(4)}`, 'metric');
+  addReportParagraph(body, `Saturation definition: (max RGB − min RGB) / max RGB; black pixels use 0. Below floor ${data.saturationFloor.toFixed(2)}: ${data.pixelsBelowSaturationFloor.toLocaleString()} pixels (${(data.fractionBelowSaturationFloor * 100).toFixed(2)}%).`, 'settings');
+  if (result.warnings.length) {
+    const list = document.createElement('ul');
+    list.className = 'step-warnings';
+    for (const warning of result.warnings) list.append(node('li', '', warning));
+    body.append(node('h4', '', 'Coverage notes'), list);
+  }
+  addReportParagraph(body, data.interpretation);
+  card.append(body);
+  appendStepReport(card);
+}
+
 function appendStepReport(card) {
   $('results').querySelector('.results-empty')?.remove();
   const prior = $('results').querySelector(`[data-step-result="${card.dataset.stepResult}"]`);
@@ -825,7 +866,7 @@ function appendStepReport(card) {
 function appendBrowserStepError(stepId, error) {
   const card = node('article', 'result');
   card.dataset.stepResult = stepId;
-  const names = { '1.1': 'Source identity', '1.2': 'File structure', '1.3': 'Metadata inventory', '1.4': 'Quantization atlas', '1.5': 'Entropy coding', '1.6': 'Embedded images', '1.7': 'Byte distribution', '2.1': 'Decoded reference', '2.2': 'Spatial measurements' };
+  const names = { '1.1': 'Source identity', '1.2': 'File structure', '1.3': 'Metadata inventory', '1.4': 'Quantization atlas', '1.5': 'Entropy coding', '1.6': 'Embedded images', '1.7': 'Byte distribution', '2.1': 'Decoded reference', '2.2': 'Spatial measurements', '3.3': 'Color relationships' };
   card.append(node('h3', '', `${stepId} · ${names[stepId] || 'Browser step'}`));
   const body = node('div', 'result-body');
   addReportParagraph(body, `Step unavailable: ${error.message}`, 'error');

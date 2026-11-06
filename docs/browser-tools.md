@@ -1,7 +1,7 @@
 # Browser tool inputs and modules
 
 Updated: 2026-11-05  
-Status: browser source context v1, JPEG steps 1.1–1.7, and Phase 2 steps 2.1–2.2 implemented.
+Status: browser source context v1, JPEG steps 1.1–1.7, Phase 2 steps 2.1–2.2, and Phase 3 step 3.3 implemented.
 
 ## Shared source context
 
@@ -109,6 +109,14 @@ eligibility threshold is defined, so the result is explicitly partial and does
 not classify low-texture regions. The browser control does not offer native
 JPEG component planes.
 
+`assets/js/steps/color-relationships.mjs` implements Phase 3, step 3.3 as a
+whole-image descriptive RGB summary over the same browser-decoded package. It
+reports optional layered RGB histograms, per-channel means and standard
+deviations, pairwise Pearson correlations, and the fraction below the selected
+saturation floor. The floor uses `(max-min)/max`, with black defined as zero
+saturation. Pixel calculations run in a module worker. This is not the catalog's
+wavelet-ratio method, a hue map, a regional analysis, or a forensic detector.
+
 `assets/js/app.mjs` creates the context after the browser has decoded the selected
 image for display and attaches that separate RGBA pixel representation with
 browser-decoder provenance. The context retains the original file independently.
@@ -119,7 +127,7 @@ JPEG, PNG, or WebP pixel package when available. PNG and WebP cannot run the
 JPEG-specific Phase 1 steps.
 **Run selected** executes selected browser-backed steps in the active phase and
 catalog order. Phase 1 steps 1.1–1.7 run on encoded JPEG bytes; Phase 2 steps
-2.1–2.2 use the browser-decoded pixel package. Remaining Phase 2/3 selections show inline
+2.1–2.2 and Phase 3 step 3.3 use the browser-decoded pixel package. Remaining Phase 2/3 selections show inline
 configuration-only status and do not open the full-workbench dialog. Per-step
 guidance remains available for implementation status.
 
@@ -147,7 +155,7 @@ workspace remains JPEG. BMP signature parsing, BMP decoding, per-format tool
 registration, worker transfer rules, larger numerical types, color-management
 policy, and a stable serialized/cross-language contract are open future work.
 JPEG steps 1.1–1.7 currently read/hash or parse the whole file on the main browser
-thread; step 2.2 processes decoded pixels in a worker. The low-level JPEG inspector
+thread; steps 2.2 and 3.3 process decoded pixels in a worker. The low-level JPEG inspector
 computes some additional byte statistics internally, although steps 1.2–1.6
 return only their declared structural, metadata, table, coding, or preview fields. The
 low-level parser defaults to 256 Huffman definitions; it also limits structural

@@ -27,7 +27,9 @@ Phase 2 step 2.1 records a manifest for the already-decoded browser pixel packag
 including decoder, color, orientation, and coordinate provenance. It is not the
 reproducible Python reference decode. Step 2.2 adds descriptive channel
 histograms and sampled local variation, gradient, and clipping summaries; it
-does not classify low-texture regions. See [browser tool inputs and modules](browser-tools.md).
+does not classify low-texture regions. Phase 3 step 3.3 reports layered RGB
+histograms, channel moments, pairwise correlations, and a low-saturation count;
+it does not implement a forensic color test. See [browser tool inputs and modules](browser-tools.md).
 
 Run selected tools, compare outputs with the source preview, and optionally save
 a result as a PNG. Result cards record method version, settings, a descriptive

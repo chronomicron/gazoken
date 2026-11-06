@@ -63,8 +63,8 @@ histograms, moments and zero fractions without inferring compression history.
 A [current-run evidence report](evidence-report.md) assembles Phase 1 outputs
 without adding a forensic verdict. The local Python Phase 2 and Phase 3 analyses
 remain configuration-only. The static site provides a browser-decoded reference
-manifest and descriptive Phase 2 spatial summaries, with coverage limits; Phase 3
-has no browser measurements yet.
+manifest, descriptive Phase 2 spatial summaries, and a descriptive whole-image RGB
+channel summary in Phase 3, each with explicit coverage limits.
 No calibrated detector, scientific benchmark, C/C++ package, or paper is
 implemented yet.
 

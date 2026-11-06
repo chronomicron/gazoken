@@ -14,6 +14,7 @@ Image Forensics Workbench, under グルー研究室 · Grou-lab.
 | [Byte distribution](byte-distribution.md) | Python and static-browser step 1.7: exact whole-file byte histogram, Shannon entropy and limits. |
 | [Browser decoded reference](decoded-reference.md) | Static-browser step 2.1: browser pixel package provenance, dimensions, coordinate mapping and limits. |
 | [Spatial measurements](spatial-measurements.md) | Static-browser step 2.2: RGB/luminance histograms, sampled local variation and gradient summaries, clipping indicators and limits. |
+| [Color relationships](color-relationships.md) | Static-browser step 3.3: layered RGB histograms, channel moments, pairwise correlations and limits. |
 | [Entropy coding](entropy-coding.md) | Python and static-browser step 1.5: stored Huffman definitions, canonical codes, scan-time assignments and limits. |
 | [Metadata inventory](metadata-inventory.md) | Python and static-browser step 1.3: bounded Exif, reader options, GPS/vendor controls and limitations. |
 | [JPEG file structure](file-structure.md) | Python and static-browser step 1.2: marker map, frames, scans, restart intervals and byte-boundary checks. |

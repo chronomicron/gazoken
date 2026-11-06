@@ -127,3 +127,72 @@ export function measureSpatial(pixels, width, height, options = {}) {
     windows,
   };
 }
+
+export function measureColorRelationships(pixels, width, height, options = {}) {
+  validatePixels(pixels, width, height);
+  const saturationFloor = options.saturation_floor ?? 0.05;
+  const includeChannels = options.include_channels ?? true;
+  if (!Number.isFinite(saturationFloor) || saturationFloor < 0 || saturationFloor > 1) {
+    throw new RangeError('Saturation floor must be between 0 and 1.');
+  }
+  if (typeof includeChannels !== 'boolean') throw new TypeError('Channel histogram control must be true or false.');
+
+  const histogram = includeChannels ? { R: Array(256).fill(0), G: Array(256).fill(0), B: Array(256).fill(0) } : null;
+  const count = width * height;
+  let meanR = 0, meanG = 0, meanB = 0;
+  let m2R = 0, m2G = 0, m2B = 0;
+  let covarianceRG = 0, covarianceRB = 0, covarianceGB = 0;
+  let belowSaturationFloor = 0;
+  for (let index = 0; index < count; index++) {
+    const offset = index * 4;
+    const red = pixels[offset];
+    const green = pixels[offset + 1];
+    const blue = pixels[offset + 2];
+    if (histogram) {
+      histogram.R[red]++;
+      histogram.G[green]++;
+      histogram.B[blue]++;
+    }
+    const n = index + 1;
+    const deltaR = red - meanR;
+    const deltaG = green - meanG;
+    const deltaB = blue - meanB;
+    meanR += deltaR / n;
+    meanG += deltaG / n;
+    meanB += deltaB / n;
+    m2R += deltaR * (red - meanR);
+    m2G += deltaG * (green - meanG);
+    m2B += deltaB * (blue - meanB);
+    covarianceRG += deltaR * (green - meanG);
+    covarianceRB += deltaR * (blue - meanB);
+    covarianceGB += deltaG * (blue - meanB);
+    const maximum = Math.max(red, green, blue);
+    const minimum = Math.min(red, green, blue);
+    const saturation = maximum === 0 ? 0 : (maximum - minimum) / maximum;
+    if (saturation < saturationFloor) belowSaturationFloor++;
+  }
+  const standardDeviation = value => Math.sqrt(Math.max(0, value / count));
+  const correlation = (covariance, firstMoment, secondMoment) => {
+    const denominator = Math.sqrt(firstMoment * secondMoment);
+    return denominator ? Math.max(-1, Math.min(1, covariance / denominator)) : null;
+  };
+  return {
+    width,
+    height,
+    pixelCount: count,
+    channels: {
+      R: { mean: meanR, standardDeviation: standardDeviation(m2R) },
+      G: { mean: meanG, standardDeviation: standardDeviation(m2G) },
+      B: { mean: meanB, standardDeviation: standardDeviation(m2B) },
+    },
+    pairwisePearsonCorrelation: {
+      'R-G': correlation(covarianceRG, m2R, m2G),
+      'R-B': correlation(covarianceRB, m2R, m2B),
+      'G-B': correlation(covarianceGB, m2G, m2B),
+    },
+    saturationFloor,
+    pixelsBelowSaturationFloor: belowSaturationFloor,
+    fractionBelowSaturationFloor: belowSaturationFloor / count,
+    ...(histogram ? { histograms: histogram } : {}),
+  };
+}

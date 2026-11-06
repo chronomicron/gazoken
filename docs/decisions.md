@@ -401,6 +401,21 @@ Proposals remain separate until agreed. The initial handoff predates this log;
   [spatial measurements](spatial-measurements.md) and
   [browser tool inputs and modules](browser-tools.md).
 
+## D028 — Browser RGB channel relationships — 2026-11-05
+
+- Status: implemented increment, requested by Robert after step 2.2.
+- Decision: add an isolated JavaScript adapter for Phase 3, step 3.3 using the
+  browser-decoded pixel package. Provide whole-image RGB histograms, channel
+  moments, pairwise correlations, and a low-saturation fraction; run pixel loops
+  in the module worker.
+- Rationale: give visitors a layered channel visualization and basic comparison
+  measurements without claiming a method-specific forensic result.
+- Consequences: report partial coverage because hue maps, regional comparisons,
+  and the wavelet-ratio candidate are not implemented. Preserve browser decoder
+  provenance and make no editing or device attribution. See
+  [color relationships](color-relationships.md) and
+  [browser tool inputs and modules](browser-tools.md).
+
 ## Pending proposals
 
 
