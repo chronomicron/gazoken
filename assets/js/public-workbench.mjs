@@ -5,18 +5,29 @@ import { run as runQuantizationTables } from './formats/jpeg/steps/quantization-
 import { run as runEntropyCoding } from './formats/jpeg/steps/entropy-coding.mjs';
 import { run as runEmbeddedImages } from './formats/jpeg/steps/embedded-images.mjs';
 import { run as runByteDistribution } from './formats/jpeg/steps/byte-distribution.mjs';
+import { run as runDecodedReference } from './steps/decoded-reference.mjs';
 
 const $ = (id) => document.getElementById(id);
 const dialog = $('python-dialog');
 const selectedSteps = new Set(['1.1', '1.2', '1.3', '1.4', '1.7']);
 let stepCatalog = [];
 let sourceContext = null;
-const browserStepIds = new Set(['1.1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.7']);
+const browserStepIds = new Set(['1.1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.7', '2.1']);
+const pixelStepIds = new Set(['2.1']);
+
+function canRunBrowserStep(stepId) {
+  if (!sourceContext || !browserStepIds.has(stepId)) return false;
+  if (pixelStepIds.has(stepId)) {
+    return ['image/jpeg', 'image/png', 'image/webp'].includes(sourceContext.mediaType)
+      && sourceContext.record().representations?.decodedPixels?.available === true;
+  }
+  return sourceContext.mediaType === 'image/jpeg';
+}
 
 document.addEventListener('gazoken:source-context', ({ detail }) => {
   sourceContext = detail?.sourceContext || null;
   document.querySelectorAll('[data-run-browser-step]').forEach(button => {
-    button.disabled = !sourceContext || sourceContext.mediaType !== 'image/jpeg';
+    button.disabled = !canRunBrowserStep(button.dataset.runBrowserStep);
   });
 });
 
@@ -139,7 +150,9 @@ function renderStep(step) {
   const info = node('span', 'step-info');
   info.append(node('strong', '', step.title));
   info.append(node('small', '', step.subtitle || step.group || 'Investigation step'));
-  const state = step.implementation === 'ready' ? null : node('span', 'step-state', 'PLANNED');
+  const state = browserStep && step.implementation !== 'ready'
+    ? node('span', 'step-state ready', 'BROWSER')
+    : step.implementation === 'ready' ? null : node('span', 'step-state', 'PLANNED');
   const chevron = node('span', 'chevron', '›');
   summary.append(number, info);
   if (state) summary.append(state);
@@ -177,16 +190,24 @@ function renderStep(step) {
       ? 'This browser step locates declared embedded JPEG previews in Exif and JFXX blocks, verifies their bounded byte ranges, and records hashes without replacing or decoding the source.'
     : step.id === '1.7'
       ? 'This browser step counts each byte value in the original encoded file and reports descriptive Shannon entropy. The result is not a tampering score.'
+    : step.id === '2.1'
+      ? 'This browser step records dimensions, pixel layout, source linkage, and decoder provenance for the current browser-decoded image. Python decoder controls do not apply here.'
     : step.implementation === 'ready'
       ? 'Method implemented in the local Python app. This static page cannot run it.'
       : 'Planned method. Local settings can be recorded; no measurement is produced.');
   controls.append(legend, description);
-  if (step.parameters?.length) {
+  if (step.parameters?.length && step.id !== '2.1') {
     const grid = node('div', 'parameter-preview');
-    for (const parameter of step.parameters) addParameter(grid, parameter, browserStep);
+    for (const parameter of step.parameters || []) addParameter(grid, parameter, browserStep);
     controls.append(grid);
   }
-  const inputText = step.tool?.inputs?.length ? 'Required input: ' + step.tool.inputs.join(', ') + '.' : '';
+  const inputText = browserStep
+    ? step.id === '2.1'
+      ? 'Browser input: current decoded pixel package plus its original-file source identity and decoder provenance.'
+      : step.id.startsWith('2.') || step.id.startsWith('3.')
+        ? 'Browser input: the separate decoded pixel package; the original encoded file remains unchanged.'
+        : step.tool?.inputs?.length ? 'Required input: original encoded JPEG bytes.' : ''
+    : step.tool?.inputs?.length ? 'Required input: ' + step.tool.inputs.join(', ') + '.' : '';
   if (inputText) controls.append(node('p', 'step-input-note', inputText));
   controls.append(note);
   const actions = node('div', 'step-actions');
@@ -194,7 +215,7 @@ function renderStep(step) {
   use.type = 'button';
   if (browserStep) {
     use.dataset.runBrowserStep = step.id;
-    use.disabled = !sourceContext || sourceContext.mediaType !== 'image/jpeg';
+    use.disabled = !canRunBrowserStep(step.id);
     use.title = `Runs step ${step.id} on the original encoded JPEG file.`;
     use.addEventListener('click', async () => {
       await executeBrowserStep(step.id, use, controls);
@@ -225,8 +246,10 @@ function readParameters(controls) {
 }
 
 async function executeBrowserStep(stepId, button, controls = button?.closest('.step-card')?.querySelector('.step-controls')) {
-  if (!sourceContext || sourceContext.mediaType !== 'image/jpeg') {
-    $('run-python-status').textContent = `Load a JPEG image to run step ${stepId} in the browser.`;
+  if (!canRunBrowserStep(stepId)) {
+    $('run-python-status').textContent = pixelStepIds.has(stepId)
+      ? `Load a supported image with decoded pixels to run step ${stepId} in the browser.`
+      : `Load a JPEG image to run step ${stepId} in the browser.`;
     return false;
   }
   if (button) {
@@ -243,6 +266,7 @@ async function executeBrowserStep(stepId, button, controls = button?.closest('.s
       '1.5': runEntropyCoding,
       '1.6': runEmbeddedImages,
       '1.7': runByteDistribution,
+      '2.1': runDecodedReference,
     };
     const result = await runners[stepId](sourceContext, parameters);
     if (stepId === '1.1') appendSourceIdentityResult(result);
@@ -251,7 +275,8 @@ async function executeBrowserStep(stepId, button, controls = button?.closest('.s
     else if (stepId === '1.4') appendQuantizationTablesResult(result);
     else if (stepId === '1.5') appendEntropyCodingResult(result);
     else if (stepId === '1.6') appendEmbeddedImagesResult(result);
-    else appendByteDistributionResult(result);
+    else if (stepId === '1.7') appendByteDistributionResult(result);
+    else if (stepId === '2.1') appendDecodedReferenceResult(result);
     $('run-python-status').textContent = `Step ${stepId} completed in this browser.`;
     return true;
   } catch (error) {
@@ -261,7 +286,7 @@ async function executeBrowserStep(stepId, button, controls = button?.closest('.s
   } finally {
     if (button) {
       button.textContent = 'Run this step in browser';
-      button.disabled = !sourceContext || sourceContext.mediaType !== 'image/jpeg';
+      button.disabled = !canRunBrowserStep(stepId);
     }
   }
 }
@@ -653,6 +678,25 @@ function appendByteDistributionResult(result) {
   appendStepReport(card);
 }
 
+function appendDecodedReferenceResult(result) {
+  const card = node('article', 'result');
+  card.dataset.stepResult = '2.1';
+  const top = node('div', 'result-top');
+  top.append(node('h3', '', '2.1 · Browser-decoded reference'));
+  card.append(top);
+  const body = node('div', 'result-body');
+  const data = result.measurements;
+  addReportParagraph(body, `${data.width.toLocaleString()} × ${data.height.toLocaleString()} pixels · ${data.pixelCount.toLocaleString()} pixels · ${data.dtype} ${data.channels.join('/')}`, 'metric');
+  addReportParagraph(body, `Layout: ${data.layout}`, 'settings');
+  addReportParagraph(body, `Decoder: ${data.decoderProvenance.decoder || 'browser default'} · ${data.decoderProvenance.decoderVersion || 'version unavailable'}`, 'settings');
+  addReportParagraph(body, `Color/alpha policy: ${data.decoderProvenance.colorPolicy || 'not supplied by the browser decoder'}`);
+  addReportParagraph(body, `Orientation: ${data.decoderProvenance.orientationPolicy || 'browser default'} · coordinates: ${data.coordinateMapping}`);
+  addReportParagraph(body, `Source SHA-256: ${data.sourceSha256}`, 'metric');
+  addReportParagraph(body, data.interpretation, 'step-hint');
+  card.append(body);
+  appendStepReport(card);
+}
+
 function appendStepReport(card) {
   $('results').querySelector('.results-empty')?.remove();
   const prior = $('results').querySelector(`[data-step-result="${card.dataset.stepResult}"]`);
@@ -666,7 +710,7 @@ function appendStepReport(card) {
 function appendBrowserStepError(stepId, error) {
   const card = node('article', 'result');
   card.dataset.stepResult = stepId;
-  const names = { '1.1': 'Source identity', '1.2': 'File structure', '1.3': 'Metadata inventory', '1.4': 'Quantization atlas', '1.5': 'Entropy coding', '1.6': 'Embedded images', '1.7': 'Byte distribution' };
+  const names = { '1.1': 'Source identity', '1.2': 'File structure', '1.3': 'Metadata inventory', '1.4': 'Quantization atlas', '1.5': 'Entropy coding', '1.6': 'Embedded images', '1.7': 'Byte distribution', '2.1': 'Decoded reference' };
   card.append(node('h3', '', `${stepId} · ${names[stepId] || 'Browser step'}`));
   const body = node('div', 'result-body');
   addReportParagraph(body, `Step unavailable: ${error.message}`, 'error');
@@ -675,7 +719,7 @@ function appendBrowserStepError(stepId, error) {
 }
 
 function updateSignal(stepId, signal, implementation) {
-  const status = !selectedSteps.has(stepId) ? 'gray' : implementation === 'ready' ? 'green' : 'amber';
+  const status = !selectedSteps.has(stepId) ? 'gray' : implementation === 'ready' || browserStepIds.has(stepId) ? 'green' : 'amber';
   signal.dataset.status = status;
   signal.setAttribute('aria-label', status === 'green'
     ? browserStepIds.has(stepId) ? 'Selected; can run in this browser' : 'Selected; available in the local workbench'
@@ -688,14 +732,15 @@ function updateSelection() {
   const selected = steps.filter(step => selectedSteps.has(step.id));
   $('selected-count').textContent = `${selected.length} selected`;
   const browserCount = selected.filter(step => browserStepIds.has(step.id)).length;
-  const localCount = selected.length - browserCount;
+  const localCount = selected.filter(step => !browserStepIds.has(step.id) && step.implementation === 'ready').length;
+  const plannedCount = selected.length - browserCount - localCount;
+  const availability = [];
+  if (browserCount) availability.push(`${browserCount} runs here`);
+  if (localCount) availability.push(`${localCount} available locally`);
+  if (plannedCount) availability.push(`${plannedCount} configuration only`);
   $('ready-count').textContent = selected.length === 0
     ? 'No selected steps'
-    : browserCount && localCount
-      ? `${browserCount} runs here · ${localCount} local`
-      : browserCount
-        ? `${browserCount} browser step${browserCount === 1 ? '' : 's'}`
-        : `${localCount} local step${localCount === 1 ? '' : 's'}`;
+    : availability.join(' · ');
   $('execution-plan').replaceChildren(...selected.map(step => {
     const item = node('li');
     item.append(node('b', '', step.id), node('span', '', step.title));
@@ -730,7 +775,7 @@ async function loadCatalog() {
 document.querySelectorAll('button[data-public-phase]').forEach(button => button.addEventListener('click', loadCatalog));
 $('select-ready').addEventListener('click', () => {
   const phase = document.body.dataset.publicPhase + '.';
-  for (const step of stepCatalog.filter(item => item.id.startsWith(phase) && item.implementation === 'ready')) selectedSteps.add(step.id);
+  for (const step of stepCatalog.filter(item => item.id.startsWith(phase) && (item.implementation === 'ready' || browserStepIds.has(item.id)))) selectedSteps.add(step.id);
   updateSelection();
 });
 $('select-all').addEventListener('click', () => {
@@ -753,7 +798,7 @@ $('run-python').addEventListener('click', () => {
   const browserSteps = selected.filter(step => browserStepIds.has(step.id));
   if (!browserSteps.length) {
     $('run-python-status').textContent = ['2', '3'].includes(phase.slice(0, -1))
-      ? `Phase ${phase.slice(0, -1)} has no browser analysis adapters yet. These selections are configuration only; no measurement was produced. The local workbench can record settings, but these methods are not implemented there yet either.`
+      ? `No selected Phase ${phase.slice(0, -1)} step can run in this browser. These selections are configuration only; no measurement was produced. The local workbench can record settings, but these methods are not implemented there yet either.`
       : 'None of the selected steps can run in this browser. No measurement was produced; use the local workbench for supported local tools.';
     return;
   }
@@ -766,9 +811,13 @@ $('run-python').addEventListener('click', () => {
       completed++;
     }
     const localCount = selected.length - completed;
-    $('run-python-status').textContent = localCount
-      ? `${completed} browser step${completed === 1 ? '' : 's'} completed. ${localCount} other selected step${localCount === 1 ? ' needs' : 's need'} the local Python workbench.`
-      : `${completed} browser step${completed === 1 ? '' : 's'} completed.`;
+    const remaining = selected.filter(step => !browserStepIds.has(step.id));
+    const implementedLocally = remaining.filter(step => step.implementation === 'ready').length;
+    const planned = remaining.length - implementedLocally;
+    const notices = [];
+    if (implementedLocally) notices.push(`${implementedLocally} other selected step${implementedLocally === 1 ? ' is' : 's are'} available in the local Python workbench.`);
+    if (planned) notices.push(`${planned} selected step${planned === 1 ? ' is' : 's are'} configuration only; no measurement was produced.`);
+    $('run-python-status').textContent = `${completed} browser step${completed === 1 ? '' : 's'} completed.${notices.length ? ` ${notices.join(' ')}` : ''}`;
   })();
 });
 

@@ -1,7 +1,7 @@
 # Browser tool inputs and modules
 
 Updated: 2026-11-05  
-Status: browser source context v1 and JPEG steps 1.1–1.7 implemented; later steps remain unchanged
+Status: browser source context v1, JPEG steps 1.1–1.7, and decoded-reference step 2.1 implemented.
 
 ## Shared source context
 
@@ -92,34 +92,43 @@ values and Shannon entropy in bits per byte; the static catalog currently offers
 whole-file scope only. The result card plots the counts as an SVG histogram.
 These are descriptive byte-stream statistics, not a tampering score.
 
+`assets/js/steps/decoded-reference.mjs` implements Phase 2, step 2.1 as a
+format-neutral manifest of the decoded pixels already attached to the source
+context. It records dimensions, channel layout, coordinate mapping, source hash,
+and browser decoder/color/orientation provenance without decoding again or
+allocating another pixel copy. This browser result is explicitly a display-pixel
+reference; it does not satisfy the planned reproducible Python/native decoder
+choice or provide native JPEG component planes.
+
 `assets/js/app.mjs` creates the context after the browser has decoded the selected
 image for display and attaches that separate RGBA pixel representation with
 browser-decoder provenance. The context retains the original file independently.
 It keeps the workbench's existing pixel buffer rather than allocating a duplicate;
 tools receive a detached copy only when they request that representation.
-The browser steps currently accept detected JPEG input only. PNG and WebP remain
-usable for existing Phase 2 browser views, but cannot run these JPEG-specific
-steps.
-The Phase 1 **Run selected** control executes selected browser-backed steps 1.1
-through 1.7 in catalog order. When other selected steps are included, it runs the
-browser-backed steps and reports that the remaining selections require the local
-workbench. Selecting only Phase 2 or Phase 3 steps shows an inline status that no
-browser measurement ran; it does not open the full-workbench dialog. The per-step
-guidance button remains available for installation and implementation status.
+JPEG steps 1.1–1.7 accept detected JPEG input only. Step 2.1 accepts the decoded
+JPEG, PNG, or WebP pixel package when available. PNG and WebP cannot run the
+JPEG-specific Phase 1 steps.
+**Run selected** executes selected browser-backed steps in the active phase and
+catalog order. Phase 1 steps 1.1–1.7 run on encoded JPEG bytes; Phase 2 step 2.1
+records the browser-decoded package. Remaining Phase 2/3 selections show inline
+configuration-only status and do not open the full-workbench dialog. Per-step
+guidance remains available for implementation status.
 
 Example future organization:
 
 ```text
 assets/js/
 ├── core/source-context.mjs
+├── steps/<format-neutral-step-module>.mjs
 └── formats/
     ├── jpeg/steps/<step-module>.mjs
     └── bmp/steps/<step-module>.mjs
 ```
 
-Add a format-specific module only when that step is implemented. Do not create
-placeholder algorithms or claim that the current Python step catalog runs in the
-static browser. The public GitHub Pages site still has no Python backend.
+Keep each tool in its own module, using format-neutral steps when they consume the
+shared decoded package and format-specific modules when they inspect an encoding.
+Do not create placeholder algorithms or imply that a browser adapter is a Python
+measurement. The public GitHub Pages site still has no Python backend.
 
 ## Limits and next extensions
 

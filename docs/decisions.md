@@ -371,6 +371,20 @@ Proposals remain separate until agreed. The initial handoff predates this log;
   [byte distribution](byte-distribution.md) and
   [browser tool inputs and modules](browser-tools.md).
 
+## D026 — Browser-decoded Phase 2 reference — 2026-11-05
+
+- Status: implemented increment, requested by Robert after the Phase 2/3 review.
+- Decision: add a format-neutral static-browser adapter for step 2.1. It records
+  the decoded pixel package already attached to `SourceContext`, including source
+  identity, dimensions, channels, layout, coordinate mapping, and browser decoder,
+  color, alpha, and orientation provenance. It does not decode a second copy.
+- Rationale: make the exact browser pixel representation available to subsequent
+  static tools while preserving the source and describing decoder limits.
+- Consequences: this supports JPEG, PNG, and WebP browser display pixels but does
+  not provide the reproducible Python/native JPEG decoder or component planes
+  proposed for the local framework. See [decoded reference](decoded-reference.md)
+  and [browser tool inputs and modules](browser-tools.md).
+
 ## Pending proposals
 
 
