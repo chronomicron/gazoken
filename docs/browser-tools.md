@@ -1,7 +1,7 @@
 # Browser tool inputs and modules
 
 Updated: 2026-11-05  
-Status: browser source context v1 and JPEG steps 1.1–1.4 implemented; later steps remain unchanged
+Status: browser source context v1 and JPEG steps 1.1–1.5 implemented; later steps remain unchanged
 
 ## Shared source context
 
@@ -70,6 +70,15 @@ definition history, assignments, and bounded parser warnings. These are stored
 encoding choices; they do not estimate quality, identify an encoder, or prove a
 prior save or edit.
 
+`assets/js/formats/jpeg/steps/entropy-coding.mjs` implements Phase 1, step 1.5
+using the original encoded bytes. It inventories chronological DHT definitions,
+validates canonical code trees, optionally includes stored symbols and derived
+codes, and links scan selectors to the active definitions. Its options match the
+step catalog. Progressive DC refinement requires no Huffman assignment, and
+arithmetic-coded frames are reported as unsupported for these assignments. The
+adapter does not decode entropy symbols or infer coding efficiency or encoder
+identity.
+
 `assets/js/app.mjs` creates the context after the browser has decoded the selected
 image for display and attaches that separate RGBA pixel representation with
 browser-decoder provenance. The context retains the original file independently.
@@ -79,7 +88,7 @@ The browser steps currently accept detected JPEG input only. PNG and WebP remain
 usable for existing Phase 2 browser views, but cannot run these JPEG-specific
 steps.
 The Phase 1 **Run selected** control executes selected browser-backed steps 1.1
-through 1.4 in catalog order. When other selected steps are included, it runs the
+through 1.5 in catalog order. When other selected steps are included, it runs the
 browser-backed steps and reports that the remaining selections require the local
 workbench. Selecting only local-workbench steps opens the local-workbench guidance.
 
@@ -104,10 +113,12 @@ viewer and is designed to carry their format identity. The active public media
 workspace remains JPEG. BMP signature parsing, BMP decoding, per-format tool
 registration, worker transfer rules, larger numerical types, color-management
 policy, and a stable serialized/cross-language contract are open future work.
-Steps 1.1–1.4 currently read/hash or parse the whole file on the main browser
+Steps 1.1–1.5 currently read/hash or parse the whole file on the main browser
 thread; large-file work may later move to a worker. The low-level JPEG inspector
-computes some additional byte statistics internally, although steps 1.2–1.4
-return only their declared structural, metadata, or table fields. The parser
-currently limits structural markers to 4,096; frame headers to 32; scan and
-Huffman definitions to 256 each; and quantization definitions to 1,024. File-size
-and pixel limits remain those of the existing public viewer.
+computes some additional byte statistics internally, although steps 1.2–1.5
+return only their declared structural, metadata, table, or coding fields. The
+low-level parser defaults to 256 Huffman definitions; it also limits structural
+markers to 4,096, frame headers to 32, scan headers to 256, and quantization
+definitions to 1,024. Step 1.5 disables the low-level shallow Huffman inventory
+and applies its own limit of 1,024 fully parsed definitions. File-size and pixel
+limits remain those of the existing public viewer.

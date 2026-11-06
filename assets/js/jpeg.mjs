@@ -18,7 +18,9 @@ function distribution(values) {
 export function inspectJpeg(input, options = {}) {
   const bytes=input instanceof Uint8Array?input:new Uint8Array(input);
   const quantizationLimit=options.maxQuantizationTables ?? 256;
+  const huffmanLimit=options.maxHuffmanTables ?? 256;
   if(!Number.isInteger(quantizationLimit) || quantizationLimit<1 || quantizationLimit>1024) throw new RangeError('Quantization table limit must be an integer from 1 to 1024.');
+  if(!Number.isInteger(huffmanLimit) || huffmanLimit<1 || huffmanLimit>1024) throw new RangeError('Huffman table limit must be an integer from 1 to 1024.');
   if(bytes.length>25*1024*1024) throw new Error('JPEG inspection is limited to 25 MiB.');
   if(bytes.length<2 || bytes[0]!==255 || bytes[1]!==216) throw new Error('Not a JPEG file: the SOI signature FF D8 is missing.');
   const report={version:JPEG_INSPECTOR_VERSION,size:bytes.length,complete:false,segments:[{marker:'SOI',code:216,offset:0,length:2,payloadOffset:2,payloadLength:0}],frames:[],quantizationTables:[],huffmanTables:[],scans:[],exif:[],applications:[],comments:[],restartIntervals:[],warnings:[],trailingBytes:0,statistics:byteStatistics(bytes)};
@@ -32,7 +34,7 @@ export function inspectJpeg(input, options = {}) {
   let offset=2,frame=null;
   try {
     while(offset<bytes.length) {
-      if(report.segments.length>=4096 || report.huffmanTables.length>=256 || report.scans.length>=256) { warn('Structural inspection limit reached; remaining data was not parsed.'); break; }
+      if(report.segments.length>=4096 || (options.includeHuffman!==false && report.huffmanTables.length>=huffmanLimit) || report.scans.length>=256) { warn('Structural inspection limit reached; remaining data was not parsed.'); break; }
       const markerStart=offset;
       if(bytes[offset]!==255) throw new Error(`Expected a JPEG marker at byte ${offset}.`);
       while(bytes[offset]===255) offset++;
@@ -86,10 +88,10 @@ export function inspectJpeg(input, options = {}) {
         report.frames.push(frame);
         if(![0xc0,0xc1,0xc2].includes(code)) warn(`${frame.process}: structural fields only; this process has not been validated by Gazoken.`);
         if(components.some(c=>!c.horizontal||!c.vertical)) warn('A frame component has zero sampling factors.');
-      } else if(code===0xc4) {
+      } else if(code===0xc4 && options.includeHuffman!==false) {
         let p=start;
         while(p<end) {
-          if(report.huffmanTables.length>=256) throw new Error('Huffman table limit reached.');
+          if(report.huffmanTables.length>=huffmanLimit) throw new Error('Huffman table limit reached.');
           const tableOffset=p;
           need(p,17,end);
           const info=bytes[p++],counts=Array.from(bytes.subarray(p,p+16));p+=16;

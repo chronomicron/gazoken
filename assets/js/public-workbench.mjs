@@ -2,13 +2,14 @@ import { run as runSourceIdentity } from './formats/jpeg/steps/source-identity.m
 import { run as runFileStructure } from './formats/jpeg/steps/file-structure.mjs';
 import { run as runMetadataInventory } from './formats/jpeg/steps/metadata-inventory.mjs';
 import { run as runQuantizationTables } from './formats/jpeg/steps/quantization-tables.mjs';
+import { run as runEntropyCoding } from './formats/jpeg/steps/entropy-coding.mjs';
 
 const $ = (id) => document.getElementById(id);
 const dialog = $('python-dialog');
 const selectedSteps = new Set(['1.1', '1.2', '1.3', '1.4', '1.7']);
 let stepCatalog = [];
 let sourceContext = null;
-const browserStepIds = new Set(['1.1', '1.2', '1.3', '1.4']);
+const browserStepIds = new Set(['1.1', '1.2', '1.3', '1.4', '1.5']);
 
 document.addEventListener('gazoken:source-context', ({ detail }) => {
   sourceContext = detail?.sourceContext || null;
@@ -168,6 +169,8 @@ function renderStep(step) {
       ? 'This browser step reads bounded metadata from the original JPEG bytes. Metadata values are editable file claims, not authenticated provenance.'
     : step.id === '1.4'
       ? 'This browser step extracts exact stored quantization values, their definitions over time, and frame or scan references from the original JPEG bytes.'
+    : step.id === '1.5'
+      ? 'This browser step reads stored Huffman definitions and scan-time table assignments from the original JPEG bytes. It does not decode entropy symbols.'
     : step.implementation === 'ready'
       ? 'Method implemented in the local Python app. This static page cannot run it.'
       : 'Planned method. Local settings can be recorded; no measurement is produced.');
@@ -231,12 +234,14 @@ async function executeBrowserStep(stepId, button, controls = button?.closest('.s
       '1.2': runFileStructure,
       '1.3': runMetadataInventory,
       '1.4': runQuantizationTables,
+      '1.5': runEntropyCoding,
     };
     const result = await runners[stepId](sourceContext, parameters);
     if (stepId === '1.1') appendSourceIdentityResult(result);
     else if (stepId === '1.2') appendFileStructureResult(result);
     else if (stepId === '1.3') appendMetadataInventoryResult(result);
-    else appendQuantizationTablesResult(result);
+    else if (stepId === '1.4') appendQuantizationTablesResult(result);
+    else appendEntropyCodingResult(result);
     $('run-python-status').textContent = `Step ${stepId} completed in this browser.`;
     return true;
   } catch (error) {
@@ -481,6 +486,54 @@ function appendQuantizationTablesResult(result) {
   appendStepReport(card);
 }
 
+function appendEntropyCodingResult(result) {
+  const card = node('article', 'result');
+  card.dataset.stepResult = '1.5';
+  const top = node('div', 'result-top');
+  top.append(node('h3', '', '1.5 · Entropy coding'));
+  card.append(top);
+  const body = node('div', 'result-body');
+  const data = result.measurements;
+  addReportParagraph(body, `${data.extractionStatus.toUpperCase()} · ${data.definitionCount} Huffman definitions · ${data.scanCount} scans · ${data.eoiReached ? 'EOI reached' : 'EOI not reached'}`, 'metric');
+  addReportParagraph(body, `Codebooks ${data.codebooksIncluded ? 'included' : 'omitted'} · scan assignments ${data.scanScriptIncluded ? 'included' : 'omitted'} · original JPEG bytes`, 'settings');
+  for (const definition of data.definitions.slice(0, 32)) {
+    const detail = document.createElement('details');
+    detail.append(node('summary', '', `${definition.tableClass === 0 ? 'DC' : 'AC'} table ${definition.tableId} · definition ${definition.definitionIndex + 1} · byte ${definition.definitionOffset} · ${definition.symbolCount} symbols`));
+    addReportParagraph(detail, `Codes by length 1–16: ${definition.countsByLength.join(', ')}`, 'settings');
+    if (definition.symbols) {
+      addReportParagraph(detail, `Stored symbol order: ${definition.symbols.map(value => `0x${value.toString(16).padStart(2, '0')}`).join(' ')}`, 'settings');
+      const list = document.createElement('ul');
+      for (const item of definition.codes.slice(0, 64)) list.append(node('li', '', `${item.code} → 0x${item.symbol.toString(16).padStart(2, '0')} (${item.length} bits)`));
+      if (definition.codes.length) detail.append(list);
+      if (definition.codes.length > 64) addReportParagraph(detail, `First 64 of ${definition.codes.length} canonical codes shown.`, 'settings');
+    }
+    body.append(detail);
+  }
+  if (data.definitions.length > 32) addReportParagraph(body, `First 32 of ${data.definitions.length} definitions shown.`, 'settings');
+  if (data.scanScriptIncluded && data.scans.length) {
+    const section = document.createElement('details');
+    section.append(node('summary', '', 'Scan-time Huffman assignments'));
+    const list = document.createElement('ul');
+    for (const scan of data.scans.slice(0, 64)) {
+      const assignments = scan.assignments.map(item => `${item.tableClass === 0 ? 'DC' : 'AC'} component ${item.componentId} → table ${item.tableId}, definition ${item.definitionIndex === null ? 'missing' : item.definitionIndex + 1}`).join('; ');
+      list.append(node('li', '', `Byte ${scan.markerOffset} · spectral ${scan.spectralStart}–${scan.spectralEnd} · restart interval ${scan.restartInterval}: ${assignments || 'no Huffman assignments required'}`));
+    }
+    section.append(list);
+    body.append(section);
+    if (data.scans.length > 64) addReportParagraph(body, `First 64 of ${data.scans.length} scan records shown.`, 'settings');
+  }
+  if (result.warnings.length) {
+    const list = document.createElement('ul');
+    list.className = 'step-warnings';
+    for (const warning of result.warnings.slice(0, 20)) list.append(node('li', '', warning));
+    body.append(node('h4', '', 'Parser warnings'), list);
+  }
+  addReportParagraph(body, data.interpretation);
+  addReportParagraph(body, data.limits, 'settings');
+  card.append(body);
+  appendStepReport(card);
+}
+
 function appendStepReport(card) {
   $('results').querySelector('.results-empty')?.remove();
   const prior = $('results').querySelector(`[data-step-result="${card.dataset.stepResult}"]`);
@@ -494,7 +547,7 @@ function appendStepReport(card) {
 function appendBrowserStepError(stepId, error) {
   const card = node('article', 'result');
   card.dataset.stepResult = stepId;
-  const names = { '1.1': 'Source identity', '1.2': 'File structure', '1.3': 'Metadata inventory', '1.4': 'Quantization atlas' };
+  const names = { '1.1': 'Source identity', '1.2': 'File structure', '1.3': 'Metadata inventory', '1.4': 'Quantization atlas', '1.5': 'Entropy coding' };
   card.append(node('h3', '', `${stepId} · ${names[stepId] || 'Browser step'}`));
   const body = node('div', 'result-body');
   addReportParagraph(body, `Step unavailable: ${error.message}`, 'error');

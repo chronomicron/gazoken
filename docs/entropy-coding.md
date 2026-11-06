@@ -77,3 +77,15 @@ JavaScript checks passed. GUI verification ran 1.5 on the reference JPEG and
 recorded four definitions (DC/AC tables 0 and 1) and one scan through the shared
 runner. Phase 1 and project READMEs were updated. Committed locally; not pushed
 or deployed.
+
+## Static browser adapter
+
+On 2026-11-05 the public workbench gained a separate JavaScript adapter at
+`assets/js/formats/jpeg/steps/entropy-coding.mjs`. It uses the original JPEG
+bytes from `SourceContext`, implements the catalog's `codebooks` and `scan_script`
+options, validates DHT declarations, and displays canonical codes and active
+scan-time table assignments. It caps the inventory at 1,024 definitions and
+inherits the low-level parser's marker, frame, and scan limits. JavaScript syntax
+and whitespace checks were run; browser interaction was not verified for this
+increment. The existing Python tests and GUI observations above do not validate
+this browser adapter.

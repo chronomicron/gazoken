@@ -328,6 +328,21 @@ Proposals remain separate until agreed. The initial handoff predates this log;
   See [quantization atlas](quantization-tables.md) and
   [browser tool inputs and modules](browser-tools.md).
 
+## D023 — Browser JPEG entropy coding inventory — 2026-11-05
+
+- Status: implemented increment, requested by Robert after step 1.4.
+- Decision: add an isolated JavaScript adapter for step 1.5 using the shared
+  `SourceContext` original-byte representation. Parse and validate chronological
+  Huffman definitions, derive canonical codes, and link scan assignments to the
+  definitions active at each scan. Preserve the catalog's codebook and scan-script
+  options.
+- Rationale: let visitors inspect stored Huffman declarations on the static site
+  using the same file boundary and per-step module structure.
+- Consequences: the adapter does not decode entropy symbols, measure symbol
+  frequencies, infer coding efficiency, or identify an encoder. It imposes a
+  1,024-definition cap and retains the underlying structural parser limits. See
+  [entropy coding](entropy-coding.md) and [browser tool inputs and modules](browser-tools.md).
+
 ## Pending proposals
 
 
