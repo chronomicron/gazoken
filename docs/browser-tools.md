@@ -103,7 +103,9 @@ steps.
 The Phase 1 **Run selected** control executes selected browser-backed steps 1.1
 through 1.7 in catalog order. When other selected steps are included, it runs the
 browser-backed steps and reports that the remaining selections require the local
-workbench. Selecting only local-workbench steps opens the local-workbench guidance.
+workbench. Selecting only Phase 2 or Phase 3 steps shows an inline status that no
+browser measurement ran; it does not open the full-workbench dialog. The per-step
+guidance button remains available for installation and implementation status.
 
 Example future organization:
 

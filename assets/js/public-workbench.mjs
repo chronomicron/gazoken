@@ -752,8 +752,9 @@ $('run-python').addEventListener('click', () => {
   }
   const browserSteps = selected.filter(step => browserStepIds.has(step.id));
   if (!browserSteps.length) {
-    $('run-python-status').textContent = 'These selected steps need the local Python workbench.';
-    openPythonHelp();
+    $('run-python-status').textContent = ['2', '3'].includes(phase.slice(0, -1))
+      ? `Phase ${phase.slice(0, -1)} has no browser analysis adapters yet. These selections are configuration only; no measurement was produced. The local workbench can record settings, but these methods are not implemented there yet either.`
+      : 'None of the selected steps can run in this browser. No measurement was produced; use the local workbench for supported local tools.';
     return;
   }
   (async () => {
