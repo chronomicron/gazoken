@@ -19,7 +19,7 @@ export async function run(inputs, parameters = {}) {
   }
 
   const bytes = await inputs.readOriginalBytes();
-  const parsed = inspectJpeg(bytes);
+  const parsed = inspectJpeg(bytes, { includeExif: false });
   const limitReached = parsed.segments.length > segmentLimit
     || (parsed.segments.length >= MAX_SEGMENTS && parsed.warnings.some(warning => warning.includes('Structural inspection limit reached')));
   const keptSegments = parsed.segments.slice(0, segmentLimit);

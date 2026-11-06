@@ -12,11 +12,12 @@ Load a file using **Choose image** or drag one onto the source area. The generat
 JPEG demo illustrates a textured field with a smoother rectangle; it is not a
 research dataset or a demonstration of detector accuracy.
 
-The public Phase 1 steps 1.1 and 1.2 run in JavaScript on JPEG files. Step 1.1
-reports the original file's byte length, start-of-image signature, and SHA-256;
-step 1.2 inventories JPEG markers, frame declarations, and optional scan layout.
-Both receive the unchanged encoded source; the decoded pixel buffer used by Phase
-2 views is a separate representation. See [browser tool inputs and modules](browser-tools.md).
+The static Phase 1 steps 1.1–1.3 run in JavaScript on JPEG files. Step 1.1 reports
+the original file's byte length, start-of-image signature, and SHA-256; step 1.2
+inventories JPEG markers, frame declarations, and optional scan layout; step 1.3
+lists bounded metadata blocks and classic TIFF/Exif values. They receive the
+unchanged encoded source; the decoded pixel buffer used by Phase 2 views is a
+separate representation. See [browser tool inputs and modules](browser-tools.md).
 
 Run selected tools, compare outputs with the source preview, and optionally save
 a result as a PNG. Result cards record method version, settings, a descriptive

@@ -1,7 +1,7 @@
 # Browser tool inputs and modules
 
 Updated: 2026-11-05  
-Status: browser source context v1 and JPEG steps 1.1–1.2 implemented; later steps remain unchanged
+Status: browser source context v1 and JPEG steps 1.1–1.3 implemented; later steps remain unchanged
 
 ## Shared source context
 
@@ -50,15 +50,26 @@ browser tool-result shape. The step adapter applies its segment limit and projec
 only structural fields into the result; it does not use decoded pixels. Parser
 warnings and reaching EOI describe extraction coverage, not JPEG conformance.
 
+`assets/js/formats/jpeg/steps/metadata-inventory.mjs` implements Phase 1, step
+1.3 using the original encoded bytes. It inventories APP/COM blocks and reads
+bounded classic TIFF/Exif values through `assets/js/exif.mjs`. The reader
+selection, GPS IFD inclusion, and MakerNote-value inclusion are explicit
+parameters. With GPS or vendor data excluded, the Exif parser avoids following or
+reading those values;
+the controls are not a guarantee that location or identifying information cannot
+appear in other metadata. `ExifTool` remains explicitly unavailable and is never
+launched by the static page.
+
 `assets/js/app.mjs` creates the context after the browser has decoded the selected
 image for display and attaches that separate RGBA pixel representation with
 browser-decoder provenance. The context retains the original file independently.
 It keeps the workbench's existing pixel buffer rather than allocating a duplicate;
 tools receive a detached copy only when they request that representation.
-The browser step currently accepts detected JPEG input only. PNG and WebP remain
-usable for existing Phase 2 browser views, but cannot run this JPEG-specific step.
-The Phase 1 **Run selected** control executes selected browser-backed steps 1.1
-and 1.2 in catalog order. When other selected steps are included, it runs the
+The browser steps currently accept detected JPEG input only. PNG and WebP remain
+usable for existing Phase 2 browser views, but cannot run these JPEG-specific
+steps.
+The Phase 1 **Run selected** control executes selected browser-backed steps 1.1,
+1.2, and 1.3 in catalog order. When other selected steps are included, it runs the
 browser-backed steps and reports that the remaining selections require the local
 workbench. Selecting only local-workbench steps opens the local-workbench guidance.
 
@@ -83,7 +94,8 @@ viewer and is designed to carry their format identity. The active public media
 workspace remains JPEG. BMP signature parsing, BMP decoding, per-format tool
 registration, worker transfer rules, larger numerical types, color-management
 policy, and a stable serialized/cross-language contract are open future work.
-Steps 1.1 and 1.2 currently read/hash the whole file on the main browser thread;
-large-file work may later move to a worker. The low-level parser computes some
-additional inspector statistics internally, although step 1.2 returns structural
-fields only. File-size and pixel limits remain those of the existing public viewer.
+Steps 1.1–1.3 currently read/hash or parse the whole file on the main browser
+thread; large-file work may later move to a worker. The low-level JPEG inspector
+computes some additional byte statistics internally, although steps 1.2 and 1.3
+return only their declared structural or metadata fields. File-size and pixel
+limits remain those of the existing public viewer.

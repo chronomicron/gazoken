@@ -74,3 +74,14 @@ JavaScript checks passed. Browser verification executed 1.3 on the reference JPE
 showing its JFIF block and a valid empty Exif inventory as a Python measurement.
 Real nested Exif values were verified with the documented baseline fixture in
 adapter tests. Changes are committed locally, not pushed or deployed.
+
+## Static browser adapter
+
+The static workbench also runs step 1.3 through the isolated JavaScript adapter
+[`metadata-inventory.mjs`](../assets/js/formats/jpeg/steps/metadata-inventory.mjs).
+It uses the shared `SourceContext` original-byte representation and the bounded
+browser TIFF/Exif reader. GPS and MakerNote options are applied during Exif parsing.
+The browser reports APP/COM block inventory, bounded Exif fields, parser warnings,
+and the selected reader state. `ExifTool` remains unavailable in the browser. As
+with the Python tool, excluding the standard GPS IFD does not establish that all
+location information has been removed. See [browser tool inputs and modules](browser-tools.md).

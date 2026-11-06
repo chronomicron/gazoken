@@ -1,17 +1,19 @@
 import { run as runSourceIdentity } from './formats/jpeg/steps/source-identity.mjs';
 import { run as runFileStructure } from './formats/jpeg/steps/file-structure.mjs';
+import { run as runMetadataInventory } from './formats/jpeg/steps/metadata-inventory.mjs';
 
 const $ = (id) => document.getElementById(id);
 const dialog = $('python-dialog');
 const selectedSteps = new Set(['1.1', '1.2', '1.3', '1.4', '1.7']);
 let stepCatalog = [];
 let sourceContext = null;
-const browserStepIds = new Set(['1.1', '1.2']);
+const browserStepIds = new Set(['1.1', '1.2', '1.3']);
 
 document.addEventListener('gazoken:source-context', ({ detail }) => {
   sourceContext = detail?.sourceContext || null;
-  const button = document.querySelector('[data-run-browser-step="1.1"]');
-  if (button) button.disabled = !sourceContext || sourceContext.mediaType !== 'image/jpeg';
+  document.querySelectorAll('[data-run-browser-step]').forEach(button => {
+    button.disabled = !sourceContext || sourceContext.mediaType !== 'image/jpeg';
+  });
 });
 
 function node(tag, className = '', text = '') {
@@ -161,6 +163,8 @@ function renderStep(step) {
     ? 'This browser step reads the original JPEG file bytes. Decoded preview pixels are a separate representation.'
     : step.id === '1.2'
       ? 'This browser step inventories markers, frame declarations, and scan layout from the original encoded JPEG bytes.'
+    : step.id === '1.3'
+      ? 'This browser step reads bounded metadata from the original JPEG bytes. Metadata values are editable file claims, not authenticated provenance.'
     : step.implementation === 'ready'
       ? 'Method implemented in the local Python app. This static page cannot run it.'
       : 'Planned method. Local settings can be recorded; no measurement is produced.');
@@ -219,11 +223,11 @@ async function executeBrowserStep(stepId, button, controls = button?.closest('.s
   }
   try {
     const parameters = readParameters(controls);
-    const result = stepId === '1.1'
-      ? await runSourceIdentity(sourceContext, parameters)
-      : await runFileStructure(sourceContext, parameters);
+    const runners = { '1.1': runSourceIdentity, '1.2': runFileStructure, '1.3': runMetadataInventory };
+    const result = await runners[stepId](sourceContext, parameters);
     if (stepId === '1.1') appendSourceIdentityResult(result);
-    else appendFileStructureResult(result);
+    else if (stepId === '1.2') appendFileStructureResult(result);
+    else appendMetadataInventoryResult(result);
     $('run-python-status').textContent = `Step ${stepId} completed in this browser.`;
     return true;
   } catch (error) {
@@ -324,6 +328,74 @@ function appendFileStructureResult(result) {
   appendStepReport(card);
 }
 
+function appendMetadataInventoryResult(result) {
+  const card = node('article', 'result');
+  card.dataset.stepResult = '1.3';
+  const top = node('div', 'result-top');
+  top.append(node('h3', '', '1.3 · Metadata inventory'));
+  card.append(top);
+  const body = node('div', 'result-body');
+  const data = result.measurements;
+  addReportParagraph(body, `${data.reader} · ${data.extractionStatus.toUpperCase()} · ${data.blocks.length} metadata blocks · ${data.exif.length} Exif blocks`, 'metric');
+  addReportParagraph(body, `Standard GPS IFD ${data.gpsIncluded ? 'included' : 'excluded'} · MakerNote values ${data.vendorBytesIncluded ? 'included, bounded' : 'excluded'}`, 'settings');
+  addReportParagraph(body, 'Metadata may contain personal information. Values shown here are declarations in the file and are not verified.', 'step-hint');
+  if (data.blocks.length) {
+    const blockTable = document.createElement('table');
+    const head = document.createElement('thead');
+    const header = document.createElement('tr');
+    for (const title of ['Marker', 'Offset', 'Payload bytes', 'Kind']) {
+      const cell = document.createElement('th');
+      cell.scope = 'col';
+      cell.textContent = title;
+      header.append(cell);
+    }
+    head.append(header);
+    const rows = document.createElement('tbody');
+    for (const block of data.blocks.slice(0, 128)) {
+      const row = document.createElement('tr');
+      for (const value of [block.marker, block.markerOffset, block.payloadBytes, block.kind]) {
+        const cell = document.createElement('td');
+        cell.textContent = String(value);
+        row.append(cell);
+      }
+      rows.append(row);
+    }
+    blockTable.append(head, rows);
+    body.append(blockTable);
+    if (data.blocks.length > 128) addReportParagraph(body, `First 128 of ${data.blocks.length} metadata blocks shown.`, 'settings');
+  } else {
+    addReportParagraph(body, 'No APP or COM metadata blocks were found.', 'settings');
+  }
+  for (const [index, record] of data.exif.entries()) {
+    const detail = document.createElement('details');
+    const heading = `Exif block ${index + 1} · ${record.byteOrder || 'byte order unavailable'} · ${record.entries.length} entries`;
+    detail.append(node('summary', '', heading));
+    const list = document.createElement('ul');
+    for (const entry of record.entries.slice(0, 80)) {
+      let value = entry.omitted || entry.value;
+      if (value === null || value === undefined) value = 'No value read';
+      else if (typeof value !== 'string') value = JSON.stringify(value);
+      const displayTruncated = value.length > 240;
+      if (displayTruncated) value = `${value.slice(0, 237)}…`;
+      const item = document.createElement('li');
+      item.textContent = `${entry.ifd} · ${entry.name} (${entry.tag}; ${entry.type} × ${entry.count}) · ${value}${entry.truncated || displayTruncated ? ' [display truncated]' : ''}`;
+      list.append(item);
+    }
+    detail.append(list);
+    if (record.entries.length > 80) detail.append(node('p', 'settings', `First 80 of ${record.entries.length} Exif entries shown.`));
+    body.append(detail);
+  }
+  if (result.warnings.length) {
+    const warningList = document.createElement('ul');
+    warningList.className = 'step-warnings';
+    for (const warning of result.warnings.slice(0, 20)) warningList.append(node('li', '', warning));
+    body.append(node('h4', '', 'Parser warnings'), warningList);
+  }
+  addReportParagraph(body, data.interpretation);
+  card.append(body);
+  appendStepReport(card);
+}
+
 function appendStepReport(card) {
   $('results').querySelector('.results-empty')?.remove();
   const prior = $('results').querySelector(`[data-step-result="${card.dataset.stepResult}"]`);
@@ -336,7 +408,8 @@ function appendStepReport(card) {
 function appendBrowserStepError(stepId, error) {
   const card = node('article', 'result');
   card.dataset.stepResult = stepId;
-  card.append(node('h3', '', `${stepId} · ${stepId === '1.1' ? 'Source identity' : 'File structure'}`));
+  const names = { '1.1': 'Source identity', '1.2': 'File structure', '1.3': 'Metadata inventory' };
+  card.append(node('h3', '', `${stepId} · ${names[stepId] || 'Browser step'}`));
   const body = node('div', 'result-body');
   addReportParagraph(body, `Step unavailable: ${error.message}`, 'error');
   card.append(body);

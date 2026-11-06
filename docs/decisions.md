@@ -300,6 +300,20 @@ Proposals remain separate until agreed. The initial handoff predates this log;
   existing low-level inspector computes additional statistics internally, while
   the step result exposes structural fields. See [browser tool inputs and modules](browser-tools.md).
 
+## D021 — Browser JPEG metadata inventory — 2026-11-05
+
+- Status: implemented increment, requested by Robert after step 1.2.
+- Decision: add a separate JavaScript adapter for JPEG step 1.3 using the shared
+  source context, browser marker parser, and bounded TIFF/Exif reader. Apply GPS
+  IFD and MakerNote options during parsing and preserve explicit `ExifTool`
+  unavailability.
+- Rationale: provide a useful metadata inventory in the static browser while
+  preserving the same original-byte input boundary and per-step module structure.
+- Consequences: values remain editable metadata claims; the GPS option omits only
+  the standard GPS IFD. The browser adapter adds no external process, XMP parser,
+  or BMP support. See [metadata inventory](metadata-inventory.md) and
+  [browser tool inputs and modules](browser-tools.md).
+
 ## Pending proposals
 
 

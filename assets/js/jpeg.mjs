@@ -15,7 +15,7 @@ function distribution(values) {
   for(const v of values) histogram[v]=(histogram[v]||0)+1;
   return {minimum:Math.min(...values),maximum:Math.max(...values),mean:values.reduce((a,b)=>a+b,0)/values.length,histogram};
 }
-export function inspectJpeg(input) {
+export function inspectJpeg(input, options = {}) {
   const bytes=input instanceof Uint8Array?input:new Uint8Array(input);
   if(bytes.length>25*1024*1024) throw new Error('JPEG inspection is limited to 25 MiB.');
   if(bytes.length<2 || bytes[0]!==255 || bytes[1]!==216) throw new Error('Not a JPEG file: the SOI signature FF D8 is missing.');
@@ -135,8 +135,13 @@ export function inspectJpeg(input) {
         let kind='Application data (uninterpreted)';
         if(code===0xe1 && end-start>=6 && text(start,6)==='Exif') {
           kind='Exif / TIFF';
-          if(report.exif.length<32) report.exif.push(parseExif(bytes,start,end));
-          else warn('Exif segment limit reached.');
+          if(options.includeExif!==false) {
+            if(report.exif.length<32) report.exif.push(parseExif(bytes,start,end,{
+              includeGps: options.includeGps !== false,
+              includeVendor: options.includeVendor !== false,
+            }));
+            else warn('Exif segment limit reached.');
+          }
         } else if(code===0xe0 && prefix.startsWith('JFIF\0')) {
           kind='JFIF';
           if(end-start>=14) segment.jfif={version:`${bytes[start+5]}.${String(bytes[start+6]).padStart(2,'0')}`,densityUnit:bytes[start+7],xDensity:u16(start+8),yDensity:u16(start+10),thumbnailWidth:bytes[start+12],thumbnailHeight:bytes[start+13]};

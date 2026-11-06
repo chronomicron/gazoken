@@ -12,3 +12,6 @@ The GUI, HTTP endpoint and Python runner share this interface and catalog.
 
 `contracts.py` owns inputs/results. `registry.py` explicitly registers only real
 implementations. No modules are imported from user-supplied paths or filenames.
+This inventory describes the Python adapters. Static browser adapters use their
+own JavaScript modules and `SourceContext`; see the
+[browser tool guide](../../../docs/browser-tools.md).

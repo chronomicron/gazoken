@@ -3,7 +3,9 @@ const TYPES = {1:['BYTE',1],2:['ASCII',1],3:['SHORT',2],4:['LONG',4],5:['RATIONA
 const TAGS = {0x0100:'ImageWidth',0x0101:'ImageLength',0x010e:'ImageDescription',0x010f:'Make',0x0110:'Model',0x0112:'Orientation',0x011a:'XResolution',0x011b:'YResolution',0x0128:'ResolutionUnit',0x0131:'Software',0x0132:'DateTime',0x013b:'Artist',0x014a:'SubIFDs',0x0201:'JPEGInterchangeFormat',0x0202:'JPEGInterchangeFormatLength',0x8298:'Copyright',0x829a:'ExposureTime',0x829d:'FNumber',0x8769:'ExifIFDPointer',0x8822:'ExposureProgram',0x8825:'GPSIFDPointer',0x8827:'PhotographicSensitivity',0x9000:'ExifVersion',0x9003:'DateTimeOriginal',0x9004:'DateTimeDigitized',0x9010:'OffsetTime',0x9011:'OffsetTimeOriginal',0x9101:'ComponentsConfiguration',0x9201:'ShutterSpeedValue',0x9202:'ApertureValue',0x9204:'ExposureBiasValue',0x9207:'MeteringMode',0x9209:'Flash',0x920a:'FocalLength',0x927c:'MakerNote',0x9286:'UserComment',0xa000:'FlashpixVersion',0xa001:'ColorSpace',0xa002:'PixelXDimension',0xa003:'PixelYDimension',0xa005:'InteroperabilityIFDPointer',0xa217:'SensingMethod',0xa300:'FileSource',0xa301:'SceneType',0xa401:'CustomRendered',0xa402:'ExposureMode',0xa403:'WhiteBalance',0xa405:'FocalLengthIn35mmFilm',0xa406:'SceneCaptureType',0xa420:'ImageUniqueID',0xa430:'CameraOwnerName',0xa431:'BodySerialNumber',0xa432:'LensSpecification',0xa433:'LensMake',0xa434:'LensModel',0xa435:'LensSerialNumber'};
 const GPS = {0:'GPSVersionID',1:'GPSLatitudeRef',2:'GPSLatitude',3:'GPSLongitudeRef',4:'GPSLongitude',5:'GPSAltitudeRef',6:'GPSAltitude',7:'GPSTimeStamp',12:'GPSSpeedRef',13:'GPSSpeed',16:'GPSImgDirectionRef',17:'GPSImgDirection',18:'GPSMapDatum',29:'GPSDateStamp'};
 const hex = (n) => `0x${n.toString(16).padStart(4,'0').toUpperCase()}`;
-export function parseExif(bytes, start, end) {
+export function parseExif(bytes, start, end, options = {}) {
+  const includeGps = options.includeGps !== false;
+  const includeVendor = options.includeVendor !== false;
   const result = { offset:start, byteOrder:null, entries:[], warnings:[] };
   const base = start + 6;
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
@@ -22,6 +24,7 @@ export function parseExif(bytes, start, end) {
     if (u16(base+2) !== 42) throw new Error('Unsupported TIFF header (expected classic TIFF magic 42).');
     const queue = [{relative:u32(base+4), name:'IFD0',depth:0}];
     const visited = new Set();
+    let examined = 0;
     while (queue.length) {
       const {relative, name, depth} = queue.shift();
       if (!relative) continue;
@@ -33,9 +36,11 @@ export function parseExif(bytes, start, end) {
         const count = u16(dir);
         check(dir+2,count*12+4);
         for (let i=0; i<count; i++) {
-          if (result.entries.length >= 1000) { warn('Exif entry limit reached.'); break; }
+          if (examined >= 1000) { warn('Exif entry limit reached.'); break; }
+          examined++;
           const p=dir+2+i*12;
           const tag=u16(p), type=u16(p+2), length=u32(p+4);
+          if (tag===0x8825 && !includeGps) continue;
           const definition=TYPES[type];
           const entry={ifd:name,tag:hex(tag),name:(name==='GPS'?GPS[tag]:TAGS[tag]) || `Unknown ${hex(tag)}`,type:definition?.[0] || `Unknown type ${type}`,count:length,entryOffset:p,valueOffset:null,value:null,truncated:false};
           result.entries.push(entry);
@@ -43,6 +48,7 @@ export function parseExif(bytes, start, end) {
           const size=definition[1]*length;
           const valueOffset=size<=4?p+8:base+u32(p+8);
           entry.valueOffset=valueOffset;
+          if (tag===0x927c && !includeVendor) { entry.omitted='Vendor data excluded'; continue; }
           try {
             check(valueOffset,size);
             if (type===2) {
@@ -75,7 +81,10 @@ export function parseExif(bytes, start, end) {
               entry.value=length===1?values[0]:values;
               if ([0x8769,0x8825,0xa005,0x014a].includes(tag) && [4,13].includes(type)) {
                 const names={0x8769:'Exif',0x8825:'GPS',0xa005:'Interop',0x014a:'SubIFD'};
-                for(const relative of values) queue.push({relative,name:names[tag],depth:depth+1});
+                for(const relative of values) {
+                  if(queue.length>=64) { warn('Exif pointer queue limit reached.'); break; }
+                  queue.push({relative,name:names[tag],depth:depth+1});
+                }
               }
             }
           } catch(error) { entry.value='Unreadable'; warn(`${entry.name}: ${error.message}`); }
