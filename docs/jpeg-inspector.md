@@ -1,6 +1,6 @@
 # Read-only JPEG inspector
 
-Updated: 2026-11-03  
+Updated: 2026-11-05
 Implementation version: 0.1.0  
 Status: structural prototype implemented locally; no attribution/history detector validated
 
@@ -16,10 +16,12 @@ including EXIF and graphical quantization-table inspection. It does not implemen
 the unpublished conductor, component-comparison, or directional research proposals.
 
 All parsing, charting, hashing, and report export are local to the browser. The
-only optional fetch is the bundled synthetic reference JPEG on the same site.
-There are no external metadata lookups, image uploads, analytics, or web-storage
-persistence. A JSON export contains the metadata displayed, including GPS fields
-if present; the user chooses whether to save or share that report.
+only optional project-data fetch is the bundled synthetic reference JPEG on the
+same site. Statcounter loads its analytics script and measures page visits; image
+bytes are not sent to it. There are no external metadata lookups, image uploads,
+or web-storage persistence. A JSON export contains the metadata displayed,
+including GPS fields if present; the user chooses whether to save or share that
+report.
 
 The source bytes remain available unchanged for hex inspection. A worker receives
 a clone, extracts the report, and calculates SHA-256 where Web Crypto is available.

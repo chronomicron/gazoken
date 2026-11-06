@@ -1,6 +1,6 @@
 # Website publishing plan
 
-Updated: 2026-11-03
+Updated: 2026-11-05
 
 ## Target and verified repository facts
 
@@ -101,7 +101,7 @@ Pages hosts static HTML/CSS/JavaScript; it does not execute our Python API.
 
 | Entry point | Runs where | Current capabilities |
 | --- | --- | --- |
-| `index.html` | Visitor's browser; no Python installation | ELA, local-mean residual, Sobel edges, bit planes; sample gallery including a known PNG bit pattern. |
+| `index.html` | Visitor's browser; no Python installation | Workbench-matched three-phase layout and catalog; ELA, local-mean residual, Sobel edges, bit planes; sample gallery including a known PNG bit pattern. Python-only actions explain local installation and distinguish implemented from planned methods. |
 | `jpeg.html` | Visitor's browser; no Python installation | Raw JPEG segments, metadata, quantization/Huffman tables, scan structure, hex view, byte statistics; three JPEG samples. |
 | `gazoken` command | User's local Python server and browser | Three-phase module framework, original-byte identity, file structure, bounded metadata, distribution, exact quantization tables, Huffman codebook/scan inventory and bounded embedded JPEG extraction, current-run evidence assembly, parameter/result/session records; most planned adapters remain unimplemented. |
 
@@ -111,6 +111,16 @@ the local app's additional workflow, and link installation instructions/source.
 Sharing a visual shell/catalog later is possible, but each executable capability
 must declare its browser/Python availability. Browser decode results and local
 Python outputs need explicit provenance and parity checks before being equated.
+
+The public `index.html` uses the same `src/gazoken/web/workbench.css` stylesheet as
+the local Python interface and mirrors its rail, media selector, phase navigation,
+source viewer, step selection controls, execution plan, and run bar. It opens in
+Phase 1, reads the shared step catalog from `src/gazoken/web/steps.json`, and shows
+Python parameters as read-only previews. Selected Python steps lead to setup
+guidance; the four browser image views remain runnable in Phase 2. The browser
+viewer also has working grid and zoom controls. The Phase 1 JPEG inspector remains
+a separate page and asks visitors to choose the file there again. This shared
+presentation does not make the local FastAPI API available on GitHub Pages.
 
 For the full app today, users can clone the repository **or download its source
 ZIP**, install Python 3.11+, create a virtual environment, install the checkout
@@ -135,3 +145,16 @@ available to the static JavaScript demo. No public backend was added.
 
 Step 1.10 [coefficient statistics](coefficient-statistics.md) consumes that native
 package in the same local run. It is not added to the static browser demo.
+
+The public `index.html` and `jpeg.html` pages load the user-provided Statcounter
+snippet (project 13365206) and disclose page-visit analytics in their footers.
+The tracker is a third-party request; local image decoding and inspection remain
+in the visitor's browser, and image bytes are not sent to Statcounter. The local
+Python workbench does not include this tracker.
+
+The static workbench now has a browser-specific shared `SourceContext` and an
+isolated JavaScript module for JPEG step 1.1 (source identity). The wrapper retains
+the original encoded file and records an optional decoded-pixel representation
+separately, so later format-specific steps can choose the representation they
+require. See [browser tool inputs and modules](browser-tools.md). This does not
+add BMP support or change the Python adapter contract.

@@ -1,6 +1,6 @@
 # First image workbench
 
-Updated: 2026-11-03  
+Updated: 2026-11-05
 Implementation: v0.1.0, exploratory prototype  
 Owner: Gazoken / Grou-lab
 
@@ -11,6 +11,11 @@ checkboxes and parameters, and displays a separate result for each selected tool
 Load a file using **Choose image** or drag one onto the source area. The generated
 JPEG demo illustrates a textured field with a smoother rectangle; it is not a
 research dataset or a demonstration of detector accuracy.
+
+The public Phase 1 step 1.1 runs in JavaScript on JPEG files and reports the
+original file's byte length, start-of-image signature, and SHA-256. It receives
+the unchanged encoded source; the decoded pixel buffer used by Phase 2 views is a
+separate representation. See [browser tool inputs and modules](browser-tools.md).
 
 Run selected tools, compare outputs with the source preview, and optionally save
 a result as a PNG. Result cards record method version, settings, a descriptive
@@ -27,8 +32,9 @@ A paper-specific replication study and a dataset evaluation suite remain future 
 ## Processing and limits
 
 - Supported signatures: JPEG, PNG, WebP; maximum 25 MiB and 12,000,000 decoded pixels.
-- All image decoding and analysis happens in the browser. This application sends
-  no image bytes to a server, uses no analytics, and stores no images in web storage.
+- All image decoding and analysis happens in the browser. Image bytes are not
+  sent to a server; Statcounter measures public-page visits. Images are not stored
+  in web storage.
   Normal website requests and browser-managed memory/cache are separate from this.
 - The common input is browser-decoded 8-bit RGB, composited onto white with opaque
   alpha, at decoded dimensions without resizing. Browser orientation and colour

@@ -269,6 +269,23 @@ Proposals remain separate until agreed. The initial handoff predates this log;
   current JPEG session. Format-specific contracts and validation remain open.
 - Roadmap: [media expansion](roadmap.md#media-expansion-direction--accepted-2026-11-05).
 
+## D019 — Browser source context and per-step modules — 2026-11-05
+
+- Status: accepted direction and first increment implemented, based on Robert's
+  request to keep future BMP tools in mind and support tools needing either
+  original JPEG bytes or decoded pixel data.
+- Decision: browser tools receive a format-neutral source context that preserves
+  the original encoded file and represents decoded pixels separately with
+  dimensions, layout, channels, source linkage, and decoder provenance. Keep
+  executable steps in individual format-specific JavaScript modules. Implement
+  JPEG step 1.1 as the first isolated browser adapter.
+- Rationale: let each step request the representation it needs without losing or
+  confusing the original file, decoded view, or future derived data.
+- Consequences: static JPEG step 1.1 reports size, JPEG SOI signature and SHA-256;
+  it does not perform full JPEG conformance validation. The browser context is not
+  a cross-language schema and adds no BMP implementation. Future BMP and other
+  format adapters remain open. See [browser tool inputs and modules](browser-tools.md).
+
 ## Pending proposals
 
 

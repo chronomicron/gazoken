@@ -1,14 +1,20 @@
 import { installSamples } from './samples.mjs';
+import { SourceContext } from './core/source-context.mjs';
 const $ = (id) => document.getElementById(id);
 const original = $('original');
 const ctx = original.getContext('2d', { willReadFrequently: true });
+const imageWrap = $('image-wrap');
+const overlay = $('overlay');
+const overlayCtx = overlay.getContext('2d');
 const MAX_PIXELS = 12_000_000;
 const MAX_BYTES = 25 * 1024 * 1024;
 let image = null;
+let sourceContext = null;
 let generation = 0;
 let task = null;
 let busy = false;
 let loading = false;
+let runCount = 0;
 const names = { ela: 'Error-level analysis', residual: 'Noise residual', edges: 'Edge strength', bitplane: 'Bit-plane inspection' };
 const explanations = {
   ela: 'Absolute RGB difference from a JPEG recompression. Brightness may reflect texture, edges, or compression as well as editing. This view does not locate edits reliably by itself.',
@@ -29,8 +35,9 @@ function emptyResults() {
   $('result-count').textContent = 'No analyses yet';
 }
 function controls() {
-  $('tool-options').disabled = busy || loading;
-  $('run').disabled = !image || busy || loading || !document.querySelector('input[name="tool"]:checked:not(:disabled)');
+  const browserPhase = document.body.dataset.publicPhase === '2';
+  $('tool-options').disabled = busy || loading || !browserPhase;
+  $('run').disabled = !browserPhase || !image || busy || loading || !document.querySelector('input[name="tool"]:checked:not(:disabled)');
   $('clear').disabled = !image && !loading;
   $('run').textContent = busy ? 'Analysing…' : 'Run selected tools →';
   $('results').setAttribute('aria-busy', String(busy));
@@ -45,12 +52,36 @@ function cancel() {
 }
 function resetSource() {
   image = null;
+  sourceContext = null;
+  document.dispatchEvent(new CustomEvent('gazoken:source-context', { detail: { sourceContext: null } }));
   original.width = original.height = 0;
-  original.hidden = true;
+  overlay.width = overlay.height = 0;
+  imageWrap.hidden = true;
   $('empty-source').hidden = false;
   $('file-info').textContent = 'No image loaded.';
+  $('file-size').textContent = '—';
+  $('file-type').textContent = '—';
+  $('stage-label').textContent = 'NO SOURCE LOADED';
+  $('dimensions').textContent = '— × —';
+  imageWrap.style.transform = 'scale(1)';
+  runCount = 0;
+  $('run-count').textContent = '0 RUNS';
+  $('journal').replaceChildren(Object.assign(document.createElement('p'), { className:'muted', textContent:'Browser views and their settings will be listed here.' }));
   $('source-note').textContent = 'The source file is kept unchanged. Analyses use its browser-decoded pixels.';
   emptyResults();
+}
+function drawGrid() {
+  if (!image) return;
+  overlay.width = image.width;
+  overlay.height = image.height;
+  overlayCtx.clearRect(0, 0, overlay.width, overlay.height);
+  if (!$('grid').checked) return;
+  overlayCtx.strokeStyle = 'rgba(204, 232, 129, .55)';
+  overlayCtx.lineWidth = 1;
+  overlayCtx.beginPath();
+  for (let x = 8; x < image.width; x += 8) { overlayCtx.moveTo(x + .5, 0); overlayCtx.lineTo(x + .5, image.height); }
+  for (let y = 8; y < image.height; y += 8) { overlayCtx.moveTo(0, y + .5); overlayCtx.lineTo(image.width, y + .5); }
+  overlayCtx.stroke();
 }
 async function detectedType(file) {
   const b = new Uint8Array(await file.slice(0, 12).arrayBuffer());
@@ -84,9 +115,30 @@ async function loadFile(file, demo = false) {
     ctx.drawImage(bitmap, 0, 0);
     const pixels = ctx.getImageData(0, 0, width, height).data;
     image = { width, height, pixels, type, name: file.name };
-    original.hidden = false;
+    sourceContext = new SourceContext(file, type);
+    sourceContext.attachDecodedPixels({
+      data: pixels,
+      width,
+      height,
+      channels: ['R', 'G', 'B', 'A'],
+      provenance: {
+        decoder: 'browser createImageBitmap + Canvas 2D',
+        decoderVersion: navigator.userAgent,
+        colorPolicy: 'browser default color handling; alpha composited onto white before pixel capture',
+        orientationPolicy: 'browser createImageBitmap default',
+        coordinates: 'top-left origin; row-major; pixel coordinates',
+      },
+    });
+    document.dispatchEvent(new CustomEvent('gazoken:source-context', { detail: { sourceContext } }));
+    imageWrap.hidden = false;
     $('empty-source').hidden = true;
-    $('file-info').textContent = `${file.name} · ${width} × ${height} px · ${(file.size / 1024 / 1024).toFixed(2)} MiB · ${type.replace('image/', '').toUpperCase()}`;
+    imageWrap.style.transform = `scale(${$('zoom').value === 'fit' ? 1 : Number($('zoom').value)})`;
+    $('file-info').textContent = file.name;
+    $('file-size').textContent = `${(file.size / 1024).toFixed(1)} KiB`;
+    $('file-type').textContent = `${type.replace('image/', '').toUpperCase()} · browser preview`;
+    $('stage-label').textContent = file.name.toUpperCase();
+    $('dimensions').textContent = `${width} × ${height}`;
+    drawGrid();
     $('source-note').textContent = demo
       ? 'Synthetic demo: generated texture with a smoother rectangular region. This illustrates the tools; it is not a validation benchmark.'
       : 'Browser-decoded RGB, with transparency composited onto white. No resizing is applied. The source file is unchanged.';
@@ -185,6 +237,13 @@ $('tools-form').addEventListener('submit', async (event) => {
   if (!image || busy || loading) return;
   const selected = [...document.querySelectorAll('input[name="tool"]:checked:not(:disabled)')].map((e) => e.value);
   if (!selected.length) { status('Select at least one tool.', true); return; }
+  runCount++;
+  $('run-count').textContent = `${runCount} RUN${runCount === 1 ? '' : 'S'}`;
+  if (runCount === 1) $('journal').replaceChildren();
+  const journalEntry = document.createElement('p');
+  journalEntry.className = 'public-run-entry';
+  journalEntry.textContent = `Run ${runCount} · ${selected.map(kind => names[kind]).join(', ')} · browser views`;
+  $('journal').prepend(journalEntry);
   cancel();
   const token = generation;
   const source = image;
@@ -248,7 +307,14 @@ $('file').addEventListener('change', (event) => {
   event.target.value = '';
   loadFile(file);
 });
+$('choose').addEventListener('click', () => $('file').click());
+$('choose-empty').addEventListener('click', () => $('file').click());
+$('grid').addEventListener('change', drawGrid);
+$('zoom').addEventListener('change', () => {
+  imageWrap.style.transform = `scale(${$('zoom').value === 'fit' ? 1 : Number($('zoom').value)})`;
+});
 $('clear').addEventListener('click', () => { cancel(); resetSource(); controls(); status('Load an image to begin.'); });
+document.addEventListener('publicphasechange', controls);
 const drop = $('drop-zone');
 for (const type of ['dragenter', 'dragover']) drop.addEventListener(type, (event) => { event.preventDefault(); drop.classList.add('dragover'); });
 for (const type of ['dragleave', 'drop']) drop.addEventListener(type, (event) => { event.preventDefault(); drop.classList.remove('dragover'); });

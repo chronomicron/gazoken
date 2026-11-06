@@ -27,6 +27,7 @@ Image Forensics Workbench, under グルー研究室 · Grou-lab.
 | [Research workflow](research/README.md) | Experiments, reproducibility, and publication preparation. |
 | [Tool brief template](research/tool-template.md) | Scope and validation plan for an individual method. |
 | [Publishing plan](publishing.md) | Website address and proposed deployment route. |
+| [Browser tool inputs and modules](browser-tools.md) | Static workbench source context, encoded/pixel representations, and per-step JavaScript modules. |
 | [Initial handoff](archive/initial-handoff.md) | Original context, preserved unchanged. |
 
 ## Maintaining the record
