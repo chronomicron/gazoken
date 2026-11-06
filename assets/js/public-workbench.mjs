@@ -104,7 +104,6 @@ document.querySelectorAll('button[data-public-phase]').forEach(button => button.
   $('phase-description').textContent = description;
   $('browser-tools-panel').hidden = phase !== 2;
   $('inspector-promo').hidden = phase !== 1;
-  document.querySelector('.python-panel').scrollIntoView({block:'nearest',behavior:'smooth'});
   document.dispatchEvent(new CustomEvent('publicphasechange'));
 }));
 
