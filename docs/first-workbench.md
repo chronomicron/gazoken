@@ -26,6 +26,9 @@ measurement, and interpretation limits. Changing settings clears earlier results
 so they cannot be mistaken for outputs from the new configuration. Clearing or
 replacing the source cancels pending work.
 
+The **Clear reports** control empties the current report area without clearing the
+loaded source or run journal.
+
 The initial tool selection is an architect implementation choice within the user's
 request for a small, versatile workbench. No detection rates, published results,
 or forensic validity have been established. These filters do not determine whether

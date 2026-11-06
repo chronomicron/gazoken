@@ -486,6 +486,7 @@ function appendStepReport(card) {
   const prior = $('results').querySelector(`[data-step-result="${card.dataset.stepResult}"]`);
   prior?.remove();
   $('results').append(card);
+  $('clear-reports').disabled = false;
   const reportCount = $('results').querySelectorAll('[data-step-result]').length;
   $('result-count').textContent = `${reportCount} step report${reportCount === 1 ? '' : 's'}`;
 }

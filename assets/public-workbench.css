@@ -17,6 +17,9 @@
 .observation-panel,.step-reports{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:20px;margin-top:15px}
 .evidence-description{font-size:12px;line-height:1.7;color:var(--muted);margin:12px 0}
 .results-grid{display:grid;gap:14px;margin-top:14px}
+.report-actions{display:flex;align-items:center;gap:10px}
+.report-clear{border:0;background:transparent;color:var(--teal);font-size:10px;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.report-clear:disabled{color:var(--muted);opacity:.55;cursor:default}
 .results-empty,.muted{color:var(--muted);font-size:12px;line-height:1.7}
 .result{background:#fff;border:1px solid var(--line);border-radius:6px;overflow:hidden}
 .result-top{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #edf0eb}

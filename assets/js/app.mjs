@@ -30,9 +30,10 @@ function emptyResults() {
   $('results').replaceChildren();
   const empty = document.createElement('p');
   empty.className = 'results-empty';
-  empty.textContent = 'Your selected analyses will appear here, each with its own settings and interpretation.';
+  empty.textContent = 'Run a supported step or browser view to add a report here.';
   $('results').append(empty);
   $('result-count').textContent = 'No analyses yet';
+  $('clear-reports').disabled = true;
 }
 function controls() {
   const browserPhase = document.body.dataset.publicPhase === '2';
@@ -231,6 +232,7 @@ function addResult(kind, options, result, error = null) {
   }
   card.append(body);
   $('results').append(card);
+  $('clear-reports').disabled = false;
 }
 $('tools-form').addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -256,6 +258,7 @@ $('tools-form').addEventListener('submit', async (event) => {
   busy = true;
   controls();
   $('results').replaceChildren();
+  $('clear-reports').disabled = true;
   let completed = 0;
   let failures = 0;
   try {
@@ -314,6 +317,7 @@ $('zoom').addEventListener('change', () => {
   imageWrap.style.transform = `scale(${$('zoom').value === 'fit' ? 1 : Number($('zoom').value)})`;
 });
 $('clear').addEventListener('click', () => { cancel(); resetSource(); controls(); status('Load an image to begin.'); });
+$('clear-reports').addEventListener('click', emptyResults);
 document.addEventListener('publicphasechange', controls);
 const drop = $('drop-zone');
 for (const type of ['dragenter', 'dragover']) drop.addEventListener(type, (event) => { event.preventDefault(); drop.classList.add('dragover'); });
